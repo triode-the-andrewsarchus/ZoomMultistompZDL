@@ -2,7 +2,7 @@
   "name": "ZDL Howl",
   "filename": "XXZHOWL",
   "id": "07001150",
-  "version": "0.10",
+  "version": "0.11",
   "display": "ZDL HOWL",
   "badge": "ZD",
   "description": "Experimental port of Howl. Never save an experimental patch.",
@@ -17,13 +17,13 @@
     {
       "name": "Tune",
       "max": 100,
-      "default": 35,
+      "default": 17,
       "explanation": "Tune control."
     },
     {
       "name": "Annihil",
       "max": 100,
-      "default": 50,
+      "default": 34,
       "explanation": "Annihil control."
     },
     {

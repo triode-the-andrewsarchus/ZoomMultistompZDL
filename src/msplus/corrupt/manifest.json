@@ -2,7 +2,7 @@
   "name": "ZDLCorrupt",
   "filename": "XXZCRRPT",
   "id": "07001140",
-  "version": "0.10",
+  "version": "0.11",
   "display": "ZDL CORRUPT",
   "badge": "ZD",
   "description": "Experimental port of Corrupt. Never save an experimental patch.",
@@ -37,6 +37,12 @@
       "max": 100,
       "default": 50,
       "explanation": "Mix control."
+    },
+    {
+      "name": "Gate",
+      "max": 100,
+      "default": 100,
+      "explanation": "Pitch-tracking threshold. Lower detects quieter inputs; 100 matches the original."
     }
   ]
 }

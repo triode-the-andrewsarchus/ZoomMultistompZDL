@@ -1,0 +1,9 @@
+{
+  "name": "ZDL Cal", "filename": "XXZCAL", "id": "07001170",
+  "version": "0.10", "display": "CALIBRATE", "badge": "ZD",
+  "description": "Quiet diagnostic only: 997/1499 Hz triangles, peak <=0.001 on the DSP bus. Remove after calibration. Never save.",
+  "dspload": 8, "kernel": "calibrate.c", "state_bytes": 8,
+  "scaffold": "cleanroom",
+  "params": [{"name": "Level", "max": 100, "default": 50,
+              "explanation": "Peak DSP amplitude = Level * 0.00001. Diagnostic only."}]
+}

@@ -16,6 +16,7 @@ import upstream  # noqa: F401
 import mido
 import zoomzt2
 from audio import AudioRig, run_capture, temporary_quantum
+from upstream import ROOT
 from backup import CheckedInput, stock_patch
 from pedal_diy import check_envelope, check_zic
 from decode_preset import ZPTC
@@ -25,11 +26,13 @@ from pedal_common import assert_autosave_off, editor_off
 
 # Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
 CASES = {
+    'XXZCAL': [('peak50', [(2, 50)], 'silence'), ('peak10', [(2, 10)], 'silence'),
+               ('volume10', [(2, 50), (0, 10, 0x64)], 'silence')],
     'XXZGAIN': [(name, [(2, level), (0, enabled)], 'sweep')
                 for name, level, enabled in [('unity', 100, 1), ('half', 50, 1),
                                             ('quarter', 25, 1), ('zero', 0, 1), ('bypass', 50, 0)]]
                + [('tone', [(0, 1), (2, 100)], 'tone')],
-    'XXZFLWR': [(name, [(3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+    'XXZFLWR': [(name, [(2, 30), (3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                + [('extreme', [(2, 100)], 'sweep')],
     'XXZKLNG': [(name, [(2, 20), (3, 0), (4, mix)], 'tone')
                 for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
@@ -37,10 +40,10 @@ CASES = {
     'XXZSCRCH': [(name, [(3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                 + [('tone', [(2, 100)], 'tone')],
     'XXZCRRPT': [(name, [(5, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
-                + [('tone', [(2, 100), (3, 100), (4, 100)], 'tone')],
+                + [('tone', [(2, 100), (3, 100), (4, 100), (6, 10)], 'tone')],
     'XXZDUST': [('distortion', [(2, 0)], 'sweep'), ('octave', [(2, 100)], 'tone'),
                 ('motor', [(2, 0), (3, 100)], 'tone'), ('zero', [(5, 0)], 'sweep')],
-    'XXZHOWL': [(name, [(4, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+    'XXZHOWL': [(name, [(2, 35), (3, 50), (4, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                + [('extreme', [(2, 100), (3, 100)], 'sweep')],
 }
 
@@ -84,20 +87,22 @@ class TempPatch:
         transport = MidoTransport(self.pedal.inport, self.pedal.outport)
         transport.send([0x7e, 0x7f, 0x06, 0x01])
         identity = transport.recv(3)
-        if identity is None or identity[:9] != bytes.fromhex('7e000602526e002600'):
-            raise RuntimeError('Expected the verified MS-70CDR+ identity')
+        if identity is None or identity[:9] != bytes.fromhex('7e000602526e002600') or identity[9:] != b'1.10':
+            raise RuntimeError('Expected the verified MS-70CDR+ firmware 1.10 identity')
         self.log.write('IDENTITY ' + identity.hex() + '\n')
         assert_autosave_off(self.pedal)
         self.original = self.current()
         stock_patch(self.original)
         if ZPTC.parse(self.original).fx_count != 1:
             raise ValueError('Audition requires a one-slot scratch patch; no automatic patch clearing')
+        self.restore_parameter_count = self.original_parameter_count()
 
     def transmit_sysex(self, data):
         if not (data == [0x52, 0, 0x6e, 0x64, 0x13]
-                or (len(data) == 13 and data[:7] == [0x52, 0, 0x6e, 0x64, 0x20, 0, 0]
-                    and 0 <= data[7] <= 11)):
-            raise ValueError('Only current-patch reads and slot-zero parameter edits are allowed')
+                or (len(data) == 13 and data[:6] == [0x52, 0, 0x6e, 0x64, 0x20, 0]
+                    and ((data[6] == 0 and 0 <= data[7] <= 11)
+                         or (data[6:8] == [0x64, 0] and data[8] <= 100 and data[9:] == [0, 0, 0, 0])))):
+            raise ValueError('Only current-patch reads, slot-zero edits and bounded patch volume are allowed')
         self.log.write('TX ' + bytes(data).hex() + '\n')
         self.log.flush()
         self.pedal.outport.send(mido.Message('sysex', data=data))
@@ -132,34 +137,32 @@ class TempPatch:
                 raise RuntimeError(f'Unexpected reply: {data.hex()}')
         raise RuntimeError('No current-patch reply')
 
-    def edit(self, parameter, value):
+    def edit(self, parameter, value, slot=0):
         # Fixed slot zero. Only effect ID, on/off and ten documented knobs.
-        if not (0 <= parameter <= 11 and 0 <= value < (1 << 29)):
+        if not ((slot == 0 and 0 <= parameter <= 11 and 0 <= value < (1 << 29))
+                or (slot == 0x64 and parameter == 0 and 0 <= value <= 100)):
             raise ValueError('Invalid temporary parameter edit')
         self.modified = True
         try:
-            self._edit_checked(parameter, value)
+            self._edit_checked(parameter, value, slot)
         except BaseException:
             self.protocol_ok = False
             raise
 
-    def _edit_checked(self, parameter, value):
-        self.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x20, 0, 0, parameter]
+    def _edit_checked(self, parameter, value, slot):
+        self.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x20, 0, slot, parameter]
                   + [(value >> shift) & 127 for shift in range(0, 35, 7)])
         time.sleep(0.12)
         patch = ZPTC.parse(self.current())
         effect = patch.EDTB.effects[0].reversed.bitwise
-        actual = (int(effect.enabled) if parameter == 0 else
+        actual = (patch.PPRM.reversed.bitwise.patchVolume if slot == 0x64 else
+                  int(effect.enabled) if parameter == 0 else
                   effect.id if parameter == 1 else effect[f'param{parameter - 1}'])
         if actual != value or (parameter == 1 and patch.ids[0] != value):
             raise RuntimeError(f'Temp edit readback mismatch: parameter {parameter}, wanted {value}, got {actual}')
 
-    def restore(self):
-        original = stock_patch(self.original)
-        effect = original.EDTB.effects[0].reversed.bitwise
-        self.edit(1, effect.id)
-        # Only restore parameters actually declared by the stock effect. Setting
-        # undeclared knobs is outside the known-safe command vocabulary.
+    def original_parameter_count(self):
+        effect = stock_patch(self.original).EDTB.effects[0].reversed.bitwise
         matching = [p for p in (self.backup / 'files').glob('*.ZD2')
                     if int.from_bytes(p.read_bytes()[96:100], 'little') == effect.id]
         if len(matching) != 1:
@@ -168,11 +171,19 @@ class TempPatch:
         parameters = json.loads(config['PRME']['xml'])['Parameters']
         if not 1 <= len(parameters) <= 10:
             raise RuntimeError('Unexpected original stock parameter count')
-        for index in range(len(parameters)):
+        return len(parameters)
+
+    def restore(self):
+        original = stock_patch(self.original)
+        effect = original.EDTB.effects[0].reversed.bitwise
+        self.edit(1, effect.id)
+        for index in range(self.restore_parameter_count):
             self.edit(index + 2, effect[f'param{index + 1}'])
         self.edit(0, int(effect.enabled))
+        if ZPTC.parse(self.current()).PPRM.reversed.bitwise.patchVolume != original.PPRM.reversed.bitwise.patchVolume:
+            self.edit(0, original.PPRM.reversed.bitwise.patchVolume, slot=0x64)
         final = stock_patch(self.current())
-        if final.ids != original.ids or final.EDTB != original.EDTB:
+        if final.ids != original.ids or final.EDTB != original.EDTB or final.PPRM != original.PPRM:
             raise RuntimeError('Restored patch differs from original effect settings')
         editor_off(self.pedal)
 
@@ -206,7 +217,7 @@ class TempPatch:
 
 
 
-def record(directory, kind, level, rig):
+def capture_trial(directory, kind, level, rig):
     sends = [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)]
     returns = [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]
     return run_capture(directory, sends, returns, kind, level, rig=rig)
@@ -229,25 +240,32 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         session = TempPatch(log, args.backup)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
+        sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'), ROOT / 'src/msplus/common/compat.h']
+        original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')
+        if original_source.exists():
+            sources.append(original_source)
+        (args.output / 'SOURCES.json').write_text(json.dumps({str(p.resolve().relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}, indent=2) + '\n')
         try:
             session.verify_saved()
             artifact = args.effect / 'build' / (manifest['filename'] + '.ZD2')
             (args.output / 'BUILT.ZD2').write_bytes(artifact.read_bytes())
             session.verify_installed(artifact)
             session.edit(0, 0)
-            reports = {'baseline': record(args.output / 'baseline', 'sweep', -30, rig),
-                       'baseline-tone': record(args.output / 'baseline-tone', 'tone', -30, rig)}
+            reports = {'baseline': capture_trial(args.output / 'baseline', 'sweep', -30, rig),
+                       'baseline-tone': capture_trial(args.output / 'baseline-tone', 'tone', -30, rig)}
             session.edit(1, int(manifest['id'], 16))
             session.edit(0, 1)
             for label, edits, kind in CASES[manifest['filename']]:
-                for parameter, value in edits:
-                    session.edit(parameter, value)
+                for edit in edits:
+                    session.edit(*edit)
                 time.sleep(0.15)
-                level = -60 if manifest['filename'] == 'XXZSCRCH' and label == 'tone' else -30
-                reports[label] = record(args.output / label, kind, level, rig)
+                level = -30
+                if manifest['filename'] == 'XXZCRRPT' and label == 'tone':
+                    level = -20
+                reports[label] = capture_trial(args.output / label, kind, level, rig)
                 print(label, {k: reports[label][k] for k in ('silent', 'clipped', 'xruns')}, flush=True)
             session.edit(0, 1)
-            reports['silence'] = record(args.output / 'silence', 'silence', -30, rig)
+            reports['silence'] = capture_trial(args.output / 'silence', 'silence', -30, rig)
             (args.output / 'captures.json').write_text(json.dumps(reports, indent=2) + '\n')
         finally:
             if not session.protocol_ok:

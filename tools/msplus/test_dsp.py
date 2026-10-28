@@ -1,51 +1,16 @@
 """Compile the real Plus kernels natively; exercise state/coeff/bus safety."""
-import ctypes
-import json
 import re
-import subprocess
 import unittest
-from pathlib import Path
 
 import numpy as np
 from scipy import signal
 
-ROOT = Path(__file__).resolve().parents[2]
-
-
-class Kernel:
-    def __init__(self, name):
-        folder = ROOT / 'src/msplus' / name
-        self.manifest = json.loads((folder / 'manifest.json').read_text())
-        header = (folder / 'build/sh_params.h').read_text()
-        symbol = re.search(r'#define SH_AUDIO_FN (\w+)', header)[1]
-        so = ROOT / 'build/msplus' / f'{name}-host.so'
-        subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
-                        '-I' + str(folder / 'build'), str(folder / self.manifest['kernel']),
-                        '-o', str(so)], check=True)
-        self.lib = ctypes.CDLL(str(so))
-        self.fn = getattr(self.lib, symbol)
-        self.fn.argtypes = [ctypes.POINTER(ctypes.c_void_p)] * 2
-        self.coeff = np.zeros(16, np.float32)
-        self.coeff[0] = 1
-        for index, param in enumerate(self.manifest['params'], 5):
-            self.coeff[index] = param['default'] / param['max']
-        self.state = np.zeros(48, np.uint32)
-        self.guard_word = int(re.search(r'#define SH_STATE_GUARD_WORD\s+(\d+)', header)[1])
-        self.guard = int(re.search(r'#define SH_STATE_GUARD\s+(0x[0-9A-Fa-f]+)', header)[1], 16)
-        self.state[self.guard_word] = self.guard
-        self.bus = np.zeros(32, np.float32)
-        self.instance = (ctypes.c_void_p * 3)(None, self.coeff.ctypes.data, self.state.ctypes.data)
-        self.ctx = (ctypes.c_void_p * 2)(None, self.bus.ctypes.data)
-
-    def block(self, samples):
-        self.bus[:] = np.asarray(samples).T.reshape(32)
-        self.fn(self.instance, self.ctx)
-        return self.bus.reshape(2, 16).T.copy()
+from native import Kernel, ROOT
 
 
 class DSPTests(unittest.TestCase):
     def test_faults_fail_closed_and_stay_in_bounds(self):
-        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox']:
+        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate']:
             k = Kernel(name)
             canary = k.state[k.guard_word:].copy()
             k.state[k.guard_word] = 0
@@ -171,6 +136,13 @@ class DSPTests(unittest.TestCase):
             v = np.clip(y * 2.4, -1, 1)
             expected = (1.5 * v - 0.5 * v ** 3) * 0.42
             self.assertLess(np.sqrt(np.mean((output[:, ch] - expected) ** 2)), 0.00003)
+
+    def test_calibration_probe_cannot_exceed_quiet_ceiling(self):
+        k = Kernel('calibrate')
+        k.coeff[5] = 1
+        audio = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(1000)])
+        self.assertLessEqual(np.max(abs(audio)), 0.001001)
+        np.testing.assert_allclose(np.sqrt(np.mean(audio ** 2, axis=0)), 0.001 / np.sqrt(3), rtol=0.01)
 
 
 if __name__ == '__main__':

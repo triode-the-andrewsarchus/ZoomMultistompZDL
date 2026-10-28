@@ -97,22 +97,50 @@ def validate_gain(directory, reference, results):
     return errors
 
 
+def tone_peaks(audio, rate, channel, centers):
+    start = int((0.8 + channel * 2.5) * rate)
+    segment = audio[start:start + int(0.8 * rate), channel]
+    freq, power = signal.periodogram(segment, fs=rate, window='hann',
+                                     nfft=2 ** 20, scaling='spectrum')
+    rows = []
+    for expected in centers:
+        band = np.abs(freq - expected) < 20
+        index = int(np.argmax(power[band]))
+        rows.append(dict(channel=channel, expected_hz=expected,
+                         measured_hz=float(freq[band][index]),
+                         power_dbfs=float(10 * np.log10(max(power[band][index], 1e-30)))))
+    return rows
+
+
 def validate_ring(directory):
     audio, rate = sf.read(directory / 'wet/return.wav', always_2d=True)
     rows, errors = [], []
-    # Hardware validation established B->input 3 and A->input 4 on this rig.
     for ch, carrier in enumerate([400.4 * 1.006, 400.4]):
-        segment = audio[int((0.8 + ch * 2.5) * rate):int((1.6 + ch * 2.5) * rate), ch]
-        nfft = 2 ** 20
-        freq = np.fft.rfftfreq(nfft, 1 / rate)
-        magnitude = abs(np.fft.rfft(segment * np.hanning(len(segment)), n=nfft))
-        for expected in [997 - carrier, 997 + carrier]:
-            band = np.abs(freq - expected) < 10
-            measured = float(freq[band][np.argmax(magnitude[band])])
-            rows.append(dict(channel=ch, expected_hz=expected, measured_hz=measured))
-            if abs(measured - expected) > 1:
-                errors.append(f'Klang channel {ch}: sideband {measured:.2f}, expected {expected:.2f}')
+        rows.extend(tone_peaks(audio, rate, ch, [997 - carrier, 997 + carrier]))
+    for row in rows:
+        if abs(row['measured_hz'] - row['expected_hz']) > 1:
+            errors.append(f'Klang sideband mismatch: {row}')
     return rows, errors
+
+
+def validate_tracking(directory):
+    audio, rate = sf.read(directory / 'tone/return.wav', always_2d=True)
+    rows, errors = [], []
+    for ch in range(2):
+        rows.extend(tone_peaks(audio, rate, ch, [498.5, 997, 1994]))
+    for row in rows:
+        if abs(row['measured_hz'] - row['expected_hz']) > 3 or row['power_dbfs'] < -75:
+            errors.append(f'Corrupt master/sub/harmony tracking mismatch: {row}')
+    return rows, errors
+
+
+def validate_dry(directory, reference, effect):
+    audio, rate = sf.read(directory / 'dry/return.wav', always_2d=True)
+    if effect == 'klang':
+        reference, _ = sf.read(directory / 'baseline-tone/return.wav', always_2d=True)
+    expected = -6.0206 if effect == 'scorch' else 0
+    return [f'{effect} dry gain mismatch: {row}' for row in compare(reference, audio, rate)
+            if abs(row['gain_db'] - expected) > 0.5]
 
 
 def check_silence(directory):
@@ -132,7 +160,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('directory', type=Path)
     ap.add_argument('--gain-check', action='store_true')
-    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl'])
+    ap.add_argument('--calibration', type=Path)
+    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox'])
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
     results = load_captures(args.directory, reference, rate)
@@ -141,6 +170,20 @@ def main():
     if args.gain_check or args.effect == 'gain':
         errors = validate_gain(args.directory, reference, results)
         checks.append('gain_curve')
+    if args.effect in ('flower', 'klang', 'scorch', 'corrupt', 'howl'):
+        errors.extend(validate_dry(args.directory, reference, args.effect))
+        checks.append('dry_path_gain')
+    if args.effect == 'scorch' and args.calibration:
+        from reference import compare_scorch
+        rows, problems = compare_scorch(args.directory, args.calibration)
+        results['software_reference'] = rows
+        errors.extend(problems)
+        checks.append('native_DSP_harmonics')
+    if args.effect == 'corrupt':
+        rows, problems = validate_tracking(args.directory)
+        results['tracking'] = rows
+        errors.extend(problems)
+        checks.append('master_sub_harmony_frequencies')
     if args.effect == 'klang':
         rows, problems = validate_ring(args.directory)
         results['sidebands'] = rows

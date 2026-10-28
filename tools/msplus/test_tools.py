@@ -1,5 +1,7 @@
 """Offline fault tests: never opens MIDI/audio ports."""
 import unittest
+import tempfile
+from pathlib import Path
 from unittest.mock import Mock
 
 import mido
@@ -81,6 +83,28 @@ class AuditionSafetyTests(unittest.TestCase):
         session.pedal.inport.poll.side_effect = [mido.Message('sysex', data=[0x52, 0, 0x6e, 0, 1])]
         with self.assertRaises(RuntimeError):
             session.drain()
+
+
+class CampaignSafetyTests(unittest.TestCase):
+    def test_uncertain_install_stops_without_followup(self):
+        from unittest.mock import patch
+        from run import upstream_operation
+        with tempfile.TemporaryDirectory() as tmp, patch('run.fcntl.flock'), patch('run.subprocess.run', return_value=Mock(returncode=4)) as execute:
+            with self.assertRaises(RuntimeError):
+                upstream_operation(Path(tmp), 'install', Path('XXTEST.ZD2'))
+            self.assertEqual(execute.call_count, 1)
+            self.assertIn('install', execute.call_args.args[0])
+
+    def test_temp_volume_is_bounded_and_other_system_edits_refused(self):
+        import io
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.log = io.StringIO()
+        session.pedal = Mock()
+        session.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x20, 0, 0x64, 0, 10, 0, 0, 0, 0])
+        for param in [0x0f, 0x08, 0x09]:
+            with self.assertRaises(ValueError):
+                session.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x20, 0, 0x64, param, 1, 0, 0, 0, 0])
 
 
 if __name__ == '__main__':

@@ -29,10 +29,12 @@
 #include "../../msplus/common/compat.h"
 #define CORRUPT_AUDIO_FUNC SH_AUDIO_FN
 #define CORRUPT_FRAMES SH_FRAMES
+#define CR_TRACK_GATE trackingGate
 #define CORRUPT_INPUT(sample) mp_input(sample)
 #define CORRUPT_OUTPUT(dry, wet) mp_output(dry, wet, fade)
 #else
 #define CORRUPT_FRAMES 8
+#define CR_TRACK_GATE CR_GATE
 #define CORRUPT_INPUT(sample) (sample)
 #define CORRUPT_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
@@ -102,11 +104,13 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
     const float *coef = (const float *)instance[1];
     float *fxBuf = (float *)ctx[1];
     float fade = coef[SH_COEFF_BYPASS];
+    float gate = coef[SH_PARAM_GATE];
+    float trackingGate = gate * 0.01f;
     float subLvl = coef[SH_PARAM_SUB];
     float tone = coef[SH_PARAM_TONE];
     float waveLvl = coef[SH_PARAM_WAVE];
     float mix = coef[SH_PARAM_MIX];
-    if (!mp_ready(instance, fade) || !mp_normalized(subLvl) || !mp_normalized(tone) || !mp_normalized(waveLvl) || !mp_normalized(mix)) {
+    if (!mp_ready(instance, fade) || !mp_normalized(gate) || !mp_normalized(subLvl) || !mp_normalized(tone) || !mp_normalized(waveLvl) || !mp_normalized(mix)) {
         mp_silence(fxBuf);
         return;
     }
@@ -177,7 +181,7 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
 #else
         sinceCross++;
 #endif
-        if (prevLp < 0.0f && lpIn >= 0.0f && env > CR_GATE) {
+        if (prevLp < 0.0f && lpIn >= 0.0f && env > CR_TRACK_GATE) {
             float p = (float)sinceCross;
             if (p >= CR_MIN_P && p <= CR_MAX_P) {
                 period += CR_P_SMOOTH * (p - period);

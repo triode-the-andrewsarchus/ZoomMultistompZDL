@@ -1,11 +1,27 @@
 {
-  "name": "ZDL Flower", "filename": "XXZFLWR", "id": "07001110",
-  "version": "0.10", "display": "ZDL FLOWER", "badge": "ZD",
+  "name": "ZDL Flower",
+  "filename": "XXZFLWR",
+  "id": "07001110",
+  "version": "0.11",
+  "display": "ZDL FLOWER",
+  "badge": "ZD",
   "description": "Experimental port of Flower: independent stereo random resonant step filters. Never save an experimental patch.",
-  "dspload": 30, "kernel": "flower.c", "state_bytes": 64,
+  "dspload": 30,
+  "kernel": "flower.c",
+  "state_bytes": 64,
   "scaffold": "cleanroom",
   "params": [
-    {"name": "Rate", "max": 100, "default": 30, "explanation": "Step rate, 0.5 to 14 Hz."},
-    {"name": "Mix", "max": 100, "default": 50, "explanation": "Dry/wet mix."}
+    {
+      "name": "Rate",
+      "max": 100,
+      "default": 45,
+      "explanation": "Step rate, 0.5 to 14 Hz."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Dry/wet mix."
+    }
   ]
 }

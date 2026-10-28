@@ -2,10 +2,10 @@
   "name": "ZDLDustbox",
   "filename": "XXZDUST",
   "id": "07001160",
-  "version": "0.10",
+  "version": "0.11",
   "display": "ZDL DUSTBOX",
   "badge": "ZD",
-  "description": "Experimental Dustbox port. Development Power default 25 reduces return level. Never save an experimental patch.",
+  "description": "Experimental Dustbox port. Original Power default 50. Never save an experimental patch.",
   "dspload": 40,
   "kernel": "dustbox.c",
   "state_bytes": 84,
@@ -35,7 +35,7 @@
     {
       "name": "Power",
       "max": 100,
-      "default": 25,
+      "default": 50,
       "explanation": "Power control."
     }
   ]
