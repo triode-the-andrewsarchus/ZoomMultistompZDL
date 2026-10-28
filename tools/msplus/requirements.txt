@@ -1,0 +1,5 @@
+-r ../../build/msplus/stomphacks/requirements.txt
+numpy
+scipy
+soundfile
+jack-client
