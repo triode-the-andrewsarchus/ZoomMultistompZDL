@@ -1,0 +1,404 @@
+{
+  "date": "2026-10-28",
+  "pedal": "MS-70CDR+",
+  "firmware": "1.10",
+  "compiler": "TI C6000 8.3.15",
+  "scope": "Standalone ports only; configured checks do not establish complete DSP equivalence or chain capacity. Scorch fails the optional calibrated reference comparison.",
+  "interface": "AudioFuse 16Rig, return gains 0 dB",
+  "host_rate": 48000,
+  "dsp_rate": 44100,
+  "private_recordings": "build/msplus/campaign-0db-01",
+  "ports": {
+    "gain": {
+      "checks": [
+        "capture_integrity",
+        "gain_curve",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "102d3d33783b0c920eaedc6181723f4acc16851d0786ec5d13180f78a83cd2ce",
+      "sources": {
+        "src/msplus/gain/manifest.json": "914b09577fd31ecd4da47fe5064c88b252922ae894a0386c09ab1069a4595c9c",
+        "src/msplus/gain/gain.c": "74f81a98625db1c1e7a547f441d6a663465f3be714d251de486e43082682d22a",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210"
+      },
+      "capture_count": 9,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "silence_stability": {
+        "peak": [
+          7.521314546465874e-05,
+          8.276477456092834e-05
+        ],
+        "growth_db": [
+          0.5251743658882893,
+          0.45101945246132014
+        ]
+      },
+      "relative_gain_db": {
+        "unity": [
+          -0.002691297425379155,
+          -0.0024084949629174395
+        ],
+        "half": [
+          -6.024573345318864,
+          -6.021967433668973
+        ],
+        "quarter": [
+          -12.044309064725127,
+          -12.042647022281974
+        ],
+        "bypass": [
+          -0.002387262523827455,
+          -0.0015669722186534003
+        ]
+      }
+    },
+    "flower": {
+      "checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
+      "sources": {
+        "src/msplus/flower/manifest.json": "92cdfcd5c5773540dd4138832eedc8be7047db05895e9b22365c8ff892be2657",
+        "src/msplus/flower/flower.c": "b0d89fecfed01dc3f41d327acb2c5287708d170c5b53a895f061e4f6654726ae",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/flower/flower.c": "509f252da9d9c175582a9a05645f8e261638c066910207bea7b82cb14b2e57d6"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "silence_stability": {
+        "peak": [
+          8.360156789422035e-05,
+          8.069351315498352e-05
+        ],
+        "growth_db": [
+          0.26622429349568455,
+          0.33451869036880655
+        ]
+      }
+    },
+    "klang": {
+      "checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "ring_sideband_frequencies",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
+      "sources": {
+        "src/msplus/klang/manifest.json": "f4eb057625aeaa7782af6345bd725b8ea4b4424a14ad613e012745d8e5ef9691",
+        "src/msplus/klang/klang.c": "deb16cdc42199ddd49ab6e2a91c097fd98b837c7a9e9a9128268263a59837ee9",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/klang/klang.c": "a9fee170b31849addd07656c2e386bb95ed1a26865184214e9c5d3d375232206"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "sidebands": [
+        {
+          "channel": 0,
+          "expected_hz": 594.1976,
+          "measured_hz": 594.17724609375,
+          "power_dbfs": -64.78046883076514
+        },
+        {
+          "channel": 0,
+          "expected_hz": 1399.8024,
+          "measured_hz": 1399.7955322265625,
+          "power_dbfs": -64.71872487248602
+        },
+        {
+          "channel": 1,
+          "expected_hz": 596.6,
+          "measured_hz": 596.6033935546875,
+          "power_dbfs": -64.75736939475011
+        },
+        {
+          "channel": 1,
+          "expected_hz": 1397.4,
+          "measured_hz": 1397.4151611328125,
+          "power_dbfs": -64.6609849557462
+        }
+      ],
+      "silence_stability": {
+        "peak": [
+          7.344875484704971e-05,
+          7.981760427355766e-05
+        ],
+        "growth_db": [
+          3.061585395238981,
+          3.0246169995275136
+        ]
+      }
+    },
+    "scorch": {
+      "checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "native_DSP_harmonics",
+        "zero_input_stability"
+      ],
+      "passed": false,
+      "errors": [
+        "Scorch reference mismatch: {'channel': 0, 'harmonic': 1, 'predicted_rms': 0.3922723714420716, 'measured_rms': 0.3301272004910077, 'error_db': -1.4981282378538985}",
+        "Scorch reference mismatch: {'channel': 0, 'harmonic': 4, 'predicted_rms': 0.00039425827009799923, 'measured_rms': 0.00018904576191733997, 'error_db': -6.384277326795208}",
+        "Scorch reference mismatch: {'channel': 1, 'harmonic': 1, 'predicted_rms': 0.39468083005353993, 'measured_rms': 0.3335884810876492, 'error_db': -1.4606997398610435}",
+        "Scorch reference mismatch: {'channel': 1, 'harmonic': 4, 'predicted_rms': 0.000402134269634711, 'measured_rms': 0.00019152065372438998, 'error_db': -6.443109390604443}"
+      ],
+      "built_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+      "sources": {
+        "src/msplus/scorch/manifest.json": "ece65afd972027784fe5c7ac84bc80fe5a969ee0184c535f33308d78ebbdde7e",
+        "src/msplus/scorch/scorch.c": "01916f2591326810547ce7f78b3e401c55f0fa4021b344b5904d2eaf82266f53",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "software_reference": [
+        {
+          "channel": 0,
+          "harmonic": 1,
+          "predicted_rms": 0.3922723714420716,
+          "measured_rms": 0.3301272004910077,
+          "error_db": -1.4981282378538985
+        },
+        {
+          "channel": 0,
+          "harmonic": 2,
+          "predicted_rms": 0.0006414286928191818,
+          "measured_rms": 0.0007382475620209027,
+          "error_db": 1.221072765032085
+        },
+        {
+          "channel": 0,
+          "harmonic": 3,
+          "predicted_rms": 0.1595075860488622,
+          "measured_rms": 0.11647438591356253,
+          "error_db": -2.7310182633951294
+        },
+        {
+          "channel": 0,
+          "harmonic": 4,
+          "predicted_rms": 0.00039425827009799923,
+          "measured_rms": 0.00018904576191733997,
+          "error_db": -6.384277326795208
+        },
+        {
+          "channel": 0,
+          "harmonic": 5,
+          "predicted_rms": 0.017073044228301262,
+          "measured_rms": 0.014180885068105005,
+          "error_db": -1.6121525635205425
+        },
+        {
+          "channel": 1,
+          "harmonic": 1,
+          "predicted_rms": 0.39468083005353993,
+          "measured_rms": 0.3335884810876492,
+          "error_db": -1.4606997398610435
+        },
+        {
+          "channel": 1,
+          "harmonic": 2,
+          "predicted_rms": 0.0006441086483427405,
+          "measured_rms": 0.0007593706638403255,
+          "error_db": 1.429893699589935
+        },
+        {
+          "channel": 1,
+          "harmonic": 3,
+          "predicted_rms": 0.16006541720162595,
+          "measured_rms": 0.11843953762951714,
+          "error_db": -2.6160161525616377
+        },
+        {
+          "channel": 1,
+          "harmonic": 4,
+          "predicted_rms": 0.000402134269634711,
+          "measured_rms": 0.00019152065372438998,
+          "error_db": -6.443109390604443
+        },
+        {
+          "channel": 1,
+          "harmonic": 5,
+          "predicted_rms": 0.016988963209332172,
+          "measured_rms": 0.014547214327880868,
+          "error_db": -1.3477407679933542
+        }
+      ],
+      "silence_stability": {
+        "peak": [
+          0.01501256413757801,
+          0.015317711047828197
+        ],
+        "growth_db": [
+          0.02323595517800186,
+          0.02340782907914437
+        ]
+      }
+    },
+    "corrupt": {
+      "checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "master_sub_harmony_frequencies",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
+      "sources": {
+        "src/msplus/corrupt/manifest.json": "cb7ab2845b50886162bb1d5fa220774894c7b4c600e836771394de58ac0ef930",
+        "src/msplus/corrupt/corrupt.c": "d4c4e832d0bbecbc4dd7b5c96a2bfd9a9ed646061b725312e54fdce8b8ac61c9",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/corrupt/corrupt.c": "7e5782e55dd7e60191e26184aec640faf5022107239fc8cc06d2e60fbe65d3da"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "tracking": [
+        {
+          "channel": 0,
+          "expected_hz": 498.5,
+          "measured_hz": 498.504638671875,
+          "power_dbfs": -48.888464561227025
+        },
+        {
+          "channel": 0,
+          "expected_hz": 997,
+          "measured_hz": 997.00927734375,
+          "power_dbfs": -48.9079772310383
+        },
+        {
+          "channel": 0,
+          "expected_hz": 1994,
+          "measured_hz": 1994.0185546875,
+          "power_dbfs": -49.06768656081105
+        },
+        {
+          "channel": 1,
+          "expected_hz": 498.5,
+          "measured_hz": 498.504638671875,
+          "power_dbfs": -48.871481643622126
+        },
+        {
+          "channel": 1,
+          "expected_hz": 997,
+          "measured_hz": 997.00927734375,
+          "power_dbfs": -48.877357319629425
+        },
+        {
+          "channel": 1,
+          "expected_hz": 1994,
+          "measured_hz": 1994.0643310546875,
+          "power_dbfs": -48.9775321766697
+        }
+      ],
+      "silence_stability": {
+        "peak": [
+          0.00017046835273504257,
+          0.0001735086552798748
+        ],
+        "growth_db": [
+          -0.9426640109547897,
+          -0.9551352011814496
+        ]
+      }
+    },
+    "howl": {
+      "checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
+      "sources": {
+        "src/msplus/howl/manifest.json": "a755d99ba39a3133385f01442614f0ed7e958da249991149a6a5fc4e6f7aad64",
+        "src/msplus/howl/howl.c": "1e92ff368f24582ecaf6bfdda1197fe2c836dc1d6fc49b2b276aa40ffb624c7c",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/howl/howl.c": "ce118f36d911c6b5b4e2d9c01e2e1a7daeea4fc0f6bcddb97d4e5b551fe94b68"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "silence_stability": {
+        "peak": [
+          0.0033886381424963474,
+          0.041284263134002686
+        ],
+        "growth_db": [
+          -4.780534234552067,
+          -31.62922214193964
+        ]
+      }
+    },
+    "dustbox": {
+      "checks": [
+        "capture_integrity",
+        "zero_input_stability"
+      ],
+      "passed": true,
+      "errors": [],
+      "built_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+      "sources": {
+        "src/msplus/dustbox/manifest.json": "0b4915c18b1853a4ea8670f3346e5e8916d40a261471b479678f2ddd0ce24188",
+        "src/msplus/dustbox/dustbox.c": "f1655219ce6d0644622c3e5a5752a4742858e01dd02228a9f2ba4755262f71ac",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/dustbox/dustbox.c": "9842544e2152699725ded1bc2fe4cac0328f1ea8e0247559ec5129d295914a29"
+      },
+      "capture_count": 7,
+      "all_finite_unclipped_xrun_free": true,
+      "stock_restored": true,
+      "silence_stability": {
+        "peak": [
+          5.1437877118587494e-05,
+          5.160970613360405e-05
+        ],
+        "growth_db": [
+          1.7098938303109366,
+          1.7173144379704866
+        ]
+      }
+    }
+  },
+  "final_audit": {
+    "autosave_off_confirmed": true,
+    "stock_only_temp_patch": true,
+    "saved_patch_count": 100,
+    "saved_patch_defined_bytes_unchanged": true,
+    "effect_list_byte_identical": true,
+    "flst_sha256": "be914082f8d79cf489b6f3103ead12c5c8a3469d4ae6251c4c12ef376096a608",
+    "absent_custom_files": [
+      "XXZCAL.ZD2",
+      "XXZCAL.ZIC",
+      "XXZCRRPT.ZD2",
+      "XXZCRRPT.ZIC",
+      "XXZDUST.ZD2",
+      "XXZDUST.ZIC",
+      "XXZFLWR.ZD2",
+      "XXZFLWR.ZIC",
+      "XXZGAIN.ZD2",
+      "XXZGAIN.ZIC",
+      "XXZHOWL.ZD2",
+      "XXZHOWL.ZIC",
+      "XXZKLNG.ZD2",
+      "XXZKLNG.ZIC",
+      "XXZSCRCH.ZD2",
+      "XXZSCRCH.ZIC"
+    ],
+    "maximum_bytes": 6204530,
+    "available_bytes": 1210640
+  }
+}

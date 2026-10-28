@@ -1,5 +1,7 @@
 # Pedal research: which other Zoom pedals could run this project?
 
+> 2026-10-28 update: experimental MS-70CDR+ source ports now run on firmware 1.10. See the [current implementation, hardware results and remaining blockers](../MSPLUS-DEVELOPMENT.md); historical research below predates those tests.
+
 Started 2026-10-12, after the intro video brought in questions about other
 Zoom pedals. This folder collects what is known per pedal family, where it came
 from, and the next safe experiment. Facts marked *unverified* come from a single

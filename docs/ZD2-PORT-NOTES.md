@@ -1,5 +1,7 @@
 # ZD2 port research — September 14, 2026
 
+> 2026-10-28 update: experimental MS-70CDR+ source ports now run on firmware 1.10. See the [current implementation, hardware results and remaining blockers](MSPLUS-DEVELOPMENT.md); historical research below predates those tests.
+
 Status: notes only. No ZD2 build, effect port, dependency installation, or pedal
 write was performed for this investigation. Our released pack remains ZDL-only;
 PE has not gained Plus-series patch support.

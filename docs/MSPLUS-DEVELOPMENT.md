@@ -1,193 +1,216 @@
 # MS-70CDR+ development
 
-Work in progress on branch `feat/ms70cdr-plus`. Released `dist/*.ZDL` files
-remain for the original generation. No Plus binaries belong in `dist/`.
+Experimental source ports on branch `feat/ms70cdr-plus`, tested on an actual
+MS-70CDR+ firmware **1.10**. Six of the 22 release effects now build and run,
+plus a gain proof of concept. Scorch still fails a detailed reference comparison.
+Released `dist/*.ZDL` files and the browser editor target the original generation;
+no Plus release binaries have been published.
 
-## Upstream tooling
+## Port status
 
-Use [Stomphacks](https://github.com/thammer/stomphacks) for compilation,
-cleanroom scaffolding, ZD2/ZIC packaging, validation and guarded installation.
-Read its [SAFETY.md](https://github.com/thammer/stomphacks/blob/main/SAFETY.md)
-before opening a session. `tools/msplus/upstream.lock.json` pins dependencies,
-including zoom-zt2's directory-enumeration fix (PR 112). Setup never opens MIDI:
+| Port | Mutable state | Hardware validation on 2026-10-28 |
+|---|---:|---|
+| Gain proof of concept | 4 bytes | Unity, half, quarter, zero and firmware bypass; stereo isolation |
+| Flower | 64 bytes | Dry/half/wet and extreme-rate sweeps; independent native reference |
+| Klang | 32 bytes | Dry/half/wet; predicted ring sidebands within 1 Hz; extreme settings |
+| Scorch | 64 bytes | Mono dry path, wet distortion and silence run; calibrated harmonics **fail**, unresolved |
+| Corrupt | 48 bytes | Dry/half/wet; sub/master/harmony at 498.5/997/1994 Hz; adjustable tracking gate |
+| Howl | 56 bytes | Dry/half/wet and extreme settings; independent native two-pole reference |
+| Dustbox | 84 bytes | Distortion, octave, motor and Power=0 captures; native state/guard checks |
+
+Every listed capture at the final 0 dB interface setting is finite, unclipped,
+and free of xruns. This is standalone validation at selected settings, not
+complete audio equivalence, all knob transitions, long-duration endurance, or
+aggregate DSP capacity. See [numeric results](MSPLUS-HIL-20261028.json).
+Native reference tests do not replace hardware comparison.
+
+The other 16 release effects are TapeEcho4, ToTape9, Galactic, Shatter,
+Arrakis, Microloom, GenLoss, Taffy, Dissolve, Mangle, Rooms, Hydra, Rewire,
+Stasis, Spiral and Gyre. Their delay/history buffers exceed Stomphacks' verified
+small-state allocation (188 user bytes plus guard). The Plus large-memory
+ownership, allocation size and lifetime contract is not established. No
+speculative writes to `instance[3]`, legacy arenas or unverified context slots
+were attempted. Establish that contract upstream before porting these effects.
+
+## Build with upstream tooling
+
+[Stomphacks](https://github.com/thammer/stomphacks) supplies the compiler driver,
+cleanroom scaffold, ZD2/ZIC packaging, validation and guarded installer. Read its
+[SAFETY.md](https://github.com/thammer/stomphacks/blob/main/SAFETY.md),
+[DSP ABI](https://github.com/thammer/stomphacks/blob/main/docs/zd2-abi.md) and
+installation instructions before hardware work. `tools/msplus/upstream.lock.json`
+pins Stomphacks and zoom-zt2, including its directory-enumeration fix (PR 112).
+Setup never opens MIDI and refuses to overwrite an existing dependency tree.
 
 ```sh
 tools/msplus/setup.sh
-export ZOOM_TI_CGT=/path/to/ti-cgt-c6000
+# Install TI C6000 tools separately; do not commit proprietary tools.
+export ZOOM_TI_CGT=/path/to/ti-cgt-c6000_8.3.15
 PY=build/msplus/venv/bin/python
 SH=build/msplus/stomphacks
-$PY "$SH/tools/zd2_make_effect.py" "$SH/effects/gain/manifest.json"
+$PY tools/msplus/build.py
+# Or select ports: $PY tools/msplus/build.py gain flower klang
 $PY "$SH/tools-pedal/install_selftest.py"
+$PY tools/msplus/test_dsp.py
+$PY -c "import sys; sys.path.insert(0,'tools/msplus'); import upstream; import unittest; unittest.main(module='test_tools')"
 ```
 
-TI's Linux 8.3.15 compiler builds the upstream gain with every REPORT check
-passing. Stomphacks documents 8.5.0; this compiler difference must remain in
-validation records. Obtain TI tools from [TI](https://www.ti.com/tool/C6000-CGT);
-do not commit proprietary tools or pedal backups.
+The default compiler location is `build/msplus/ti/ti-cgt-c6000_8.3.15`.
+TI 8.3.15 passes every upstream build REPORT check. Upstream documents 8.5.0
+and tests firmware 1.20; these differences are recorded, not assumed equivalent.
+Our audition tool deliberately accepts only the verified firmware 1.10 identity.
 
-## Session and backup
+## Reusing original C
 
-Only one process may use MIDI. Never save an experimental patch. Never modify
-factory files, flash firmware, or issue unknown SysEx. Keep autosave off and
-require the pedal's ACK before every audition or installation. A transfer
-failure requires clean session closure and verification; keep the pedal powered
-if safety cannot be verified. Recovery from storage corruption is not proven.
+The original ABI uses 8-frame channel blocks, one context, a magic shuttle and
+an arena descriptor. Plus uses 16 frames/channel, separate instance/context,
+in-place audio at `ctx[1]`, normalized coefficients at `instance[1]`, and small
+zeroed state at `instance[2]`. Thin source adapters include the original C with
+`ZOOM_MSPLUS`; sample math is shared. Do not copy old proprietary handler blobs.
+
+`src/msplus/common/compat.h` checks initialization and normalized parameter
+snapshots, sanitizes inputs, implements firmware bypass mixing and rejects
+non-finite/out-of-bounds outputs. No dynamic allocation or unknown memory is
+used. All six modified legacy kernels retain byte-identical legacy `.audio`
+sections when built with the same TI compiler.
+
+Gain drops the old 8x compensation for an uninitialized legacy handler.
+Howl/Dustbox skip their legacy parameter-latch workaround. Corrupt's Plus
+crossing counter saturates after one second to prevent signed overflow during
+long silence. Its additional Gate knob scales the original 0.01 tracking gate;
+default 100 preserves the original threshold. The weak interface loopback test
+uses Gate=10 to exercise tracking. Other musical defaults match the originals.
+
+Gain, Flower and the quiet calibration diagnostic use the strict no-stack
+`.audio` route. Larger ports use Stomphacks' documented `kernel_section: text`,
+`allow_stack: true`, `opt_for_space: null` mode. The verifier still prohibits
+calls and unresolved runtime helpers. No upstream safety checks were patched.
+Declared DSP loads are conservative placeholders; they are not timing profiles.
+
+## Backup and guarded hardware campaign
+
+Only one process may use MIDI. Autosave must be OFF with a pedal ACK. Never save
+an experimental effect in a patch, overwrite/delete factory effects, flash
+firmware, or issue unknown SysEx. Recovery from storage corruption is unproven.
+Use private playground IDs `07001100` through `07001170` and filenames `XXZ*`
+only after upstream collision checks; these are not public ID allocations.
 
 ```sh
 $PY "$SH/tools-pedal/safe_connect.py" build/msplus/session-YYYYMMDD
 $PY tools/msplus/backup.py build/msplus/backup-YYYYMMDD
+# Requires a one-slot, stock-only temporary scratch patch and discovered ports.
+pw-jack $PY tools/msplus/run.py \
+  --backup build/msplus/backup-YYYYMMDD --output build/msplus/campaign-01 \
+  gain flower klang corrupt howl dustbox
+# Scorch can run separately; calibration enables its stricter comparison below.
+$PY tools/msplus/verify.py build/msplus/backup-YYYYMMDD build/msplus/final-audit-01
 ```
 
-Our backup retains upstream's enumeration completeness gate and uses its
-timeout-bounded, CRC-checking `FileSession` downloader. Patch replies also have
-strict CRC and length checks. It requires a fresh destination, verifies every
-saved patch references only stock IDs, checks the effect list remains unchanged,
-and emits `VERIFIED.json` with SHA-256 hashes only on completion. A directory
-without that marker is incomplete. All files are private and git-ignored.
+Backup uses upstream's completeness-gated enumeration and timeout-bounded,
+CRC-checking FileSession downloads. It validates ZD2/ZIC envelopes, all 100
+saved patches and the stock-only scratch patch; `VERIFIED.json` contains hashes.
+A directory without that marker is incomplete. Files, patches, toolchains and
+recordings stay ignored under `build/msplus/`.
 
-## Audio discovery
+The runner performs upstream install dry run, guarded install, audition,
+verified stock restoration, uninstall dry run, guarded uninstall and analysis.
+Audition independently reads back the installed binary and every parameter
+edit. It checks saved patches before and after; ordinary audio failures still
+restore the stock scratch patch before removal. Uncertain transfers or missing
+restoration markers stop without follow-up commands. Keep the pedal powered
+and inspect logs if protocol safety is unverified. The tool never retries an
+uncertain write or blindly resets the pedal.
 
-Use PipeWire's JACK bridge, specifying exact physical ports. The capture
-records all AudioFuse inputs by default. The default send peak is -50 dBFS;
-there is no automatic connection to speakers or default audio devices.
+Patch dumps have 848-byte envelopes with variable padding beyond the PTCF's
+declared length. Compare all defined PTCF bytes; retain raw dumps and CRCs.
+Known unsolicited notifications are drained before fresh requests; unrelated
+or error replies stop further edits. The audition transmitter allowlist permits
+only reviewed temporary parameter/volume edits, never patch saves or file writes.
+
+## Audio routing and measurement
+
+The AudioFuse 16Rig presents 34 channels at 48 kHz. Physical discovery and
+low-level independent probes established this mapping:
+
+| Physical connection | JACK port |
+|---|---|
+| Output 7 to pedal input | `AF16Rig Audio Pro:playback_AUX6` |
+| Output 8 to pedal input | `AF16Rig Audio Pro:playback_AUX7` |
+| Pedal return to input 3 | `AF16Rig Audio Pro:capture_AUX2` |
+| Pedal return to input 4 | `AF16Rig Audio Pro:capture_AUX3` |
+
+Within the DSP, bus B reaches input 3 and bus A reaches input 4. Klang's
+independent detune and the diagnostic's distinct tones establish this reversal.
+The external paths remain output7→input3 and output8→input4.
 
 ```sh
 pw-jack $PY tools/msplus/audio.py build/msplus/probe-01 \
   --send 'AF16Rig Audio Pro:playback_AUX6' 'AF16Rig Audio Pro:playback_AUX7'
 ```
 
-Sends are sequential, independent deterministic noise probes. Inspect the
-correlation matrix before choosing return ports. `--kind tone` and `--kind
-sweep` generate further signals. Each capture saves send/return WAVs, exact
-port names, samplerate, xruns, latency/gain estimates and silence/clipping
-checks. Tone correlation alone cannot resolve latency because it is periodic;
-use broadband probes. An xrun invalidates a run. Gain/latency include the
-interface, pedal and host buffering until a bypass reference is subtracted.
+Default send peak is -50 dBFS; discover returns before raising it. The CLI
+captures all physical AudioFuse inputs unless specified. No default speaker
+connections are made. Deterministic broadband probes, logarithmic sweeps,
+997 Hz tones and silence produce FLOAT WAVs and reports containing exact ports,
+levels, block sizes, xruns, finite/clipping/silence checks, gain and latency.
+Analysis reports band response, harmonics 2–5 and selected effect properties.
+Pure tones cannot determine unambiguous latency; use broadband probes.
 
-Offline checks (no hardware access):
+Campaigns keep one JACK stream open, sending zeros between captures. They
+request PipeWire quantum 1024 temporarily, restore the previous forced quantum
+(128 here), and preserve an intervening user change. Any xrun during recording
+invalidates that capture. Measured loop latency around 71 ms includes host
+buffering, both interfaces and the pedal; it is not intrinsic pedal latency.
 
-```sh
-$PY -c "import sys; sys.path.insert(0,'tools/msplus'); import upstream; import unittest; unittest.main(module='test_tools')"
-```
+Final tests use return gains **0 dB**, sends -30 dBFS except Corrupt tracking
+at -20 dBFS. Earlier +12 dB return trials clipped on loud effects and were
+rejected. A quiet bounded triangle diagnostic measured the return change as
+-12.001/-12.001 dB. Do not change return gains mid-campaign.
 
-## Findings from 2026-10-28
+## Scorch reference limitation
 
-USB `1686:07a1`, MIDI device ID `6e`, firmware **1.10**. Stomphacks tested
-firmware **1.20**, so compatibility here requires independent validation; do
-not update firmware as part of this port. Autosave OFF acknowledged by pedal;
-current patch CRC verified. Current edit buffer parses through zoom-zt2's PTCF
-reader. AudioFuse reports 34 playback/capture channels at 48 kHz. Initial
-low-level probes from playback AUX6/AUX7 correlate with capture AUX2/AUX3,
-consistent with the user's physical output 7/8 and input 3/4 routing.
-
-The original kernels' ABI is incompatible: 8-frame channel blocks, one context,
-magic shuttle and arena descriptor. Plus uses 16-frame channel blocks, separate
-instance/context pointers, in-place `ctx[1]`, coefficients at `instance[1]`,
-and a small zeroed `instance[2]` state. Reuse sample math, not the old entry
-adapter or proprietary handler blobs. Large delays/loopers need a separately
-established memory contract; do not infer one from the old pedal's arena.
-
-## First hardware-validated ports
-
-`src/msplus/gain` (`07001100`, `XXZGAIN`) and `src/msplus/flower`
-(`07001110`, `XXZFLWR`) build through Stomphacks without stock templates.
-These are private playground identities, not release allocations.
-
-Gain passed on firmware 1.10: relative to stock bypass, stereo unity measured
--0.001/-0.002 dB, half -6.021/-6.021 dB, quarter -12.043/-12.043 dB,
-and bypass -0.003/-0.002 dB. Zero removed the correlated stimulus down to
-noise. Flower passed dry/half/wet sweeps: dry matches bypass; wet produces
-independent moving stereo resonances and the expected high-frequency rolloff.
-All captures were finite, unclipped and free of xruns. These tests establish
-standalone behavior, not multi-effect DSP capacity or every knob transition.
-
-Flower compiles its existing source under a small conditional ABI adapter;
-the legacy .audio machine code remains byte-identical (2432 bytes) to before
-the change when compiled with the same TI toolchain. Plus Flower's kernel is
-1184 bytes, leaf, with no stack or callee-saved register usage. Mutable state
-is 64 bytes plus the generated guard. The shared adapter snapshots parameters,
-requires initialized state, silences invalid coefficients, sanitizes inputs,
-implements firmware bypass mixing, and rejects non-finite/out-of-bounds output.
-Do not reuse the legacy context, magic shuttle or delay descriptor on Plus.
+The diagnostic emits known triangles (997/1499 Hz, DSP peak at most 0.001),
+using only verified small state. `reference.py` estimates DSP-bus-to-return
+scaling, then compares Scorch's hardware harmonics against the actual C kernel
+compiled natively. It uses the stock-bypass tone to infer input amplitude.
 
 ```sh
-$PY "$SH/tools/zd2_make_effect.py" src/msplus/gain/manifest.json
-$PY "$SH/tools/zd2_make_effect.py" src/msplus/flower/manifest.json
-$PY tools/msplus/test_dsp.py
-$PY "$SH/tools-pedal/pedal_diy.py" install src/msplus/gain/build/XXZGAIN.ZD2 --dry-run
-# Run upstream install as a separate, reviewed operation, then:
-pw-jack $PY tools/msplus/audition.py src/msplus/gain \
-  build/msplus/backup-YYYYMMDD build/msplus/gain-hil
-$PY tools/msplus/analyze.py build/msplus/gain-hil --gain-check
-# After RESTORED exists, run upstream uninstall as a separate operation.
+$PY tools/msplus/reference.py build/msplus/calibrate-hil-0db
+$PY tools/msplus/analyze.py build/msplus/campaign-0db-01/scorch/hil \
+  --effect scorch --calibration build/msplus/calibrate-hil-0db/calibration.json
+# The same --calibration option can be supplied to run.py.
 ```
 
-Audition requires an existing **one-slot stock scratch patch**; it will not
-clear or save a patch. It verifies backup hashes, all saved patches, autosave
-ACK and independent binary readback before selecting the experimental ID with
-the documented parameter-edit command. All edits are read back. It restores
-the original stock ID/knobs/on-off state and checks saved patches again. An
-unexpected MIDI reply stops further edits rather than blindly attempting
-cleanup; inspect the private wire log, keep the pedal powered, and diagnose.
-An ordinary audio failure restores the stock patch through the same checked
-path. Installation/removal always use upstream's guarded installer.
+The current comparison fails: fundamental output is about 1.5 dB below the
+model; fourth-harmonic error is about -6.4 dB. Both return channels show the
+same pattern. The exact installed binary/source hashes are preserved. Native
+Scorch agrees with an independent scipy filter model; hardware dry-path gain
+and capture integrity pass. A simple input/output scale fit did not explain
+all harmonics. Calibration/model assumptions, target floating-point behavior
+and firmware staging remain possible causes, not established diagnoses.
+No acceptance thresholds or effect math were changed to conceal this failure.
+Do not consider Scorch quantitatively qualified until this is resolved.
 
-The 848-byte patch dumps include padding beyond the PTCF's declared length.
-That padding can vary between reads without a patch write. Saved-patch checks
-therefore compare every defined PTCF byte, retaining the raw dumps and hashes
-in the backup. Unsolicited current-patch/parameter notifications are consumed
-before fresh requests; unrelated or error replies are rejected.
+## Storage, DSP and final pedal state
 
-## Expanded small-state ports and capture safeguards
+The pedal reports 6,204,530 total bytes and **1,210,640 free** with its factory
+library. Seven experimental effect/icon pairs occupy about 98 KB allocated;
+extrapolating similar sizes to 22 suggests roughly 309 KB. Storage therefore
+looks sufficient for all 22 ports, but actual larger builds remain unmeasured.
+The [Zoom manual](https://zoomcorp.com/manuals/ms-70cdrplus-en/) specifies
+at most six simultaneous effect slots, and DSP limits can reduce that further. Installing 22 does not imply running 22 together.
 
-The additional ports are Klang (32 bytes), Scorch (64), Corrupt (48), Howl
-(56), and Dustbox (84). They include their existing C sources, retaining the
-sample math while swapping the ABI entry, state access, frame geometry and
-bypass writes. All six changed legacy kernels compile to byte-identical legacy
-`.audio` sections. Plus skips the old Howl/Dustbox parameter-block latch: the
-new initialized coefficient contract supplies validated normalized values.
-Corrupt's Plus crossing counter saturates after one second to avoid signed
-integer overflow during long unattended silence. Dustbox's development Power
-default is 25 instead of 50 to leave capture headroom.
+The final audit confirms autosave OFF, a stock-only temporary patch, all 100
+saved patches unchanged, the original effect list byte-identical, and all eight
+experimental ZD2/ZIC pairs absent. Factory files were never overwritten or
+deleted. The verified backup is `build/msplus/backup-20261028`; final audit is
+`build/msplus/final-audit-0db`. The original backup validated 306 files, including
+300 factory effect/icon envelopes.
 
-Klang and the larger kernels use Stomphacks' documented `kernel_section: text`,
-`allow_stack: true`, `opt_for_space: null` route. This permits compiler-generated
-register save/restore, while its verifier still prohibits calls and unresolved
-runtime helpers. No verifier checks are disabled or patched. Leaf-only gain
-and Flower retain the strict no-stack route.
-
-Build all available ports without opening MIDI:
-
-```sh
-build/msplus/venv/bin/python tools/msplus/build.py
-# Or select names: ... tools/msplus/build.py gain flower klang
-```
-
-`ZOOM_TI_CGT` overrides the compiler root. The current local installation is
-`build/msplus/ti/ti-cgt-c6000_8.3.15`, excluded from git. The cleanroom builder
-and installer are still upstream tools, not local implementations.
-
-Auditions now keep one JACK stream open across every capture, sending zeros
-between probes. They temporarily request PipeWire quantum 1024 and restore
-the previous forced quantum on exit, preserving an intervening user change.
-The original forced quantum was 128. Earlier runs that reported xruns remain
-invalid records; graph/setup xruns before capture are distinguished from xruns
-during a recording. Every capture records its actual block size. Signal levels
-are -30 dBFS except Scorch's maximum-gain tone, which uses -60 dBFS after a
-higher-level trial clipped the interface return. Clipped trials triggered stock
-restoration and were not accepted as successful tests.
-
-Klang confirmed an important mapping: on this rig internal Plus bus B reaches
-capture AUX2 (physical input 3), bus A reaches AUX3 (input 4). End-to-end sends
-remain AUX6->AUX2 and AUX7->AUX3. Its predicted sidebands at 594.1976,
-1399.8024, 596.6 and 1397.4 Hz measured 594.1772, 1399.7955, 596.6034 and
-1397.4152 Hz. Scorch's dry path is intentionally mono (as in its original
-source), so a one-channel probe appears at half amplitude in both returns.
-
-`analyze.py --effect klang` checks sideband frequencies. All analyses name the
-checks performed; integrity-only success does not imply sample-for-sample DSP
-agreement. Silence recordings check for hot output and growth. Tone recordings
-report harmonics 2–5 relative to a 997 Hz fundamental; the result includes the
-analog path and its noise floor. Native tests independently compare Flower,
-Scorch and Howl with sample/filter references and exercise kernel guards,
-parameter faults, channel isolation, persistent state, bypass and long silence.
+Architecture comparison against `pre-msplus` reduced duplication from 12.24%
+to about 11.8%, with average complexity 4.66→4.67 and max unchanged. It flags increased C
+entry-point complexity from necessary coefficient guards and mutually exclusive
+ABI branches, plus existing legacy arena/magic-shuttle clones in touched files.
+Those checks were retained. Its name-based call graph can conflate unrelated
+`record` methods; the Python imports remain acyclic. New infrastructure reuses
+upstream packaging/transfers and the existing C rather than copying algorithms.

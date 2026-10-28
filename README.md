@@ -40,11 +40,13 @@ Zoom Effect Manager installs the effects. See the [installation guide](docs/INST
   Shatter, Galactic, Microloom and Spool running
   ([#4](https://github.com/themanro/ZoomMultistompZDL/issues/4)); NAM and CabIR
   are untested there.
-* **Not supported:** the **Plus models** (**MS-50G+, MS-60B+ and MS-70CDR+**)
-  and the **Four series** (**G1/G1X Four, B1/B1X Four, A1/A1X Four**). They use
-  Zoom's newer ZD2 effect format, so ZDL files don't load on them. See
-  [Compatibility](#compatibility) below and the
-  [pedal research notes](docs/pedal-research/README.md).
+* **Experimental MS-70CDR+ source ports:** six release effects and a gain
+  proof of concept now build as ZD2 through Stomphacks and run on firmware 1.10.
+  Scorch still has a quantitative reference mismatch; large-buffer ports remain
+  blocked on the Plus memory contract. See [development and hardware results](docs/MSPLUS-DEVELOPMENT.md).
+  Released ZDL files and the browser editor remain for the original generation.
+* **Untested/unsupported:** MS-50G+, MS-60B+ and the Four series. These require
+  ZD2; released ZDL files cannot be loaded on them.
 * **NAM on a Plus pedal:** use [nam2zoom](https://github.com/freelender/nam-to-zoom) by Aleksandar Vukasinovic instead
   (not this project). It packs 1-10 NAM captures into one MS Plus effect;
   tested on the MS-50G+ and MS-70CDR+, experimental on the MS-60B+.
@@ -424,7 +426,8 @@ More detailed install notes live in [docs/INSTALLING-ZDLS.md](docs/INSTALLING-ZD
 | Other ZDL-based Zoom pedals (MS-60B, G1on/G1Xon, B1on/B1Xon) | Compatible family, awaiting confirmation — hardware reports welcome. |
 | Zoom MS-100BT | Custom effects confirmed by a user, installed over Bluetooth with third-party tools ([#4](https://github.com/themanro/ZoomMultistompZDL/issues/4)). No USB MIDI, so no Effect Manager or Patch Editor. NAM/CabIR untested. |
 | Original G3/G3X, G5, B3 and A3 | Share the ZFX-IV DSP family, but this project's custom effects and Patch Editor are not currently supported or validated on them. |
-| Newer Zoom ZD2-based pedals (Plus models; G1/G1X, B1/B1X and A1/A1X Four; G3n, G5n, B3n, AC-2/AC-3) | Not supported by these ZDL builds. ZD2 and ZDL effects are not interchangeable ([Zoom Firmware Editor](https://github.com/Barsik-Barbosik/Zoom-Firmware-Editor) lists which pedal uses which; the A1 Four is assumed ZD2 like the rest of the Four series). |
+| Zoom MS-70CDR+ firmware 1.10 | Experimental source-only ZD2 ports through Stomphacks: Flower, Klang, Scorch, Corrupt, Howl, Dustbox and gain. Standalone hardware tests; Scorch reference mismatch unresolved. [Details and safeguards](docs/MSPLUS-DEVELOPMENT.md). Release ZDLs and browser editor do not apply. |
+| Other newer Zoom ZD2-based pedals (MS-50G+, MS-60B+; G1/G1X, B1/B1X and A1/A1X Four; G3n, G5n, B3n, AC-2/AC-3) | Not supported by these ZDL builds. ZD2 and ZDL effects are not interchangeable ([Zoom Firmware Editor](https://github.com/Barsik-Barbosik/Zoom-Firmware-Editor) lists which pedal uses which; the A1 Four is assumed ZD2 like the rest of the Four series). |
 
 **Does sharing the processor mean my pedal can run these effects?** It makes
 porting worth investigating, but does not establish compatibility. Zoom's

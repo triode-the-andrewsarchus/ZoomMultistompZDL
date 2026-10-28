@@ -1,5 +1,7 @@
 # Probing a Zoom pedal this project has never seen
 
+> 2026-10-28 update: experimental MS-70CDR+ source ports now run on firmware 1.10. See the [current implementation, hardware results and remaining blockers](MSPLUS-DEVELOPMENT.md); historical research below predates those tests.
+
 Everything in this repository was reverse-engineered against **one** pedal: an
 MS-70CDR on firmware 2.10, device id `0x61`. The `.ZDL` container, the 146-byte
 patch layout, every bit offset in the editor's tables — all of it is specific to
