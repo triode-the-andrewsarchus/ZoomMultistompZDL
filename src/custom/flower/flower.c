@@ -25,6 +25,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define FLOWER_AUDIO_FUNC SH_AUDIO_FN
+#define FLOWER_FRAMES SH_FRAMES
+#define FLOWER_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#define FLOWER_INPUT(sample) mp_input(sample)
+#else
+#define FLOWER_FRAMES 8
+#define FLOWER_OUTPUT(dry, wet) (wet)
+#define FLOWER_INPUT(sample) (sample)
 #include "../../airwindows/common/zoom_params.h"
 #include "flower_params.h"
 
@@ -37,6 +47,7 @@
 #define FLOWER_CODE_SECTION(f) FLOWER_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 FLOWER_CODE_SECTION(FLOWER_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -97,8 +108,24 @@ static inline void flower_reset(FlowerState *st)
     st->initialized = 1u;
 }
 
+#ifdef ZOOM_MSPLUS
+void FLOWER_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void FLOWER_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float rate = coef[SH_PARAM_RATE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(rate) || !mp_normalized(mix)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    FlowerState *st = (FlowerState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -119,13 +146,16 @@ void FLOWER_AUDIO_FUNC(unsigned int *ctx)
     if (end - base < (uintptr_t)sizeof(FlowerState)) return;
 
     FlowerState *st = (FlowerState *)base;
+#endif
     if (st->magic != FLOWER_MAGIC || st->version != FLOWER_VERSION || !st->initialized) {
         flower_reset(st);
     }
 
+#ifndef ZOOM_MSPLUS
     float rate = zoom_param_norm01(params[FLOWER_RATE_SLOT], FLOWER_RATE_DEFAULT_NORM);
     float mix  = zoom_param_norm01(params[FLOWER_MIX_SLOT],  FLOWER_MIX_DEFAULT_NORM);
 
+#endif
     float rateHz   = 0.5f + rate * 13.5f;        /* ~0.5..14 steps/sec */
     float phaseInc = rateHz * FLOWER_INV_SR;     /* no runtime divide */
     float wetMix   = mix;
@@ -136,7 +166,7 @@ void FLOWER_AUDIO_FUNC(unsigned int *ctx)
         float low = st->lowL, band = st->bandL, cut = st->cutL, tgt = st->tgtL, ph = st->phaseL;
         uint32_t rng = st->rngL;
         int i;
-        for (i = 0; i < 8; i++) {
+        for (i = 0; i < FLOWER_FRAMES; i++) {
             ph += phaseInc;
             if (ph >= 1.0f) {
                 ph -= 1.0f;
@@ -144,14 +174,14 @@ void FLOWER_AUDIO_FUNC(unsigned int *ctx)
             }
             cut += FLOWER_SLEW * (tgt - cut);
             float f1 = FLOWER_TWO_PI_SR * cut;
-            float in = fxBuf[i];
+            float in = FLOWER_INPUT(fxBuf[i]);
             low += f1 * band;
             float high = in - low - FLOWER_RESO_K * band;
             band += f1 * high;
             float wet = low + FLOWER_BP_MIX * band;
             if (wet > FLOWER_CLAMP) wet = FLOWER_CLAMP;
             else if (wet < -FLOWER_CLAMP) wet = -FLOWER_CLAMP;
-            fxBuf[i] = dryMix * in + wetMix * wet;
+            fxBuf[i] = FLOWER_OUTPUT(in, dryMix * in + wetMix * wet);
         }
         st->lowL = low; st->bandL = band; st->cutL = cut; st->tgtL = tgt; st->phaseL = ph; st->rngL = rng;
     }
@@ -161,7 +191,7 @@ void FLOWER_AUDIO_FUNC(unsigned int *ctx)
         float low = st->lowR, band = st->bandR, cut = st->cutR, tgt = st->tgtR, ph = st->phaseR;
         uint32_t rng = st->rngR;
         int i;
-        for (i = 8; i < 16; i++) {
+        for (i = FLOWER_FRAMES; i < 2 * FLOWER_FRAMES; i++) {
             ph += phaseInc;
             if (ph >= 1.0f) {
                 ph -= 1.0f;
@@ -169,14 +199,14 @@ void FLOWER_AUDIO_FUNC(unsigned int *ctx)
             }
             cut += FLOWER_SLEW * (tgt - cut);
             float f1 = FLOWER_TWO_PI_SR * cut;
-            float in = fxBuf[i];
+            float in = FLOWER_INPUT(fxBuf[i]);
             low += f1 * band;
             float high = in - low - FLOWER_RESO_K * band;
             band += f1 * high;
             float wet = low + FLOWER_BP_MIX * band;
             if (wet > FLOWER_CLAMP) wet = FLOWER_CLAMP;
             else if (wet < -FLOWER_CLAMP) wet = -FLOWER_CLAMP;
-            fxBuf[i] = dryMix * in + wetMix * wet;
+            fxBuf[i] = FLOWER_OUTPUT(in, dryMix * in + wetMix * wet);
         }
         st->lowR = low; st->bandR = band; st->cutR = cut; st->tgtR = tgt; st->phaseR = ph; st->rngR = rng;
     }

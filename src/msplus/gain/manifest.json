@@ -1,0 +1,9 @@
+{
+  "name": "ZDL Gain", "filename": "XXZGAIN", "id": "07001100",
+  "version": "0.10", "display": "ZDL GAIN", "badge": "ZD",
+  "description": "Experimental MS-70CDR+ level trim port. 100 is unity; 50 is half amplitude. Never save an experimental patch.",
+  "dspload": 8, "kernel": "gain.c", "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "params": [{"name": "Level", "max": 100, "default": 100,
+              "explanation": "Linear amplitude, 100 is unity."}]
+}

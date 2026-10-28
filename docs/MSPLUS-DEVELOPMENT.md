@@ -86,3 +86,54 @@ instance/context pointers, in-place `ctx[1]`, coefficients at `instance[1]`,
 and a small zeroed `instance[2]` state. Reuse sample math, not the old entry
 adapter or proprietary handler blobs. Large delays/loopers need a separately
 established memory contract; do not infer one from the old pedal's arena.
+
+## First hardware-validated ports
+
+`src/msplus/gain` (`07001100`, `XXZGAIN`) and `src/msplus/flower`
+(`07001110`, `XXZFLWR`) build through Stomphacks without stock templates.
+These are private playground identities, not release allocations.
+
+Gain passed on firmware 1.10: relative to stock bypass, stereo unity measured
+-0.001/-0.002 dB, half -6.021/-6.021 dB, quarter -12.043/-12.043 dB,
+and bypass -0.003/-0.002 dB. Zero removed the correlated stimulus down to
+noise. Flower passed dry/half/wet sweeps: dry matches bypass; wet produces
+independent moving stereo resonances and the expected high-frequency rolloff.
+All captures were finite, unclipped and free of xruns. These tests establish
+standalone behavior, not multi-effect DSP capacity or every knob transition.
+
+Flower compiles its existing source under a small conditional ABI adapter;
+the legacy .audio machine code remains byte-identical (2432 bytes) to before
+the change when compiled with the same TI toolchain. Plus Flower's kernel is
+1184 bytes, leaf, with no stack or callee-saved register usage. Mutable state
+is 64 bytes plus the generated guard. The shared adapter snapshots parameters,
+requires initialized state, silences invalid coefficients, sanitizes inputs,
+implements firmware bypass mixing, and rejects non-finite/out-of-bounds output.
+Do not reuse the legacy context, magic shuttle or delay descriptor on Plus.
+
+```sh
+$PY "$SH/tools/zd2_make_effect.py" src/msplus/gain/manifest.json
+$PY "$SH/tools/zd2_make_effect.py" src/msplus/flower/manifest.json
+$PY tools/msplus/test_dsp.py
+$PY "$SH/tools-pedal/pedal_diy.py" install src/msplus/gain/build/XXZGAIN.ZD2 --dry-run
+# Run upstream install as a separate, reviewed operation, then:
+pw-jack $PY tools/msplus/audition.py src/msplus/gain \
+  build/msplus/backup-YYYYMMDD build/msplus/gain-hil
+$PY tools/msplus/analyze.py build/msplus/gain-hil --gain-check
+# After RESTORED exists, run upstream uninstall as a separate operation.
+```
+
+Audition requires an existing **one-slot stock scratch patch**; it will not
+clear or save a patch. It verifies backup hashes, all saved patches, autosave
+ACK and independent binary readback before selecting the experimental ID with
+the documented parameter-edit command. All edits are read back. It restores
+the original stock ID/knobs/on-off state and checks saved patches again. An
+unexpected MIDI reply stops further edits rather than blindly attempting
+cleanup; inspect the private wire log, keep the pedal powered, and diagnose.
+An ordinary audio failure restores the stock patch through the same checked
+path. Installation/removal always use upstream's guarded installer.
+
+The 848-byte patch dumps include padding beyond the PTCF's declared length.
+That padding can vary between reads without a patch write. Saved-patch checks
+therefore compare every defined PTCF byte, retaining the raw dumps and hashes
+in the backup. Unsolicited current-patch/parameter notifications are consumed
+before fresh requests; unrelated or error replies are rejected.
