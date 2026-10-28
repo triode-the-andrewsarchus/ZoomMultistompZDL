@@ -137,3 +137,57 @@ That padding can vary between reads without a patch write. Saved-patch checks
 therefore compare every defined PTCF byte, retaining the raw dumps and hashes
 in the backup. Unsolicited current-patch/parameter notifications are consumed
 before fresh requests; unrelated or error replies are rejected.
+
+## Expanded small-state ports and capture safeguards
+
+The additional ports are Klang (32 bytes), Scorch (64), Corrupt (48), Howl
+(56), and Dustbox (84). They include their existing C sources, retaining the
+sample math while swapping the ABI entry, state access, frame geometry and
+bypass writes. All six changed legacy kernels compile to byte-identical legacy
+`.audio` sections. Plus skips the old Howl/Dustbox parameter-block latch: the
+new initialized coefficient contract supplies validated normalized values.
+Corrupt's Plus crossing counter saturates after one second to avoid signed
+integer overflow during long unattended silence. Dustbox's development Power
+default is 25 instead of 50 to leave capture headroom.
+
+Klang and the larger kernels use Stomphacks' documented `kernel_section: text`,
+`allow_stack: true`, `opt_for_space: null` route. This permits compiler-generated
+register save/restore, while its verifier still prohibits calls and unresolved
+runtime helpers. No verifier checks are disabled or patched. Leaf-only gain
+and Flower retain the strict no-stack route.
+
+Build all available ports without opening MIDI:
+
+```sh
+build/msplus/venv/bin/python tools/msplus/build.py
+# Or select names: ... tools/msplus/build.py gain flower klang
+```
+
+`ZOOM_TI_CGT` overrides the compiler root. The current local installation is
+`build/msplus/ti/ti-cgt-c6000_8.3.15`, excluded from git. The cleanroom builder
+and installer are still upstream tools, not local implementations.
+
+Auditions now keep one JACK stream open across every capture, sending zeros
+between probes. They temporarily request PipeWire quantum 1024 and restore
+the previous forced quantum on exit, preserving an intervening user change.
+The original forced quantum was 128. Earlier runs that reported xruns remain
+invalid records; graph/setup xruns before capture are distinguished from xruns
+during a recording. Every capture records its actual block size. Signal levels
+are -30 dBFS except Scorch's maximum-gain tone, which uses -60 dBFS after a
+higher-level trial clipped the interface return. Clipped trials triggered stock
+restoration and were not accepted as successful tests.
+
+Klang confirmed an important mapping: on this rig internal Plus bus B reaches
+capture AUX2 (physical input 3), bus A reaches AUX3 (input 4). End-to-end sends
+remain AUX6->AUX2 and AUX7->AUX3. Its predicted sidebands at 594.1976,
+1399.8024, 596.6 and 1397.4 Hz measured 594.1772, 1399.7955, 596.6034 and
+1397.4152 Hz. Scorch's dry path is intentionally mono (as in its original
+source), so a one-channel probe appears at half amplitude in both returns.
+
+`analyze.py --effect klang` checks sideband frequencies. All analyses name the
+checks performed; integrity-only success does not imply sample-for-sample DSP
+agreement. Silence recordings check for hot output and growth. Tone recordings
+report harmonics 2–5 relative to a 997 Hz fundamental; the result includes the
+analog path and its noise floor. Native tests independently compare Flower,
+Scorch and Howl with sample/filter references and exercise kernel guards,
+parameter faults, channel isolation, persistent state, bypass and long silence.

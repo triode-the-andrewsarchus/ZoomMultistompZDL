@@ -44,6 +44,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define DUSTBOX_AUDIO_FUNC SH_AUDIO_FN
+#define DB_FRAMES SH_FRAMES
+#define DB_INPUT(sample) mp_input(sample)
+#define DB_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define DB_FRAMES 8
+#define DB_INPUT(sample) (sample)
+#define DB_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "dustbox_params.h"
 
@@ -56,6 +66,7 @@
 #define DB_CODE_SECTION(f) DB_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 DB_CODE_SECTION(DUSTBOX_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -167,8 +178,27 @@ static inline float db_soft(float x)
     return 1.5f * x - 0.5f * x * x * x;
 }
 
+#ifdef ZOOM_MSPLUS
+void DUSTBOX_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float dust = coef[SH_PARAM_DUST];
+    float motor = coef[SH_PARAM_MOTOR];
+    float filter = coef[SH_PARAM_FILTER];
+    float power = coef[SH_PARAM_POWER];
+    if (!mp_ready(instance, fade) || !mp_normalized(dust) || !mp_normalized(motor)
+            || !mp_normalized(filter) || !mp_normalized(power)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    DustboxState *st = (DustboxState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -197,6 +227,7 @@ void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
     if (bytes < (uintptr_t)sizeof(DustboxState)) return;
 
     DustboxState *st = (DustboxState *)base;
+#endif
     if (st->magic != DB_MAGIC || st->version != DB_VERSION || !st->initialized) {
         st->magic = DB_MAGIC;
         st->version = DB_VERSION;
@@ -206,14 +237,17 @@ void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
         st->hiLP = 0.0f;
         st->sign = 0;
         st->ff1 = st->ff2 = 0;
+#ifndef ZOOM_MSPLUS
         st->accKnob[0] = zoom_param_norm01(params[DUSTBOX_DUST_SLOT], DUSTBOX_DUST_DEFAULT_NORM);
         st->accKnob[1] = zoom_param_norm01(params[DUSTBOX_MOTOR_SLOT], DUSTBOX_MOTOR_DEFAULT_NORM);
         st->accKnob[2] = zoom_param_norm01(params[DUSTBOX_FILTER_SLOT], DUSTBOX_FILTER_DEFAULT_NORM);
         st->accKnob[3] = zoom_param_norm01(params[DUSTBOX_POWER_SLOT], DUSTBOX_POWER_DEFAULT_NORM);
         st->prevRaw[0] = st->prevRaw[1] = st->prevRaw[2] = st->prevRaw[3] = -1.0f;
+#endif
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     /* See DustboxState.accKnob comment: only a lone single-slot change is
      * treated as a real knob turn (and a raw <= 0.0001 turn is accepted as
      * true zero); bulk param-block rewrites hold the last accepted values. */
@@ -241,6 +275,7 @@ void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
     float filter = st->accKnob[2];
     float power  = st->accKnob[3];
 
+#endif
     float drive     = DB_DRIVE_FIXED;                         /* U1A: fixed, no pot */
     float stage2    = DB_STAGE2_MIN + motor * DB_STAGE2_SPAN;  /* U1B/P3: the actual Motor pot */
     float shelf     = (filter - 0.5f) * 2.0f * DB_HIGH_SHELF_DEPTH;  /* -depth..+depth */
@@ -259,8 +294,10 @@ void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
     int sign = st->sign, ff1 = st->ff1, ff2 = st->ff2;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float in = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < DB_FRAMES; i++) {
+        float inL = DB_INPUT(fxBuf[i]);
+        float inR = DB_INPUT(fxBuf[i + DB_FRAMES]);
+        float in = 0.5f * (inL + inR);
 
         /* pre high-pass */
         hp += DB_HP_COEF * (in - hp);
@@ -319,8 +356,8 @@ void DUSTBOX_AUDIO_FUNC(unsigned int *ctx)
         if (y > 1.0f) y = 1.0f;
         else if (y < -1.0f) y = -1.0f;
 
-        fxBuf[i]     = y;
-        fxBuf[i + 8] = y;
+        fxBuf[i]     = DB_OUTPUT(inL, y);
+        fxBuf[i + DB_FRAMES] = DB_OUTPUT(inR, y);
     }
 
     st->hp = hp; st->ilp = ilp;

@@ -1,0 +1,42 @@
+{
+  "name": "ZDLDustbox",
+  "filename": "XXZDUST",
+  "id": "07001160",
+  "version": "0.10",
+  "display": "ZDL DUSTBOX",
+  "badge": "ZD",
+  "description": "Experimental Dustbox port. Development Power default 25 reduces return level. Never save an experimental patch.",
+  "dspload": 40,
+  "kernel": "dustbox.c",
+  "state_bytes": 84,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Dust",
+      "max": 100,
+      "default": 50,
+      "explanation": "Dust control."
+    },
+    {
+      "name": "Motor",
+      "max": 100,
+      "default": 60,
+      "explanation": "Motor control."
+    },
+    {
+      "name": "Filter",
+      "max": 100,
+      "default": 50,
+      "explanation": "Filter control."
+    },
+    {
+      "name": "Power",
+      "max": 100,
+      "default": 25,
+      "explanation": "Power control."
+    }
+  ]
+}

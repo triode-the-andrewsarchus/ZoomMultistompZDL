@@ -1,0 +1,36 @@
+{
+  "name": "ZDL Klang",
+  "filename": "XXZKLNG",
+  "id": "07001120",
+  "version": "0.10",
+  "display": "ZDL KLANG",
+  "badge": "ZD",
+  "description": "Experimental port of Klang: swept stereo ring modulation. Never save an experimental patch.",
+  "dspload": 30,
+  "kernel": "klang.c",
+  "state_bytes": 32,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "params": [
+    {
+      "name": "Freq",
+      "max": 100,
+      "default": 20,
+      "explanation": "Carrier center, 0.5 to 2000 Hz."
+    },
+    {
+      "name": "Sweep",
+      "max": 100,
+      "default": 0,
+      "explanation": "Carrier modulation rate and depth."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Dry/wet mix."
+    }
+  ],
+  "allow_stack": true,
+  "opt_for_space": null
+}

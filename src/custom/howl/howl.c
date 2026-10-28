@@ -22,6 +22,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define HOWL_AUDIO_FUNC SH_AUDIO_FN
+#define HOWL_FRAMES SH_FRAMES
+#define HOWL_INPUT(sample) mp_input(sample)
+#define HOWL_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define HOWL_FRAMES 8
+#define HOWL_INPUT(sample) (sample)
+#define HOWL_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "howl_params.h"
 
@@ -34,6 +44,7 @@
 #define HOWL_CODE_SECTION(f) HOWL_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 HOWL_CODE_SECTION(HOWL_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -91,8 +102,25 @@ static inline float howl_soft(float x)
     return 1.5f * x - 0.5f * x * x * x;
 }
 
+#ifdef ZOOM_MSPLUS
+void HOWL_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void HOWL_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float tune = coef[SH_PARAM_TUNE];
+    float annih = coef[SH_PARAM_ANNIHIL];
+    float level = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(tune) || !mp_normalized(annih) || !mp_normalized(level)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    HowlState *st = (HowlState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -111,17 +139,21 @@ void HOWL_AUDIO_FUNC(unsigned int *ctx)
     if (end - base < (uintptr_t)sizeof(HowlState)) return;
 
     HowlState *st = (HowlState *)base;
+#endif
     if (st->magic != HOWL_MAGIC || st->version != HOWL_VERSION || !st->initialized) {
         st->magic = HOWL_MAGIC;
         st->version = HOWL_VERSION;
         st->y1L = st->y2L = st->y1R = st->y2R = 0.0f;
+#ifndef ZOOM_MSPLUS
         st->accKnob[0] = zoom_param_norm01(params[HOWL_TUNE_SLOT], HOWL_TUNE_DEFAULT_NORM);
         st->accKnob[1] = zoom_param_norm01(params[HOWL_ANNIHIL_SLOT], HOWL_ANNIHIL_DEFAULT_NORM);
         st->accKnob[2] = zoom_param_norm01(params[HOWL_MIX_SLOT], HOWL_MIX_DEFAULT_NORM);
         st->prevRaw[0] = st->prevRaw[1] = st->prevRaw[2] = -1.0f;
+#endif
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     /* Edit-driven knob latch: accept only single-slot changes (knob turns);
      * bulk rewrites (load / chain refocus) are ignored and the last accepted
      * values keep sounding. A deliberate turn to zero IS accepted as zero. */
@@ -146,6 +178,7 @@ void HOWL_AUDIO_FUNC(unsigned int *ctx)
     float tune   = st->accKnob[0];
     float annih  = st->accKnob[1];
     float level  = st->accKnob[2];
+#endif
     /* True dry/wet crossfade. This was a wet SEND: dry sat at a fixed HOWL_DRY
      * and the knob only scaled the howl to a 0.45 ceiling, so the effect could
      * never reach full wet and its level never matched the rest of the pack. */
@@ -165,9 +198,9 @@ void HOWL_AUDIO_FUNC(unsigned int *ctx)
     float y1L = st->y1L, y2L = st->y2L, y1R = st->y1R, y2R = st->y2R;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float inL = fxBuf[i];
-        float inR = fxBuf[i + 8];
+    for (i = 0; i < HOWL_FRAMES; i++) {
+        float inL = HOWL_INPUT(fxBuf[i]);
+        float inR = HOWL_INPUT(fxBuf[i + HOWL_FRAMES]);
 
         float yL = inL * HOWL_GIN + a1L * y1L + a2 * y2L;
         y2L = y1L; y1L = yL;
@@ -177,8 +210,8 @@ void HOWL_AUDIO_FUNC(unsigned int *ctx)
         float wetL = howl_soft(yL * HOWL_DRIVE) * HOWL_WET_TRIM;
         float wetR = howl_soft(yR * HOWL_DRIVE) * HOWL_WET_TRIM;
 
-        fxBuf[i]     = dryLvl * inL + wetLvl * wetL;
-        fxBuf[i + 8] = dryLvl * inR + wetLvl * wetR;
+        fxBuf[i]     = HOWL_OUTPUT(inL, dryLvl * inL + wetLvl * wetL);
+        fxBuf[i + HOWL_FRAMES] = HOWL_OUTPUT(inR, dryLvl * inR + wetLvl * wetR);
     }
 
     st->y1L = y1L; st->y2L = y2L; st->y1R = y1R; st->y2R = y2R;

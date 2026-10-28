@@ -20,6 +20,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define SCORCH_AUDIO_FUNC SH_AUDIO_FN
+#define SCORCH_FRAMES SH_FRAMES
+#define SCORCH_INPUT(sample) mp_input(sample)
+#define SCORCH_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define SCORCH_FRAMES 8
+#define SCORCH_INPUT(sample) (sample)
+#define SCORCH_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "scorch_params.h"
 
@@ -32,6 +42,7 @@
 #define SCORCH_CODE_SECTION(f) SCORCH_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 SCORCH_CODE_SECTION(SCORCH_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -100,8 +111,24 @@ static inline float sc_bq(float x, float b0, float b1, float b2, float a1, float
     return y;
 }
 
+#ifdef ZOOM_MSPLUS
+void SCORCH_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void SCORCH_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float gain = coef[SH_PARAM_GAIN];
+    float level = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(gain) || !mp_normalized(level)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    ScorchState *st = (ScorchState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -120,6 +147,7 @@ void SCORCH_AUDIO_FUNC(unsigned int *ctx)
     if (end - base < (uintptr_t)sizeof(ScorchState)) return;
 
     ScorchState *st = (ScorchState *)base;
+#endif
     if (st->magic != SC_MAGIC || st->version != SC_VERSION || !st->initialized) {
         st->magic = SC_MAGIC;
         st->version = SC_VERSION;
@@ -129,9 +157,11 @@ void SCORCH_AUDIO_FUNC(unsigned int *ctx)
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     float gain  = zoom_param_norm01(params[SCORCH_GAIN_SLOT], SCORCH_GAIN_DEFAULT_NORM);
     float level = zoom_param_norm01(params[SCORCH_MIX_SLOT], SCORCH_MIX_DEFAULT_NORM);
 
+#endif
     float pre = 1.0f + gain * 45.0f;
     float g2  = 1.0f + gain * 6.0f;
     /* Mix is now a dry/wet crossfade, and the wet path runs at unity. The old
@@ -148,8 +178,10 @@ void SCORCH_AUDIO_FUNC(unsigned int *ctx)
     float s1e = st->s1e, s2e = st->s2e;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float in = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < SCORCH_FRAMES; i++) {
+        float inL = SCORCH_INPUT(fxBuf[i]);
+        float inR = SCORCH_INPUT(fxBuf[i + SCORCH_FRAMES]);
+        float in = 0.5f * (inL + inR);
 
         /* pre high-pass (tighten) */
         hp += SC_HP_COEF * (in - hp);
@@ -181,8 +213,8 @@ void SCORCH_AUDIO_FUNC(unsigned int *ctx)
         if (out > 1.0f) out = 1.0f;
         else if (out < -1.0f) out = -1.0f;
 
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = SCORCH_OUTPUT(inL, out);
+        fxBuf[i + SCORCH_FRAMES] = SCORCH_OUTPUT(inR, out);
     }
 
     st->hp = hp; st->lp = lp;

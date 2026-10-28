@@ -48,5 +48,40 @@ class AudioTests(unittest.TestCase):
         self.assertTrue(analyze(x, y, 48000)['clipped'])
 
 
+class AuditionSafetyTests(unittest.TestCase):
+    def test_forbidden_commands_cannot_reach_output(self):
+        import io
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.log = io.StringIO()
+        session.pedal = Mock()
+        for command in [[0x52, 0, 0x6e, 0x5b], [0x52, 0, 0x6e, 0x28],
+                        [0x52, 0, 0x6e, 0x01], [0x52, 0, 0x6e, 0x60, 0x24]]:
+            with self.assertRaises(ValueError):
+                session.transmit_sysex(command)
+        session.pedal.outport.send.assert_not_called()
+
+    def test_edit_failure_prevents_automatic_cleanup_edits(self):
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.protocol_ok = True
+        session._edit_checked = Mock(side_effect=RuntimeError('bad reply'))
+        with self.assertRaises(RuntimeError):
+            session.edit(2, 50)
+        self.assertFalse(session.protocol_ok)
+
+    def test_known_notifications_drain_but_errors_stop(self):
+        import io
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.log = io.StringIO()
+        session.pedal = Mock()
+        session.pedal.inport.poll.side_effect = [mido.Message('sysex', data=[0x52, 0, 0x6e, 0x64, 0x20, 1]), None]
+        session.drain()
+        session.pedal.inport.poll.side_effect = [mido.Message('sysex', data=[0x52, 0, 0x6e, 0, 1])]
+        with self.assertRaises(RuntimeError):
+            session.drain()
+
+
 if __name__ == '__main__':
     unittest.main()

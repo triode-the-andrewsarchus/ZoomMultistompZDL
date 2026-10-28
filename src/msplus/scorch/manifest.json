@@ -1,0 +1,30 @@
+{
+  "name": "ZDL Scorch",
+  "filename": "XXZSCRCH",
+  "id": "07001130",
+  "version": "0.10",
+  "display": "ZDL SCORCH",
+  "badge": "ZD",
+  "description": "Experimental port of Scorch. Never save an experimental patch.",
+  "dspload": 40,
+  "kernel": "scorch.c",
+  "state_bytes": 64,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Gain",
+      "max": 100,
+      "default": 22,
+      "explanation": "Gain control."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control."
+    }
+  ]
+}

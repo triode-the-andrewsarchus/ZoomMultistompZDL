@@ -1,0 +1,36 @@
+{
+  "name": "ZDL Howl",
+  "filename": "XXZHOWL",
+  "id": "07001150",
+  "version": "0.10",
+  "display": "ZDL HOWL",
+  "badge": "ZD",
+  "description": "Experimental port of Howl. Never save an experimental patch.",
+  "dspload": 40,
+  "kernel": "howl.c",
+  "state_bytes": 56,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Tune",
+      "max": 100,
+      "default": 35,
+      "explanation": "Tune control."
+    },
+    {
+      "name": "Annihil",
+      "max": 100,
+      "default": 50,
+      "explanation": "Annihil control."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control."
+    }
+  ]
+}

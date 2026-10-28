@@ -18,6 +18,7 @@ import zoomzt2
 from decode_preset import ZPTC
 from file_session import FileSession, MidoTransport, tail_to_int
 from stock_catalog import STOCK_IDS
+from pedal_diy import check_envelope, check_zic
 
 
 class CheckedInput:
@@ -61,6 +62,35 @@ def stock_patch(data):
     return patch
 
 
+def backup_files(pedal, sess, destination, files):
+    names = backup_pedal.enumerate_files(pedal, destination, files)
+    if len(names) != len(set(names)) or any(Path(n).name != n for n in names):
+        raise ValueError('Invalid or duplicate directory names')
+    for i, name in enumerate(names, 1):
+        data = sess.download(name)
+        sess.close()
+        if not data:
+            raise RuntimeError(f'Empty file: {name}')
+        checker = {'.ZD2': check_envelope, '.ZIC': check_zic}.get(Path(name).suffix.upper())
+        if checker and checker(data):
+            raise RuntimeError(f'Invalid backed-up container: {name}: {checker(data)}')
+        (files / name).write_bytes(data)
+        print(f'[{i}/{len(names)}] {name}: {len(data)} CRC-checked bytes', flush=True)
+    return names
+
+
+def backup_patches(pedal, destination):
+    count, size, bank = pedal.patch_check()
+    if not (1 <= count <= 200 and size > 0 and bank > 0):
+        raise ValueError('Unexpected patch inventory')
+    for loc in range(1, count + 1):
+        data = pedal.patch_download(loc)
+        stock_patch(data)
+        (destination / f'PATCH_{loc:03d}.ZPTC').write_bytes(data)
+        print(f'Patch {loc}/{count}: CRC checked, stock-only', flush=True)
+    return count
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('destination', type=Path)
@@ -78,24 +108,8 @@ def main():
         flst = sess.download('FLST_SEQ.ZT2')
         sess.close()
         (files / 'FLST_SEQ.ZT2').write_bytes(flst)
-        names = backup_pedal.enumerate_files(pedal, args.destination, files)
-        if len(names) != len(set(names)) or any(Path(n).name != n for n in names):
-            raise ValueError('Invalid or duplicate directory names')
-        for i, name in enumerate(names, 1):
-            data = sess.download(name)
-            sess.close()
-            if not data:
-                raise RuntimeError(f'Empty file: {name}')
-            (files / name).write_bytes(data)
-            print(f'[{i}/{len(names)}] {name}: {len(data)} CRC-checked bytes', flush=True)
-        count, size, bank = pedal.patch_check()
-        if not (1 <= count <= 200 and size > 0 and bank > 0):
-            raise ValueError('Unexpected patch inventory')
-        for loc in range(1, count + 1):
-            data = pedal.patch_download(loc)
-            stock_patch(data)
-            (args.destination / f'PATCH_{loc:03d}.ZPTC').write_bytes(data)
-            print(f'Patch {loc}/{count}: CRC checked, stock-only', flush=True)
+        names = backup_files(pedal, sess, args.destination, files)
+        count = backup_patches(pedal, args.destination)
         if sess.download('FLST_SEQ.ZT2') != flst:
             raise RuntimeError('Effect list changed during backup')
         sess.close()

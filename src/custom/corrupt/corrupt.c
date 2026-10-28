@@ -25,6 +25,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define CORRUPT_AUDIO_FUNC SH_AUDIO_FN
+#define CORRUPT_FRAMES SH_FRAMES
+#define CORRUPT_INPUT(sample) mp_input(sample)
+#define CORRUPT_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define CORRUPT_FRAMES 8
+#define CORRUPT_INPUT(sample) (sample)
+#define CORRUPT_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "corrupt_params.h"
 
@@ -37,6 +47,7 @@
 #define CORRUPT_CODE_SECTION(f) CORRUPT_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 CORRUPT_CODE_SECTION(CORRUPT_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -81,8 +92,26 @@ static inline float cr_recip(float x)
     return y.f;
 }
 
+#ifdef ZOOM_MSPLUS
+void CORRUPT_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float subLvl = coef[SH_PARAM_SUB];
+    float tone = coef[SH_PARAM_TONE];
+    float waveLvl = coef[SH_PARAM_WAVE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(subLvl) || !mp_normalized(tone) || !mp_normalized(waveLvl) || !mp_normalized(mix)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    CorruptState *st = (CorruptState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -101,6 +130,7 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
     if (end - base < (uintptr_t)sizeof(CorruptState)) return;
 
     CorruptState *st = (CorruptState *)base;
+#endif
     if (st->magic != CR_MAGIC || st->version != CR_VERSION || !st->initialized) {
         st->magic = CR_MAGIC;
         st->version = CR_VERSION;
@@ -116,10 +146,12 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     float subLvl  = zoom_param_norm01(params[CORRUPT_SUB_SLOT], CORRUPT_SUB_DEFAULT_NORM);
     float tone    = zoom_param_norm01(params[CORRUPT_TONE_SLOT], CORRUPT_TONE_DEFAULT_NORM);
     float waveLvl = zoom_param_norm01(params[CORRUPT_WAVE_SLOT], CORRUPT_WAVE_DEFAULT_NORM);
     float mix     = zoom_param_norm01(params[CORRUPT_MIX_SLOT], CORRUPT_MIX_DEFAULT_NORM);
+#endif
     float tcoef = 0.04f + tone * 0.6f;      /* output low-pass: dark .. raw */
     float wet = mix;
     float dry = 1.0f - mix;
@@ -130,9 +162,9 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
     int sinceCross = st->sinceCross;
 
     int f;
-    for (f = 0; f < 8; f++) {
-        float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+    for (f = 0; f < CORRUPT_FRAMES; f++) {
+        float inL = CORRUPT_INPUT(fxBuf[f]);
+        float inR = CORRUPT_INPUT(fxBuf[f + CORRUPT_FRAMES]);
         float in = 0.5f * (inL + inR);
 
         float a = in < 0.0f ? -in : in;
@@ -140,7 +172,11 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
         else env += CR_ENV_REL * (a - env);
 
         lpIn += CR_LP_COEF * (in - lpIn);
+#ifdef ZOOM_MSPLUS
+        if (sinceCross < 44100) sinceCross++;
+#else
         sinceCross++;
+#endif
         if (prevLp < 0.0f && lpIn >= 0.0f && env > CR_GATE) {
             float p = (float)sinceCross;
             if (p >= CR_MIN_P && p <= CR_MAX_P) {
@@ -170,8 +206,8 @@ void CORRUPT_AUDIO_FUNC(unsigned int *ctx)
         if (o > CR_CLAMP) o = CR_CLAMP;
         else if (o < -CR_CLAMP) o = -CR_CLAMP;
 
-        fxBuf[f]     = dry * inL + wet * o;
-        fxBuf[f + 8] = dry * inR + wet * o;
+        fxBuf[f]     = CORRUPT_OUTPUT(inL, dry * inL + wet * o);
+        fxBuf[f + CORRUPT_FRAMES] = CORRUPT_OUTPUT(inR, dry * inR + wet * o);
     }
 
     st->lpIn = lpIn;

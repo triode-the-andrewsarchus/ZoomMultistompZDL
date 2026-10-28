@@ -1,0 +1,42 @@
+{
+  "name": "ZDLCorrupt",
+  "filename": "XXZCRRPT",
+  "id": "07001140",
+  "version": "0.10",
+  "display": "ZDL CORRUPT",
+  "badge": "ZD",
+  "description": "Experimental port of Corrupt. Never save an experimental patch.",
+  "dspload": 40,
+  "kernel": "corrupt.c",
+  "state_bytes": 48,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Sub",
+      "max": 100,
+      "default": 82,
+      "explanation": "Sub control."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 45,
+      "explanation": "Tone control."
+    },
+    {
+      "name": "Wave",
+      "max": 100,
+      "default": 50,
+      "explanation": "Wave control."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control."
+    }
+  ]
+}

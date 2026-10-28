@@ -19,6 +19,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define KLANG_AUDIO_FUNC SH_AUDIO_FN
+#define KLANG_FRAMES SH_FRAMES
+#define KLANG_INPUT(sample) mp_input(sample)
+#define KLANG_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define KLANG_FRAMES 8
+#define KLANG_INPUT(sample) (sample)
+#define KLANG_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "klang_params.h"
 
@@ -31,6 +41,7 @@
 #define KLANG_CODE_SECTION(f) KLANG_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 KLANG_CODE_SECTION(KLANG_AUDIO_FUNC)
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -69,8 +80,26 @@ static inline float kl_sin(float x)
     return y + 0.225f * (y * kl_abs(y) - y);
 }
 
+#ifdef ZOOM_MSPLUS
+void KLANG_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void KLANG_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float freq = coef[SH_PARAM_FREQ];
+    float sweep = coef[SH_PARAM_SWEEP];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(freq)
+            || !mp_normalized(sweep) || !mp_normalized(mix)) {
+        mp_silence(fxBuf);
+        return;
+    }
+    KlangState *st = (KlangState *)instance[2];
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -89,6 +118,7 @@ void KLANG_AUDIO_FUNC(unsigned int *ctx)
     if (end - base < (uintptr_t)sizeof(KlangState)) return;
 
     KlangState *st = (KlangState *)base;
+#endif
     if (st->magic != KLANG_MAGIC || st->version != KLANG_VERSION || !st->initialized) {
         st->magic = KLANG_MAGIC;
         st->version = KLANG_VERSION;
@@ -99,10 +129,12 @@ void KLANG_AUDIO_FUNC(unsigned int *ctx)
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     float freq  = zoom_param_norm01(params[KLANG_FREQ_SLOT], KLANG_FREQ_DEFAULT_NORM);
     float sweep = zoom_param_norm01(params[KLANG_SWEEP_SLOT], KLANG_SWEEP_DEFAULT_NORM);
     float mix   = zoom_param_norm01(params[KLANG_MIX_SLOT], KLANG_MIX_DEFAULT_NORM);
 
+#endif
     float carrierHz = KLANG_FREQ_MIN + freq * KLANG_FREQ_SPAN;
     float baseInc = carrierHz * KLANG_TWO_PI_SR;
     float lfoInc = sweep * sweep * KLANG_LFO_MAX * KLANG_TWO_PI_SR;
@@ -113,15 +145,15 @@ void KLANG_AUDIO_FUNC(unsigned int *ctx)
     float phL = st->phaseL, phR = st->phaseR;
     float lfL = st->lfoL, lfR = st->lfoR;
     int i;
-    for (i = 0; i < 8; i++) {
-        float inL = fxBuf[i];
-        float inR = fxBuf[i + 8];
+    for (i = 0; i < KLANG_FRAMES; i++) {
+        float inL = KLANG_INPUT(fxBuf[i]);
+        float inR = KLANG_INPUT(fxBuf[i + KLANG_FRAMES]);
 
         float cL = kl_sin(phL);
         float cR = kl_sin(phR);
         /* ring output attenuated 0.5 — the raw sidebands read hot/piercing */
-        fxBuf[i]     = dry * inL + wet * (inL * cL) * 0.5f;
-        fxBuf[i + 8] = dry * inR + wet * (inR * cR) * 0.5f;
+        fxBuf[i]     = KLANG_OUTPUT(inL, dry * inL + wet * (inL * cL) * 0.5f);
+        fxBuf[i + KLANG_FRAMES] = KLANG_OUTPUT(inR, dry * inR + wet * (inR * cR) * 0.5f);
 
         /* carrier increment swept by the LFO; always positive (depth < 1) */
         phL += baseInc * (1.0f + depth * kl_sin(lfL));

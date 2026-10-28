@@ -13,16 +13,36 @@ import time
 from pathlib import Path
 
 import upstream  # noqa: F401
-import jack
 import mido
-import numpy as np
-import soundfile as sf
 import zoomzt2
-from audio import analyze, capture, stimulus
+from audio import AudioRig, run_capture, temporary_quantum
 from backup import CheckedInput, stock_patch
+from pedal_diy import check_envelope, check_zic
 from decode_preset import ZPTC
 from file_session import FileSession, MidoTransport
 from pedal_common import assert_autosave_off, editor_off
+
+
+# Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
+CASES = {
+    'XXZGAIN': [(name, [(2, level), (0, enabled)], 'sweep')
+                for name, level, enabled in [('unity', 100, 1), ('half', 50, 1),
+                                            ('quarter', 25, 1), ('zero', 0, 1), ('bypass', 50, 0)]]
+               + [('tone', [(0, 1), (2, 100)], 'tone')],
+    'XXZFLWR': [(name, [(3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+               + [('extreme', [(2, 100)], 'sweep')],
+    'XXZKLNG': [(name, [(2, 20), (3, 0), (4, mix)], 'tone')
+                for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+               + [('extreme', [(2, 100), (3, 100)], 'sweep')],
+    'XXZSCRCH': [(name, [(3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+                + [('tone', [(2, 100)], 'tone')],
+    'XXZCRRPT': [(name, [(5, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+                + [('tone', [(2, 100), (3, 100), (4, 100)], 'tone')],
+    'XXZDUST': [('distortion', [(2, 0)], 'sweep'), ('octave', [(2, 100)], 'tone'),
+                ('motor', [(2, 0), (3, 100)], 'tone'), ('zero', [(5, 0)], 'sweep')],
+    'XXZHOWL': [(name, [(4, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+               + [('extreme', [(2, 100), (3, 100)], 'sweep')],
+}
 
 
 def verify_backup(folder):
@@ -34,6 +54,10 @@ def verify_backup(folder):
     for name, digest in manifest['sha256'].items():
         if hashlib.sha256((folder / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f'Backup hash mismatch: {name}')
+    for path in (folder / 'files').iterdir():
+        checker = {'.ZD2': check_envelope, '.ZIC': check_zic}.get(path.suffix.upper())
+        if checker and checker(path.read_bytes()):
+            raise ValueError(f'Invalid backup container: {path.name}')
     return manifest
 
 
@@ -46,6 +70,9 @@ def defined_patch(data):
 
 class TempPatch:
     def __init__(self, log, backup):
+        ports = [p for p in mido.get_input_names() if p.startswith('ZOOM MS Plus Series')]
+        if len(ports) != 1:
+            raise RuntimeError('Expected exactly one MS Plus MIDI input')
         self.pedal = zoomzt2.zoomzt2()
         if not self.pedal.connect():
             raise RuntimeError('Pedal not found')
@@ -54,13 +81,23 @@ class TempPatch:
         self.backup = backup
         self.modified = False
         self.protocol_ok = True
+        transport = MidoTransport(self.pedal.inport, self.pedal.outport)
+        transport.send([0x7e, 0x7f, 0x06, 0x01])
+        identity = transport.recv(3)
+        if identity is None or identity[:9] != bytes.fromhex('7e000602526e002600'):
+            raise RuntimeError('Expected the verified MS-70CDR+ identity')
+        self.log.write('IDENTITY ' + identity.hex() + '\n')
         assert_autosave_off(self.pedal)
         self.original = self.current()
         stock_patch(self.original)
         if ZPTC.parse(self.original).fx_count != 1:
             raise ValueError('Audition requires a one-slot scratch patch; no automatic patch clearing')
 
-    def send(self, data):
+    def transmit_sysex(self, data):
+        if not (data == [0x52, 0, 0x6e, 0x64, 0x13]
+                or (len(data) == 13 and data[:7] == [0x52, 0, 0x6e, 0x64, 0x20, 0, 0]
+                    and 0 <= data[7] <= 11)):
+            raise ValueError('Only current-patch reads and slot-zero parameter edits are allowed')
         self.log.write('TX ' + bytes(data).hex() + '\n')
         self.log.flush()
         self.pedal.outport.send(mido.Message('sysex', data=data))
@@ -80,7 +117,7 @@ class TempPatch:
 
     def current(self):
         self.drain()
-        self.send([0x52, 0, 0x6e, 0x64, 0x13])
+        self.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x13])
         for _ in range(30):
             msg = self.pedal.inport.receive()
             data = bytes(msg.data)
@@ -107,7 +144,7 @@ class TempPatch:
             raise
 
     def _edit_checked(self, parameter, value):
-        self.send([0x52, 0, 0x6e, 0x64, 0x20, 0, 0, parameter]
+        self.transmit_sysex([0x52, 0, 0x6e, 0x64, 0x20, 0, 0, parameter]
                   + [(value >> shift) & 127 for shift in range(0, 35, 7)])
         time.sleep(0.12)
         patch = ZPTC.parse(self.current())
@@ -169,25 +206,10 @@ class TempPatch:
 
 
 
-def record(directory, kind, level):
-    directory.mkdir()
-    client = jack.Client('zdl-hil', no_start_server=True)
-    try:
-        rate = client.samplerate
-        test = stimulus(rate, level, kind)
-        sends = [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)]
-        returns = [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]
-        recording, xruns = capture(client, test, sends, returns)
-    finally:
-        client.close()
-    sf.write(directory / 'send.wav', test, rate, subtype='FLOAT')
-    sf.write(directory / 'return.wav', recording, rate, subtype='FLOAT')
-    report = analyze(test, recording, rate)
-    report.update(rate=rate, sends=sends, returns=returns, xruns=xruns, kind=kind, level_db=level)
-    (directory / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
-    if xruns or not report['finite'] or report['clipped']:
-        raise RuntimeError('Invalid audio capture; stopping audition')
-    return report
+def record(directory, kind, level, rig):
+    sends = [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)]
+    returns = [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]
+    return run_capture(directory, sends, returns, kind, level, rig=rig)
 
 
 def main():
@@ -198,34 +220,34 @@ def main():
     args = ap.parse_args()
     verify_backup(args.backup)
     manifest = json.loads((args.effect / 'manifest.json').read_text())
+    if manifest['filename'] not in CASES:
+        raise ValueError('No reviewed test cases for this effect')
     args.output.mkdir(parents=True, exist_ok=False)
-    with open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, open(args.output / 'wire.log', 'w') as log:
+    with temporary_quantum(1024), AudioRig(
+            [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
+            [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]) as rig, open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, open(args.output / 'wire.log', 'w') as log:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         session = TempPatch(log, args.backup)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
         try:
             session.verify_saved()
-            session.verify_installed(args.effect / 'build' / (manifest['filename'] + '.ZD2'))
+            artifact = args.effect / 'build' / (manifest['filename'] + '.ZD2')
+            (args.output / 'BUILT.ZD2').write_bytes(artifact.read_bytes())
+            session.verify_installed(artifact)
             session.edit(0, 0)
-            reports = {'baseline': record(args.output / 'baseline', 'sweep', -30)}
+            reports = {'baseline': record(args.output / 'baseline', 'sweep', -30, rig),
+                       'baseline-tone': record(args.output / 'baseline-tone', 'tone', -30, rig)}
             session.edit(1, int(manifest['id'], 16))
             session.edit(0, 1)
-            if manifest['filename'] == 'XXZGAIN':
-                cases = [('unity', 100, 1), ('half', 50, 1), ('quarter', 25, 1),
-                         ('zero', 0, 1), ('bypass', 50, 0)]
-                for label, level, enabled in cases:
-                    session.edit(2, level)
-                    session.edit(0, enabled)
-                    time.sleep(0.15)
-                    reports[label] = record(args.output / label, 'sweep', -30)
-                    print(label, {k: reports[label][k] for k in ('silent', 'clipped', 'xruns')}, flush=True)
-            elif manifest['filename'] == 'XXZFLWR':
-                for label, mix in [('dry', 0), ('half', 50), ('wet', 100)]:
-                    session.edit(3, mix)
-                    reports[label] = record(args.output / label, 'sweep', -30)
-                    print(label, {k: reports[label][k] for k in ('silent', 'clipped', 'xruns')}, flush=True)
-            else:
-                raise ValueError('No reviewed test cases for this effect')
+            for label, edits, kind in CASES[manifest['filename']]:
+                for parameter, value in edits:
+                    session.edit(parameter, value)
+                time.sleep(0.15)
+                level = -60 if manifest['filename'] == 'XXZSCRCH' and label == 'tone' else -30
+                reports[label] = record(args.output / label, kind, level, rig)
+                print(label, {k: reports[label][k] for k in ('silent', 'clipped', 'xruns')}, flush=True)
+            session.edit(0, 1)
+            reports['silence'] = record(args.output / 'silence', 'silence', -30, rig)
             (args.output / 'captures.json').write_text(json.dumps(reports, indent=2) + '\n')
         finally:
             if not session.protocol_ok:
