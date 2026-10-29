@@ -97,7 +97,16 @@ and temporary on/off edit; it changes no DSP code or file-transfer procedure.
 The independent post-restoration audio gate remains mandatory. The failure must
 be understood before these effects can be retained for manual audition.
 
-The fresh storage audit is `build/msplus/audit-synceq-bypassed-transition-01/VERIFIED.json`:
+Another restart (USB 077) and the `synceq-bypass-boundary-01` run narrowed this
+further: the bypassed custom effect passed both physical stereo paths at
+-20.08/-20.02 dB with correlation 0.958/0.957, no xruns and no clipping. Audio
+failed later during restoration. The optional `audition.py --trace-restoration`
+now records after bypass, stock ID replacement, each restored stock knob, final
+settings and editor exit. It adds no MIDI commands. Recording exceptions are
+reported without interrupting stock restoration. This is diagnostic machinery,
+not a DSP fix or evidence that effect replacement is safe.
+
+The fresh storage audit is `build/msplus/audit-synceq-bypass-boundary-01/VERIFIED.json`:
 autosave OFF, all 100 saved patches unchanged, all factory catalogue entries intact,
 and exactly one valid custom binary/icon, SyncEQ, byte-identical to its build.
 The current patch metadata is stock-only. File sessions closed cleanly. A further
@@ -114,6 +123,13 @@ classification/install/readback, validates all artifacts before the first write,
 then audits the entire retained set and stock audio. Sixteen offline
 measurement/safety tests cover these gates and stopping on uncertain transfers.
 The tool is implemented; it has **not** installed the final set.
+
+The latest storage audit reports 1,190,190 bytes available with SyncEQ installed.
+All 34 current ZD2/ZIC pairs total 499,073 bytes, so their file sizes fit within
+the reported free space without removing factory effects. Filesystem allocation
+overhead and final installation still need verification. This says nothing about
+how many effects can run simultaneously; declared DSP loads and six chain slots
+remain separate constraints.
 
 ## October 28 bench incident and initial continuation
 

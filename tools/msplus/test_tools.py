@@ -117,6 +117,15 @@ class AuditionSafetyTests(unittest.TestCase):
             session.restore()
         self.assertEqual([call.args for call in session.edit.call_args_list][:2], [(0, 0), (1, 0x06000020)])
         settle.assert_called_once_with(.25)
+        original_edits = session.edit.call_args_list[:]
+        session.edit.reset_mock()
+        observations = []
+        with patch('audition.stock_patch', return_value=stock), patch('audition.ZPTC.parse', return_value=stock), \
+                patch('audition.editor_off'), patch('audition.time.sleep'):
+            session.restore(observations.append)
+        self.assertEqual(session.edit.call_args_list, original_edits,
+                         'Audio tracing must not add or reorder MIDI mutations')
+        self.assertEqual(observations, ['bypass', 'stock-id', 'stock-settings', 'editor-off'])
 
     def test_forbidden_commands_cannot_reach_output(self):
         import io

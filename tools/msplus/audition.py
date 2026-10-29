@@ -251,7 +251,7 @@ class TempPatch:
             raise RuntimeError('Unexpected original stock parameter count')
         return len(parameters)
 
-    def restore(self):
+    def restore(self, observe=None):
         original = stock_patch(self.original)
         effect = original.EDTB.effects[0].reversed.bitwise
         # Stop the experiment before asking the host to replace its instance.
@@ -260,16 +260,26 @@ class TempPatch:
         # and keep the subsequent independent audio-restoration gate.
         self.edit(0, 0)
         time.sleep(0.25)
+        if observe:
+            observe('bypass')
         self.edit(1, effect.id)
+        if observe:
+            observe('stock-id')
         for index in range(self.restore_parameter_count):
             self.edit(index + 2, effect[f'param{index + 1}'])
+            if observe:
+                observe(f'stock-param-{index + 1}')
         self.edit(0, int(effect.enabled))
         if ZPTC.parse(self.current()).PPRM.reversed.bitwise.patchVolume != original.PPRM.reversed.bitwise.patchVolume:
             self.edit(0, original.PPRM.reversed.bitwise.patchVolume, slot=0x64)
         final = stock_patch(self.current())
         if final.ids != original.ids or final.EDTB != original.EDTB or final.PPRM != original.PPRM:
             raise RuntimeError('Restored patch differs from original effect settings')
+        if observe:
+            observe('stock-settings')
         editor_off(self.pedal)
+        if observe:
+            observe('editor-off')
 
     def verify_saved(self):
         self.drain()
@@ -312,6 +322,8 @@ def main():
     ap.add_argument('effect', type=Path)
     ap.add_argument('backup', type=Path)
     ap.add_argument('output', type=Path)
+    ap.add_argument('--trace-restoration', action='store_true',
+                    help='Record between restoration steps; no additional MIDI operations')
     args = ap.parse_args()
     verify_backup(args.backup)
     manifest = json.loads((args.effect / 'manifest.json').read_text())
@@ -322,6 +334,16 @@ def main():
             [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]) as rig, open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, open(args.output / 'wire.log', 'w') as log:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         session = TempPatch(log, args.backup)
+        trace_errors = []
+        def observe_restoration(label):
+            # A diagnostic recording failure must never interrupt stock-patch
+            # cleanup. Record it and fail the audition after safe restoration.
+            try:
+                report = capture_trial(args.output / 'transition' / label, 'sweep', -30, rig)
+                print('restore-' + label, report['paths'], flush=True)
+            except Exception as error:
+                trace_errors.append(dict(stage=label, error=str(error)))
+                print('restore-' + label + ' recording failed: ' + str(error), flush=True)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
         sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
         original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')
@@ -379,12 +401,14 @@ def main():
             if not session.protocol_ok:
                 raise RuntimeError('Unexpected MIDI response: stopped. Temp patch may still contain the experiment; keep pedal powered and inspect wire.log before cleanup.')
             if session.modified:
-                session.restore()
+                session.restore(observe_restoration if args.trace_restoration else None)
             else:
                 editor_off(session.pedal)
                 time.sleep(0.1)
             session.verify_saved()
             session.pedal.disconnect()
+            if trace_errors:
+                (args.output / 'TRACE_ERRORS.json').write_text(json.dumps(trace_errors, indent=2) + '\n')
             (args.output / 'RESTORED').write_text('Original temp effect settings restored; all defined saved-patch bytes unchanged.\n')
             print('Original temporary patch restored', flush=True)
             # Parameter readback alone cannot establish that the DSP resumed
@@ -397,6 +421,8 @@ def main():
             (args.output / 'AUDIO_RESTORED').write_text(json.dumps(dict(
                 report='restored/report.json', report_sha256=hashlib.sha256(proof.read_bytes()).hexdigest(),
                 return_sha256=hashlib.sha256(proof.with_name('return.wav').read_bytes()).hexdigest()), indent=2) + '\n')
+            if trace_errors:
+                raise RuntimeError('Restoration completed but diagnostic recording failed; see TRACE_ERRORS.json')
 
 
 if __name__ == '__main__':
