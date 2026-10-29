@@ -3,7 +3,7 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 17,
+  "native_tests": 19,
   "tool_fault_tests": 16,
   "return_gain_db": 0,
   "ports": [
@@ -987,15 +987,15 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
-      "status": "NOT QUALIFIED: active and bypassed audio valid; subsequent stock restoration loses audio before removal",
-      "current_build_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5",
-      "evidence": "build/msplus/synceq-bypass-boundary-01/hil/analysis.json",
+      "status": "NOT QUALIFIED: stock ID replacement stops audio. Candidate packed-state build validated natively but not yet tested on hardware.",
+      "current_build_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
+      "evidence": "build/msplus/synceq-restoration-trace-01/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
         "zero_input_stability"
       ],
-      "configured_passed": true,
+      "configured_passed": false,
       "additional_activity_errors": [],
       "capture_count": 9,
       "tested_binary_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5",
@@ -1130,11 +1130,11 @@
   },
   "current_blocker": {
     "port": "synceq",
-    "audit": "build/msplus/audit-synceq-bypass-boundary-01/VERIFIED.json",
+    "audit": "build/msplus/audit-synceq-restoration-trace-01/VERIFIED.json",
     "before_replacement_audio": "build/msplus/synceq-bypassed-transition-01/hil/before-restore/report.json",
-    "failed_stock_audio": "build/msplus/synceq-bypass-boundary-01/hil/restored/report.json",
-    "finding": "After USB077 restart, active and bypassed SyncEQ audio both remained healthy. Audio failed later during stock restoration. Bypass-first replacement did not fix it; exact later trigger and root cause unresolved. Storage and saved bank verified intact.",
+    "failed_stock_audio": "build/msplus/synceq-restoration-trace-01/hil/transition/stock-id/report.json",
+    "finding": "USB078 run: bypass stereo healthy; audio lost immediately upon stock ID replacement, before restoring any stock parameter. Candidate lossless packed-state storage removes NaN control words between callbacks; hardware test pending.",
     "retained_set_installed": false,
-    "bypassed_audio": "build/msplus/synceq-bypass-boundary-01/hil/before-replacement-bypassed/report.json"
+    "bypassed_audio": "build/msplus/synceq-restoration-trace-01/hil/transition/bypass/report.json"
   }
 }

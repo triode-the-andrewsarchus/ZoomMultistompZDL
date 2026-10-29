@@ -69,6 +69,47 @@ only its own legacy state header, then the original bounded initialization runs.
 No absolute DSP address is embedded in any musical kernel. Ownership across
 multiple effect slots is not yet hardware-qualified; initial tests are standalone.
 
+## Stock replacement and non-audio arena state (October 29)
+
+The USB-078 `synceq-restoration-trace-01` campaign records a healthy bypassed
+stereo path, followed by audio loss immediately after replacing the custom ID
+with stock CloneCho's ID. The first failed recording precedes every stock knob
+restoration and editor exit. No file was removed. The saved bank and storage
+audit again passed. Bypassing for 250 ms or several seconds does not prevent it.
+
+A native SyncEQ callback leaves arena word 59 as `0xffffffff`: the unused
+`DtSync.own_twin` integer sentinel, interpreted as NaN if another effect treats
+the same memory as floats. The stock CloneCho disassembly at 0xb04 clears only
+its 192-byte small state through the host memset; its init contains no clearing
+of the delay arena. Its audio function loads the delay descriptor at 0xd0c and
+passes it to `SUB_CloneCho`. These observations support **a hypothesis**, not
+yet a hardware-proven cause: integer state left in reused audio memory poisons
+the stock signal path. Other Matujuice headers contain large integer bit patterns;
+native Scrub and GridDly also retain NaN patterns. Their short PCM rings require
+separate review: paired PCM samples can themselves form non-finite float words.
+Do not assume header packing alone qualifies those ports.
+
+The candidate `arena_state.h` compatibility helper saves each control word as two
+unsigned 16-bit halves, held in separate 32-bit words. Those words represent tiny
+finite floats (below 1e-35); no floating-point conversion is involved. It zeroes
+the raw header between callbacks and restores every bit before the next callback.
+The saved copy sits after the effect's state inside the validated arena grant.
+SyncEQ alone currently opts in; its entire 244-byte state is packed, requiring
+736 bytes including alignment. One extra small-state word tracks validity; new
+instances and arena-address changes do not reuse a previous packed header. The
+pristine Matujuice core is unchanged. This is not an allocator or a teardown hook.
+
+The candidate passes Stomphacks' existing envelope, section, relocation and leaf
+checks. Nineteen native tests pass, including arbitrary bit-pattern round trips
+(NaN payloads, infinities and random words), finite storage, canaries and instance
+reinitialization. Compared with the previous raw-state wrapper at `7aa8dee`,
+114,688 samples across neutral, boosted, filtered, bypassed and extreme controls
+are bit-identical (`build/msplus/synceq-packed-equivalence-01.json`). The candidate
+is **not yet hardware-qualified**. The installed file is still the old build;
+that exact old binary/icon pair is archived under
+`build/msplus/synceq-before-packed-state-build` for guarded removal after audio
+is restored. Never overwrite the installed filename with the new build.
+
 GenLoss is the first buffered proof of concept. Native canary tests cover
 undersized/inconsistent/oversized descriptor rejection before writes and an
 independent fixed-delay/filter reference. Its guarded hardware campaign passed

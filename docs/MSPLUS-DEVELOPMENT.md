@@ -113,6 +113,15 @@ The current patch metadata is stock-only. File sessions closed cleanly. A furthe
 physical restart is required to resume audio testing; no firmware,
 bootloader or undocumented recovery commands were attempted.
 
+The USB-078 step trace subsequently isolated audio loss to the stock-ID edit,
+before any stock knob was restored. The candidate SyncEQ build now uses lossless
+packed control-state storage between callbacks to keep NaN integer sentinels out
+of reused audio memory. It passes 19 native tests and a bit-identical 114,688-sample
+comparison with the earlier wrapper. It is not installed or hardware-qualified.
+See [the memory investigation](MSPLUS-MEMORY-RESEARCH.md#stock-replacement-and-non-audio-arena-state-october-29)
+for the hypothesis, exact storage layout, evidence and remaining PCM-ring concern.
+Only SyncEQ currently opts in; no other musical algorithm was changed.
+
 `install_set.py` prepares the requested final manual-audition set, but refuses
 before any pedal operations until every musical port has passing required audio
 checks, a valid stock baseline, verified stock-audio restoration, and current

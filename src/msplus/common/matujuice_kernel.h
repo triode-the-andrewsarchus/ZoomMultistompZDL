@@ -6,6 +6,12 @@
 #ifndef MJ_OWN_BYPASS
 #define MJ_OWN_BYPASS 0
 #endif
+#ifdef MJ_PACKED_HEADER_BYTES
+#include "arena_state.h"
+typedef char mp_header_fits[(MJ_PACKED_HEADER_BYTES <= sizeof(MJ_STATE_TYPE)
+                            && MJ_PACKED_HEADER_BYTES % 4 == 0
+                            && SH_STATE_GUARD_WORD >= 2) ? 1 : -1];
+#endif
 void SH_AUDIO_FN(void **instance, void **ctx)
 {
     const float *coef = (const float *)instance[1];
@@ -18,8 +24,19 @@ void SH_AUDIO_FN(void **instance, void **ctx)
         values[i] = coef[5+i];
         if (!mp_normalized(values[i])) { mp_silence(bus); return; }
     }
+#ifdef MJ_PACKED_HEADER_BYTES
+    uintptr_t packedOffset = (sizeof(MJ_STATE_TYPE) + 7u) & ~(uintptr_t)7u;
+    uint32_t oldBase = ((uint32_t *)instance[2])[0];
+    uintptr_t base = mp_arena_state(instance, packedOffset + 2u*MJ_PACKED_HEADER_BYTES);
+#else
     uintptr_t base = mp_arena_state(instance, sizeof(MJ_STATE_TYPE));
+#endif
     if (!base) { mp_silence(bus); return; }
+#ifdef MJ_PACKED_HEADER_BYTES
+    uint32_t *small = (uint32_t *)instance[2];
+    if (oldBase == (uint32_t)base && small[1] == 1u)
+        mp_unpack_header(base, base + packedOffset, MJ_PACKED_HEADER_BYTES);
+#endif
     float params[15];
     params[0] = fade;
     mp_raw_controls(params, values);
@@ -39,4 +56,8 @@ void SH_AUDIO_FN(void **instance, void **ctx)
             bus[at+SH_CH_B_OFFSET] = mp_output(dryB, processed ? mono[i] : dryB, outputFade);
         }
     }
+#ifdef MJ_PACKED_HEADER_BYTES
+    mp_pack_header(base, base + packedOffset, MJ_PACKED_HEADER_BYTES);
+    small[1] = 1u;
+#endif
 }

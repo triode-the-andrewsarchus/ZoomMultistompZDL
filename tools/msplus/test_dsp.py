@@ -9,6 +9,55 @@ from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
+    def test_arena_header_roundtrip_preserves_every_bit_and_leaves_finite_storage(self):
+        import ctypes
+        import subprocess
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / 'header.c'
+            library = Path(tmp) / 'header.so'
+            source.write_text('#include <stdint.h>\n#include "' + str(ROOT / 'src/msplus/common/arena_state.h')
+                              + '"\nvoid pack(uintptr_t a,uintptr_t b,unsigned n){mp_pack_header(a,b,n);}\n'
+                              'void unpack(uintptr_t a,uintptr_t b,unsigned n){mp_unpack_header(a,b,n);}\n')
+            subprocess.run(['cc', '-shared', '-fPIC', '-O2', str(source), '-o', str(library)], check=True)
+            lib = ctypes.CDLL(str(library))
+            for fn in (lib.pack, lib.unpack):
+                fn.argtypes = [ctypes.c_size_t, ctypes.c_size_t, ctypes.c_uint]
+            rng = np.random.default_rng(777)
+            original = np.concatenate([np.array([0, 0xffffffff, 0x7f800000, 0xff800000,
+                                                 0x7fc12345, 0x80000000], np.uint32),
+                                       rng.integers(0, 2**32, 1024, dtype=np.uint32)])
+            raw = np.pad(original, 1, constant_values=0xcafef00d)
+            saved = np.full(2*len(original)+2, 0xcafef00d, np.uint32)
+            lib.pack(raw.ctypes.data+4, saved.ctypes.data+4, original.nbytes)
+            self.assertTrue((raw[1:-1] == 0).all())
+            self.assertTrue(np.isfinite(saved[1:-1].view(np.float32)).all())
+            self.assertLess(float(np.max(abs(saved[1:-1].view(np.float32)))), 1e-35)
+            lib.unpack(raw.ctypes.data+4, saved.ctypes.data+4, original.nbytes)
+            np.testing.assert_array_equal(raw[1:-1], original)
+            np.testing.assert_array_equal(raw[[0, -1]], [0xcafef00d]*2)
+            np.testing.assert_array_equal(saved[[0, -1]], [0xcafef00d]*2)
+
+    def test_synceq_packed_state_survives_callbacks_and_instance_reinitialization(self):
+        k = Kernel('synceq', arena_bytes=705600)
+        source = np.tile([.02, .01], (16, 1))
+        for _ in range(32):
+            np.testing.assert_allclose(k.block(source), .01, atol=1e-8)
+            self.assertTrue(np.isfinite(k.arena[2:-2].view(np.float32)).all())
+            self.assertEqual(k.arena[2], 0)  # Raw magic is never left in the audio arena.
+        k.coeff[6] = 1  # Low +12 dB, so the control state really changes.
+        for _ in range(32):
+            k.block(source)
+        # Host _init clears small state when reinstantiating, while the same
+        # arena address can be reused. Old encoded knobs must not survive it.
+        k.state[:k.guard_word] = 0
+        k.coeff[6] = .5
+        for _ in range(8):
+            np.testing.assert_allclose(k.block(source), .01, atol=1e-8)
+        np.testing.assert_array_equal(k.arena[:2], [0xcafef00d]*2)
+        np.testing.assert_array_equal(k.arena[-2:], [0xcafef00d]*2)
+
     def test_faults_fail_closed_and_stay_in_bounds(self):
         for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate', 'linearity', 'meminfo', 'genloss']:
             k = Kernel(name)
