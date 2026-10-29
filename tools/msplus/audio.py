@@ -7,6 +7,7 @@ saved alongside WAVs; an xrun makes the run invalid. Outputs stop on exit.
 """
 import argparse
 import contextlib
+import hashlib
 import re
 import subprocess
 import json
@@ -81,6 +82,19 @@ def require_loopback(report):
         path = paths[0]
         if path['correlation'] < .8 or not -30 < path['gain_db'] < -10:
             raise RuntimeError(f'Stock audio path differs from the calibrated rig: {path}')
+
+
+def verify_restored_audio(directory, root):
+    """Verify the restoration marker against its actual stereo report and WAV."""
+    if not (directory / 'AUDIO_RESTORED').is_file():
+        raise RuntimeError('Verified stock-audio restoration is missing')
+    proof = json.loads((directory / 'AUDIO_RESTORED').read_text())
+    restored = (directory / proof['report']).resolve()
+    if not restored.is_relative_to(root) or hashlib.sha256(restored.read_bytes()).hexdigest() != proof['report_sha256']:
+        raise RuntimeError('Stock-audio restoration evidence changed')
+    if hashlib.sha256(restored.with_name('return.wav').read_bytes()).hexdigest() != proof['return_sha256']:
+        raise RuntimeError('Stock-audio restoration recording changed')
+    require_loopback(json.loads(restored.read_text()))
 
 
 class AudioRig:

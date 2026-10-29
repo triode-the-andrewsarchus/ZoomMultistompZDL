@@ -31,7 +31,7 @@ def upstream_operation(output, operation, artifact, dry=False):
                            'No further pedal commands will be sent. Keep powered if transfer safety is unverified.')
 
 
-def run_effect(name, backup, output, calibration=None):
+def run_effect(name, backup, output, calibration=None, output_probe=None):
     effect = ROOT / 'src/msplus' / name
     manifest = json.loads((effect / 'manifest.json').read_text())
     artifact = effect / 'build' / (manifest['filename'] + '.ZD2')
@@ -61,6 +61,8 @@ def run_effect(name, backup, output, calibration=None):
     analysis = [sys.executable, str(ROOT / 'tools/msplus/analyze.py'), str(hil), '--effect', name]
     if calibration is not None:
         analysis.extend(['--calibration', str(calibration)])
+    if output_probe is not None:
+        analysis.extend(['--output-probe', str(output_probe)])
     with (output / 'analysis.log').open('w') as log:
         checked = subprocess.run(analysis, stdout=log, stderr=subprocess.STDOUT)
     if checked.returncode:
@@ -91,6 +93,7 @@ def main():
     ap.add_argument('--backup', required=True, type=Path)
     ap.add_argument('--output', required=True, type=Path)
     ap.add_argument('--calibration', type=Path, help='Enable calibrated Scorch harmonic comparison')
+    ap.add_argument('--output-probe', type=Path, help='Measured output-stage linearity HIL directory')
     ap.add_argument('effects', nargs='+')
     args = ap.parse_args()
     available = {p.parent.name for p in (ROOT / 'src/msplus').glob('*/manifest.json')}
@@ -100,11 +103,13 @@ def main():
     if args.calibration is not None:
         args.calibration = args.calibration.resolve()
         json.loads(args.calibration.read_text())
+    if args.output_probe is not None:
+        args.output_probe = args.output_probe.resolve()
     verify_backup(args.backup)
     args.output.mkdir(parents=True, exist_ok=False)
     preflight(args.backup.resolve(), args.output)
     for name in args.effects:
-        run_effect(name, args.backup.resolve(), args.output / name, args.calibration)
+        run_effect(name, args.backup.resolve(), args.output / name, args.calibration, args.output_probe)
     (args.output / 'COMPLETE').write_text('All requested configured checks passed and experimental effects were removed.\n')
 
 

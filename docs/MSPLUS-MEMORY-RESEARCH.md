@@ -94,7 +94,7 @@ unsigned 16-bit halves, held in separate 32-bit words. Those words represent tin
 finite floats (below 1e-35); no floating-point conversion is involved. It zeroes
 the raw header between callbacks and restores every bit before the next callback.
 The saved copy sits after the effect's state inside the validated arena grant.
-SyncEQ alone currently opts in; its entire 244-byte state is packed, requiring
+SyncEQ was the first port to opt in; its entire 244-byte state is packed, requiring
 736 bytes including alignment. One extra small-state word tracks validity; new
 instances and arena-address changes do not reuse a previous packed header. The
 pristine Matujuice core is unchanged. This is not an allocator or a teardown hook.

@@ -51,11 +51,11 @@ long-duration endurance, every source feature or multi-effect chains.
 
 The [current evidence report](MSPLUS-HIL-34.json) records the latest per-port
 status as of October 29. Previous snapshots remain in Git history.
-**31 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
+**33 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
 pass actual stock-audio restoration with protected control-state storage. All ten
 Matujuice ports tested in `matu-packed-campaign-01` passed and were removed safely.
-Scrub and GridDly have full-length, 15-bit history candidates awaiting hardware
-tests; see the precision note below. Scorch's numerical comparison remains
+Scrub and GridDly subsequently passed hardware tests with full-length, 15-bit
+histories; see the precision note below. Scorch's numerical comparison remains
 unresolved, with high-level output compression now independently measured.
 Retention additionally requires current binary/source provenance and an actual
 verified stock-audio return for every port. The older original-effect campaigns
@@ -92,7 +92,12 @@ and one write site in derived copies, refuses unexpected source layouts, and
 never modifies the pinned upstream source. Derived code and generator hashes
 are included in hardware provenance. Both generated effects pass upstream build
 validation. Exhaustive PCM values, clean-wet reference error, full-arena finiteness,
-canaries and all other native checks pass: **22 DSP tests and 17 tooling tests**.
+canaries and all other native checks pass: **22 DSP tests and 18 tooling tests**.
+Both ports passed hardware checks and stock restoration in
+`remaining-ports-campaign-20261029-04`. Scrub's held-audio test explicitly selects
+Rec=HOLD after recording; an earlier LIVE-mode test correctly failed when silence
+overwrote the history. GenLoss and Mangle passed with their protected RNG storage
+in `remaining-ports-campaign-20261029-03`.
 
 The output-linearity diagnostic was safely removed after its completed campaign.
 It measured less than 0.053 dB gain change through DSP peak 0.275, then
@@ -100,6 +105,18 @@ It measured less than 0.053 dB gain change through DSP peak 0.275, then
 fails. This supports investigating the output stage as the cause of Scorch's
 high-amplitude harmonic mismatch; it does not yet qualify Scorch or justify
 relaxing its DSP comparison tolerances.
+
+The prepared Scorch comparison retains maximum Gain and the existing wet-only
+high-level capture, and adds Mix=50 for a direct DSP comparison below the measured
+output limit. `--output-probe` verifies the independent probe's restored-audio
+proof, recording integrity and agreement with calibration, then derives the
+contiguous range within 0.1 dB of quiet gain. High-level harmonic measurements
+remain visible and explicitly marked outside that range; they are not described
+as equivalent. The extra maximum-Gain capture must actually lie within the range
+and pass the unchanged 1 dB fundamental / 3 dB harmonic tolerances. Missing or
+out-of-range reference captures fail. Synthetic tests detect a deliberately
+incorrect low-level DSP output and reject a changed calibration. Actual Scorch
+hardware validation is pending. Trial edits are now recorded in `CASES.json`.
 
 `audit-after-packed-matu-01/VERIFIED.json` verifies an empty experimental set,
 byte-identical factory effect list, all saved patches unchanged and autosave OFF

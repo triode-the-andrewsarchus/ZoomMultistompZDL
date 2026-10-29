@@ -54,8 +54,10 @@ class PCMSourceTests(unittest.TestCase):
 
 class AudioTests(unittest.TestCase):
     def test_linearity_measurement_detects_a_saturated_output_stage(self):
+        import json
         import soundfile as sf
         from analyze import validate_linearity
+        from reference import linear_output_limit
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             wave = np.tile(np.linspace(-1, 1, 100, endpoint=False), 60)
@@ -63,19 +65,77 @@ class AudioTests(unittest.TestCase):
                 path = root / name
                 path.mkdir(exist_ok=True)
                 sf.write(path / 'return.wav', np.repeat(samples[:, None], 2, axis=1), 1000, subtype='FLOAT')
+                (path / 'report.json').write_text(json.dumps(dict(finite=True, clipped=False, xruns=[])))
             recording('baseline', np.zeros(len(wave)))
             for level in (1, 2, 5, 10, 25, 50, 75, 100):
                 recording(f'peak{level:02}', wave*.55*level/100)
             rows, errors = validate_linearity(root)
             self.assertFalse(errors)
             self.assertEqual(len(rows), 8)
+            self.assertAlmostEqual(linear_output_limit(root)[0], .55)
             recording('peak100', np.clip(wave*.55, -.3, .3))
             _, errors = validate_linearity(root)
             self.assertEqual(len(errors), 1)
             self.assertIn('level', errors[0])
+            self.assertAlmostEqual(linear_output_limit(root)[0], .4125)
+            (root / 'peak50/report.json').write_text(json.dumps(dict(finite=False, clipped=False, xruns=[])))
+            with self.assertRaisesRegex(ValueError, 'Invalid output-probe recording'):
+                linear_output_limit(root)
+            recording('peak50', wave*.55*.5)
             recording('peak01', np.zeros(len(wave)))
             _, errors = validate_linearity(root)
             self.assertIn('Quiet diagnostic amplitude is missing', errors[0])
+
+    def test_scorch_linear_reference_detects_faults_and_preserves_high_level_measurements(self):
+        import json
+        import soundfile as sf
+        from unittest.mock import patch
+        from native import Kernel
+        from reference import compare_scorch
+        rate = 44100
+        base = np.zeros((rate*6, 2))
+        for ch in range(2):
+            start = int((.5+ch*2.5)*rate)
+            base[start:start+int(1.5*rate), ch] = .002*np.sin(2*np.pi*997*np.arange(int(1.5*rate))/rate)
+        # Native blocks require a whole multiple of sixteen frames.
+        base = np.pad(base, ((0, (-len(base)) % 16), (0, 0)))
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            calibration = root / 'calibration.json'
+            calibration.write_text(json.dumps(dict(bus_to_return=[1, 1])))
+            cases = [['tone', [[2, 100], [3, 100]], 'tone'],
+                     ['tone-reference', [[2, 100], [3, 50]], 'tone']]
+            (root / 'CASES.json').write_text(json.dumps(cases))
+            for label, mix in [('baseline-tone', None), ('tone', 1), ('tone-reference', .5)]:
+                folder = root / label
+                folder.mkdir()
+                audio = base
+                if mix is not None:
+                    kernel = Kernel('scorch')
+                    kernel.coeff[5:7] = [1, mix]
+                    audio = np.concatenate([kernel.block(b) for b in base.reshape(-1, 16, 2)])
+                    audio = np.clip(audio, -.4, .4)  # independent nonlinear output stage
+                sf.write(folder / 'return.wav', audio, rate, subtype='FLOAT')
+                (folder / 'report.json').write_text(json.dumps(dict(level_db=-30)))
+            with patch('reference.verify_restored_audio'), \
+                    patch('reference.linear_output_limit', return_value=(.275, np.ones(2))) as measured_range:
+                rows, errors = compare_scorch(root, calibration, root)
+                self.assertFalse(errors)
+                self.assertEqual(len(rows), 20)
+                self.assertTrue(all(r['comparison_domain'] == 'linear' for r in rows if r['capture'] == 'tone-reference'))
+                self.assertTrue(all(r['comparison_domain'] != 'linear' for r in rows if r['capture'] == 'tone'))
+                measured_range.return_value = (.275, np.full(2, 1.1))
+                with self.assertRaisesRegex(ValueError, 'calibration gains differ'):
+                    compare_scorch(root, calibration, root)
+                measured_range.return_value = (.1, np.ones(2))
+                _, errors = compare_scorch(root, calibration, root)
+                self.assertTrue(any('exceeds' in e for e in errors))
+                measured_range.return_value = (.275, np.ones(2))
+                path = root / 'tone-reference/return.wav'
+                audio, _ = sf.read(path, always_2d=True)
+                sf.write(path, audio*.5, rate, subtype='FLOAT')
+                _, errors = compare_scorch(root, calibration, root)
+                self.assertTrue(any('reference mismatch' in e for e in errors))
 
     def test_harmonic_fit_resolves_weak_tones_at_arbitrary_window_phases(self):
         from reference import harmonic_rms

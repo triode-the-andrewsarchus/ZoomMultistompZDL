@@ -46,7 +46,8 @@ CASES = {
                 for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                + [('extreme', [(2, 100), (3, 100)], 'sweep')],
     'XXZSCRCH': [(name, [(3, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
-                + [('tone', [(2, 100)], 'tone')],
+                + [('tone', [(2, 100), (3, 100)], 'tone'),
+                   ('tone-reference', [(2, 100), (3, 50)], 'tone')],
     'XXZCRRPT': [(name, [(5, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                 + [('tone', [(2, 100), (3, 100), (4, 100), (6, 10)], 'tone')],
     'XXZDUST': [('distortion', [(2, 0)], 'sweep'), ('octave', [(2, 100)], 'tone'),
@@ -74,7 +75,7 @@ MATU_CASES = {
     'sgnl': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100, 'Codec': 0, 'Loss': 0}, 'sweep'),
              ('damage', {'Loss': 70, 'Codec': 40}, 'tone')],
     'scrub': [('dry', {'Mix': 0}, 'sweep'), ('prime', {}, 'sustain'),
-              ('wet', {'Mix': 100, 'Pos': 500}, 'silence'),
+              ('wet', {'Rec': 1, 'Mix': 100, 'Pos': 500}, 'silence'),
               ('scan', {'Pos': 400}, 'silence')],
     'griddly': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100, 'Time': 80}, 'sweep'),
                 ('prime', {}, 'sustain'), ('tail', {'enabled': 0}, 'silence')],
@@ -329,6 +330,7 @@ def main():
     manifest = json.loads((args.effect / 'manifest.json').read_text())
     cases = reviewed_cases(manifest)
     args.output.mkdir(parents=True, exist_ok=False)
+    (args.output / 'CASES.json').write_text(json.dumps(cases, indent=2) + '\n')
     with temporary_quantum(1024), AudioRig(
             [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
             [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]) as rig, open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, open(args.output / 'wire.log', 'w') as log:

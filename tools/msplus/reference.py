@@ -6,7 +6,8 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
-from native import Kernel
+from native import Kernel, ROOT
+from audio import verify_restored_audio
 
 
 def calibrate(directory):
@@ -29,6 +30,34 @@ def calibrate(directory):
     return result
 
 
+def validate_linearity(directory):
+    """Measure return gain versus known DSP peaks; no correction is fitted away."""
+    baseline, rate = sf.read(directory / 'baseline/return.wav', always_2d=True)
+    noise = np.mean(baseline[-rate:]**2, axis=0)
+    rows, errors = [], []
+    quiet_gain = None
+    for level in (1, 2, 5, 10, 25, 50, 75, 100):
+        audio, actual_rate = sf.read(directory / f'peak{level:02}/return.wav', always_2d=True)
+        if actual_rate != rate:
+            raise ValueError('Linearity capture rates differ')
+        if not np.isfinite(audio).all():
+            return [], ['Non-finite output-probe samples']
+        rms = np.sqrt(np.maximum(np.mean(audio[rate//2:5*rate]**2, axis=0) - noise, 0))
+        peak = .55 * level/100
+        gain = rms/(peak/np.sqrt(3))
+        if quiet_gain is None:
+            if not np.isfinite(gain).all() or np.any(rms < 5*np.sqrt(noise)) or np.any((gain < .5) | (gain > 2)):
+                return [], ['Quiet diagnostic amplitude is missing or inconsistent with the calibrated rig']
+            quiet_gain = gain
+        change = 20*np.log10(np.maximum(gain, 1e-15)/np.maximum(quiet_gain, 1e-15))
+        row = dict(level=level, dsp_peak=peak, bus_to_return_gain=gain.tolist(),
+                   change_from_quiet_db=change.tolist())
+        rows.append(row)
+        if np.any(abs(change) > .5):
+            errors.append(f'Output stage gain changes by more than 0.5 dB: {row}')
+    return rows, errors
+
+
 def harmonic_rms(samples, rate, frequency, count=10):
     """Fit harmonics together so arbitrary capture phase cannot leak between them.
 
@@ -46,15 +75,34 @@ def harmonic_rms(samples, rate, frequency, count=10):
     return np.hypot(coeff[:-1:2], coeff[1:-1:2]) / np.sqrt(2)
 
 
-def compare_scorch(directory, calibration):
+def linear_output_limit(directory):
+    """Find a contiguous measured range within 0.1 dB of the quiet output gain."""
+    for level in (1, 2, 5, 10, 25, 50, 75, 100):
+        report = json.loads((directory / f'peak{level:02}/report.json').read_text())
+        if report['xruns'] or not report['finite'] or report['clipped']:
+            raise ValueError('Invalid output-probe recording')
+    rows, _ = validate_linearity(directory)
+    if len(rows) != 8:
+        raise ValueError('Output probe lacks a valid quiet reference')
+    peak = 0
+    for row in rows:
+        changes = np.asarray(row['change_from_quiet_db'])
+        if not np.isfinite(changes).all():
+            raise ValueError('Invalid output-probe gain')
+        if np.any(abs(changes) > .1):
+            break
+        peak = row['dsp_peak']
+    return peak, np.asarray(rows[0]['bus_to_return_gain'])
+
+
+def compare_scorch_capture(directory, gains, capture, mix, linear_peak=None):
     base, rate = sf.read(directory / 'baseline-tone/return.wav', always_2d=True)
-    actual, actual_rate = sf.read(directory / 'tone/return.wav', always_2d=True)
+    actual, actual_rate = sf.read(directory / capture / 'return.wav', always_2d=True)
     if actual_rate != rate:
         raise ValueError('Reference rates differ')
     base_level = json.loads((directory / 'baseline-tone/report.json').read_text())['level_db']
-    test_level = json.loads((directory / 'tone/report.json').read_text())['level_db']
+    test_level = json.loads((directory / capture / 'report.json').read_text())['level_db']
     scaling = 10 ** ((test_level - base_level) / 20)
-    gains = json.loads(calibration.read_text())['bus_to_return']
     rows, errors = [], []
     for ch in range(2):
         start = int((0.8 + ch * 2.5) * rate)
@@ -62,13 +110,16 @@ def compare_scorch(directory, calibration):
         original = base[start:start + len(recorded), ch]
         amplitude = harmonic_rms(original, rate, 997, count=1)[0] * np.sqrt(2) * scaling / gains[ch]
         kernel = Kernel('scorch')
-        kernel.coeff[5:7] = [1, 1]  # reviewed tone case: Gain=100, Mix=100
+        kernel.coeff[5:7] = [1, mix]  # Keep maximum Gain in both reference captures.
         count = 44160
         t = np.arange(count) / 44100
         samples = np.zeros((count, 2))
         samples[:, 1 - ch] = amplitude * np.sin(2 * np.pi * 997 * t)
         predicted = np.concatenate([kernel.block(b) for b in samples.reshape(-1, 16, 2)])
-        predicted = predicted[-35280:, 1 - ch] * gains[ch]
+        predicted = predicted[-35280:, 1 - ch]
+        dsp_peak = float(np.max(abs(predicted)))
+        in_range = linear_peak is None or dsp_peak <= linear_peak
+        predicted = predicted * gains[ch]
         predicted_levels = harmonic_rms(predicted, 44100, 997)
         recorded_levels = harmonic_rms(recorded, rate, 997)
         for harmonic in range(1, 6):
@@ -76,12 +127,37 @@ def compare_scorch(directory, calibration):
             measured = float(recorded_levels[harmonic - 1])
             error_db = float(20 * np.log10(max(measured, 1e-15) / max(expected, 1e-15)))
             rows.append(dict(channel=ch, harmonic=harmonic, predicted_rms=expected,
-                             measured_rms=measured, error_db=error_db))
+                             measured_rms=measured, error_db=error_db, capture=capture,
+                             dsp_peak=dsp_peak, measured_linear_limit=linear_peak,
+                             comparison_domain='linear' if in_range else 'outside_measured_linear_range'))
             # Harmonics close to the ADC noise floor cannot be compared reliably.
             limit = 1 if harmonic == 1 else 3
-            if expected > 0.00005 and abs(error_db) > limit:
+            if in_range and expected > 0.00005 and abs(error_db) > limit:
                 errors.append(f'Scorch reference mismatch: {rows[-1]}')
     return rows, errors
+
+
+def compare_scorch(directory, calibration, output_probe=None):
+    gains = np.asarray(json.loads(calibration.read_text())['bus_to_return'])
+    if gains.shape != (2,) or not np.isfinite(gains).all() or np.any((gains < .5) | (gains > 2)):
+        raise ValueError('Invalid bus-to-return calibration gains')
+    if output_probe is None:
+        return compare_scorch_capture(directory, gains, 'tone', 1)
+    verify_restored_audio(output_probe, ROOT)
+    linear_peak, quiet_gains = linear_output_limit(output_probe)
+    if np.any(abs(20*np.log10(quiet_gains/gains)) > .2):
+        raise ValueError('Output probe and calibration gains differ; recalibrate the rig')
+    cases = {name: (dict(edits), kind) for name, edits, kind in
+             json.loads((directory / 'CASES.json').read_text())}
+    if cases.get('tone') != ({2: 100, 3: 100}, 'tone') or cases.get('tone-reference') != ({2: 100, 3: 50}, 'tone'):
+        raise ValueError('Scorch reference requires explicit maximum Gain with Mix=100 and Mix=50')
+    rows, errors = compare_scorch_capture(directory, gains, 'tone', 1, linear_peak)
+    reference, problems = compare_scorch_capture(directory, gains, 'tone-reference', .5, linear_peak)
+    if not all(row['comparison_domain'] == 'linear' for row in reference):
+        errors.append('Scorch reference capture exceeds the independently measured linear output range')
+    for row in rows + reference:
+        row['output_probe'] = str(output_probe)
+    return rows + reference, errors + problems
 
 
 def decode_memory(directory):

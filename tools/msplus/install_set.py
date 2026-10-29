@@ -15,7 +15,7 @@ from pathlib import Path
 from upstream import ROOT
 from run import preflight, upstream_operation
 from audition import verify_backup
-from audio import require_loopback
+from audio import require_loopback, verify_restored_audio
 from analyze import EFFECT_CHECKS
 
 
@@ -32,15 +32,7 @@ def check_measurements(name, evidence):
         checks.add('dry_path_gain')
     if not checks <= set(analysis['checks']):
         raise RuntimeError(f'{name}: hardware analysis does not cover required checks')
-    if not (evidence.parent / 'AUDIO_RESTORED').is_file():
-        raise RuntimeError(f'{name}: verified stock-audio restoration is missing')
-    proof = json.loads((evidence.parent / 'AUDIO_RESTORED').read_text())
-    restored = (evidence.parent / proof['report']).resolve()
-    if not restored.is_relative_to(ROOT) or hashlib.sha256(restored.read_bytes()).hexdigest() != proof['report_sha256']:
-        raise RuntimeError(f'{name}: stock-audio restoration evidence changed')
-    if hashlib.sha256(restored.with_name('return.wav').read_bytes()).hexdigest() != proof['return_sha256']:
-        raise RuntimeError(f'{name}: stock-audio restoration recording changed')
-    require_loopback(json.loads(restored.read_text()))
+    verify_restored_audio(evidence.parent, ROOT)
     require_loopback(json.loads((evidence.parent / 'baseline/report.json').read_text()))
 
 

@@ -42,9 +42,9 @@ Zoom Effect Manager installs the effects. See the [installation guide](docs/INST
   are untested there.
 * **Experimental MS-70CDR+ source ports:** all 22 release effects plus the
   12 Matujuice v1.5 effects build using Stomphacks. Hardware validation is in
-  progress: 31 effects pass selected standalone hardware checks. The SyncEQ and
-  DubSiren restoration failures are fixed; Scorch's detailed reference and the
-  last two Matujuice hardware tests remain in progress. See
+  progress: 33 effects, including all 12 Matujuice ports, pass selected standalone
+  hardware checks. The SyncEQ and DubSiren restoration failures are fixed;
+  Scorch's detailed reference and final installation checks remain in progress. See
   [development, limitations and hardware results](docs/MSPLUS-DEVELOPMENT.md).
 * **Untested/unsupported:** MS-50G+, MS-60B+ and the Four series. These require
   ZD2; released ZDL files cannot be loaded on them.
