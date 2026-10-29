@@ -80,18 +80,28 @@ bypass did not restore audio. USB power management remained on/active. This rule
 out deletion of the custom file as a necessary trigger; it does not yet establish
 the DSP failure's cause. All diagnostic edits were temporary and documented MIDI.
 
-Restoration now bypasses the experiment and waits 250 ms for the fade before
-replacing its ID. Previously it replaced an active experiment directly. An offline
-test enforces that order; this proposed fix is **not hardware-qualified yet**.
-SyncEQ and DubSiren also get a live-input capture immediately before restoration,
-so the next run can distinguish failure during silence processing from failure
-during replacement. The independent post-restoration audio gate remains mandatory.
+The next physical restart re-enumerated the pedal as USB device 076. Stock audio
+again passed both stereo paths (-20.08/-20.02 dB, correlation 0.958/0.957). The
+`synceq-bypassed-transition-01` audition confirmed that the active EQ still passed
+live input **after** the zero-input test: its filtered sweep had -19.81/-19.74 dB
+gain and correlation 0.625/0.626. Thus silence processing alone did not cause
+this failure. Restoration then bypassed the experiment and waited 250 ms before
+replacing its ID. Stock audio still disappeared, without xruns or clipping and
+before any removal. Bypass-first replacement is **not a demonstrated fix**.
+The exact failing step and underlying cause remain unknown. SyncEQ remains
+unqualified and installed; there is no `AUDIO_RESTORED` marker.
 
-The fresh storage audit is `build/msplus/audit-synceq-transition-01/VERIFIED.json`:
+SyncEQ and DubSiren now also record immediately after bypass, before replacement,
+to distinguish those two steps on the next run. This reuses the existing capture
+and temporary on/off edit; it changes no DSP code or file-transfer procedure.
+The independent post-restoration audio gate remains mandatory. The failure must
+be understood before these effects can be retained for manual audition.
+
+The fresh storage audit is `build/msplus/audit-synceq-bypassed-transition-01/VERIFIED.json`:
 autosave OFF, all 100 saved patches unchanged, all factory catalogue entries intact,
 and exactly one valid custom binary/icon, SyncEQ, byte-identical to its build.
 The current patch metadata is stock-only. File sessions closed cleanly. A further
-physical restart has been requested to test the revised transition; no firmware,
+physical restart is required to resume audio testing; no firmware,
 bootloader or undocumented recovery commands were attempted.
 
 `install_set.py` prepares the requested final manual-audition set, but refuses

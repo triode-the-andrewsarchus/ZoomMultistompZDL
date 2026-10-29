@@ -367,6 +367,13 @@ def main():
                 # Distinguish failure during zero-input processing from failure
                 # during the following stock-ID replacement. No file changes.
                 reports['before-restore'] = capture_trial(args.output / 'before-restore', 'sweep', -30, rig)
+                # Keep the bypass boundary observable too. This uses only the
+                # existing temporary on/off edit, before any ID replacement or
+                # saved-bank reads. Never infer DSP health from MIDI ACKs.
+                session.edit(0, 0)
+                time.sleep(0.25)
+                reports['before-replacement-bypassed'] = capture_trial(
+                    args.output / 'before-replacement-bypassed', 'sweep', -30, rig)
             (args.output / 'captures.json').write_text(json.dumps(reports, indent=2) + '\n')
         finally:
             if not session.protocol_ok:

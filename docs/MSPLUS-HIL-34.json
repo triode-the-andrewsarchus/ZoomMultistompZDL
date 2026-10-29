@@ -987,9 +987,9 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
-      "status": "NOT QUALIFIED: steady-state audio checks pass; stock restoration loses audio before any removal",
+      "status": "NOT QUALIFIED: active audio survives silence; bypass-first restoration still loses stock audio before removal",
       "current_build_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5",
-      "evidence": "build/msplus/remaining-campaign-20261029-02/synceq/hil/analysis.json",
+      "evidence": "build/msplus/synceq-bypassed-transition-01/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -997,7 +997,7 @@
       ],
       "configured_passed": true,
       "additional_activity_errors": [],
-      "capture_count": 7,
+      "capture_count": 8,
       "tested_binary_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5",
       "source_fingerprints": {
         "src/msplus/synceq/manifest.json": "35b8cb0dd1f09093e922b9bfeee4e294faae02c63e6563d814aaf24e4c4a9619",
@@ -1127,5 +1127,13 @@
       "maximum_dsp_peak": 0.55
     },
     "quiet_calibrator_machine_code_preserved_bytes": 640
+  },
+  "current_blocker": {
+    "port": "synceq",
+    "audit": "build/msplus/audit-synceq-bypassed-transition-01/VERIFIED.json",
+    "before_replacement_audio": "build/msplus/synceq-bypassed-transition-01/hil/before-restore/report.json",
+    "failed_stock_audio": "build/msplus/synceq-bypassed-transition-01/hil/restored/report.json",
+    "finding": "Steady-state and post-silence audio valid; bypass-first restoration did not prevent audio loss. Exact failing step and root cause unresolved. Storage and saved bank verified intact.",
+    "retained_set_installed": false
   }
 }
