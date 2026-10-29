@@ -100,6 +100,24 @@ class AudioTests(unittest.TestCase):
 
 
 class AuditionSafetyTests(unittest.TestCase):
+    def test_restoration_bypasses_before_replacing_the_experiment(self):
+        from unittest.mock import patch
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.original = b'stock patch'
+        session.restore_parameter_count = 0
+        session.edit = Mock()
+        session.current = Mock(return_value=b'stock patch')
+        session.pedal = Mock()
+        stock = Mock()
+        effect = Mock(id=0x06000020, enabled=False)
+        stock.EDTB.effects = [Mock(reversed=Mock(bitwise=effect))]
+        with patch('audition.stock_patch', return_value=stock), patch('audition.ZPTC.parse', return_value=stock), \
+                patch('audition.editor_off'), patch('audition.time.sleep') as settle:
+            session.restore()
+        self.assertEqual([call.args for call in session.edit.call_args_list][:2], [(0, 0), (1, 0x06000020)])
+        settle.assert_called_once_with(.25)
+
     def test_forbidden_commands_cannot_reach_output(self):
         import io
         from audition import TempPatch
@@ -135,6 +153,88 @@ class AuditionSafetyTests(unittest.TestCase):
 
 
 class CampaignSafetyTests(unittest.TestCase):
+    def test_retained_set_requires_complete_current_passing_evidence(self):
+        import hashlib
+        import json
+        from unittest.mock import patch
+        import install_set
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / 'src/msplus/test'
+            (folder / 'build').mkdir(parents=True)
+            manifest = folder / 'manifest.json'
+            manifest.write_text(json.dumps(dict(filename='XXTEST', kernel='test.c')))
+            source = folder / 'test.c'
+            source.write_text('original source')
+            artifact = folder / 'build/XXTEST.ZD2'
+            artifact.write_bytes(b'tested binary')
+            (folder / 'build/REPORT.md').write_text('validated')
+            hil = root / 'hil'
+            (hil / 'baseline').mkdir(parents=True)
+            (hil / 'baseline/report.json').write_text(json.dumps(dict(finite=True, clipped=False, xruns=[],
+                paths=[dict(send=ch, capture=ch, gain_db=-20, correlation=.95) for ch in range(2)])))
+            (hil / 'BUILT.ZD2').write_bytes(artifact.read_bytes())
+            (hil / 'SOURCES.json').write_text(json.dumps({str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                                         for p in (source, manifest)}))
+            evidence = hil / 'analysis.json'
+            (hil / 'restored').mkdir()
+            restored = hil / 'restored/report.json'
+            restored.write_bytes((hil / 'baseline/report.json').read_bytes())
+            recording = restored.with_name('return.wav')
+            recording.write_bytes(b'restored audio')
+            proof = json.dumps(dict(report='restored/report.json',
+                report_sha256=hashlib.sha256(restored.read_bytes()).hexdigest(),
+                return_sha256=hashlib.sha256(recording.read_bytes()).hexdigest()))
+            (hil / 'AUDIO_RESTORED').write_text(proof)
+            analysis = dict(passed=True, errors=[], checks=['capture_integrity', 'signal_above_noise', 'zero_input_stability'])
+            evidence.write_text(json.dumps(analysis))
+            row = dict(port='test', evidence='hil/analysis.json', tested_binary_sha256=hashlib.sha256(artifact.read_bytes()).hexdigest())
+            report = dict(ports=[row])
+            with patch.object(install_set, 'ROOT', root):
+                self.assertEqual(install_set.qualified_artifacts(report), dict(test=artifact))
+                for rows in ([], [row, row]):
+                    with self.assertRaisesRegex(RuntimeError, 'complete musical set'):
+                        install_set.qualified_artifacts(dict(ports=rows))
+                for invalid in (dict(analysis, passed=False), dict(analysis, checks=[])):
+                    evidence.write_text(json.dumps(invalid))
+                    with self.assertRaises(RuntimeError):
+                        install_set.qualified_artifacts(report)
+                evidence.write_text(json.dumps(analysis))
+                (hil / 'AUDIO_RESTORED').unlink()
+                with self.assertRaisesRegex(RuntimeError, 'stock-audio restoration'):
+                    install_set.qualified_artifacts(report)
+                (hil / 'AUDIO_RESTORED').write_text(proof)
+                recording.write_bytes(b'changed recording')
+                with self.assertRaisesRegex(RuntimeError, 'restoration recording changed'):
+                    install_set.qualified_artifacts(report)
+                recording.write_bytes(b'restored audio')
+                artifact.write_bytes(b'untested rebuild')
+                with self.assertRaisesRegex(RuntimeError, 'tested binary'):
+                    install_set.qualified_artifacts(report)
+                artifact.write_bytes(b'tested binary')
+                source.write_text('untested source change')
+                with self.assertRaisesRegex(RuntimeError, 'source has changed'):
+                    install_set.qualified_artifacts(report)
+
+    def test_retained_set_stops_on_uncertain_install_without_rollback(self):
+        from unittest.mock import patch
+        import install_set
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evidence = root / 'evidence.json'
+            evidence.write_text('{}')
+            argv = ['install_set.py', '--backup', str(root / 'backup'), '--evidence', str(evidence),
+                    '--output', str(root / 'output')]
+            with patch.object(install_set.sys, 'argv', argv), \
+                    patch.object(install_set, 'qualified_artifacts', return_value={'test': root / 'XXTEST.ZD2'}), \
+                    patch.object(install_set, 'verify_backup'), patch.object(install_set, 'preflight'), \
+                    patch.object(install_set, 'upstream_operation', side_effect=[None, RuntimeError('uncertain transfer')]) as operation, \
+                    patch.object(install_set.subprocess, 'run') as audit:
+                with self.assertRaisesRegex(RuntimeError, 'uncertain transfer'):
+                    install_set.main()
+                self.assertEqual([c.args[1] for c in operation.call_args_list], ['install', 'install'])
+                audit.assert_not_called()
+
     def test_missing_audio_restoration_marker_stops_before_uninstall(self):
         import json
         from unittest.mock import patch

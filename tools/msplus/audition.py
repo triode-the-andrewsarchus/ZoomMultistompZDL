@@ -254,6 +254,12 @@ class TempPatch:
     def restore(self):
         original = stock_patch(self.original)
         effect = original.EDTB.effects[0].reversed.bitwise
+        # Stop the experiment before asking the host to replace its instance.
+        # MIDI metadata can acknowledge an active replacement even when the
+        # audio engine fails to return to the stock path. Preserve the ramp
+        # and keep the subsequent independent audio-restoration gate.
+        self.edit(0, 0)
+        time.sleep(0.25)
         self.edit(1, effect.id)
         for index in range(self.restore_parameter_count):
             self.edit(index + 2, effect[f'param{index + 1}'])
@@ -357,6 +363,10 @@ def main():
             # requested siren burst.
             session.edit(0, 0 if args.effect.name == 'dubsiren' else 1)
             reports['silence'] = capture_trial(args.output / 'silence', 'silence', -30, rig)
+            if args.effect.name in ('synceq', 'dubsiren'):
+                # Distinguish failure during zero-input processing from failure
+                # during the following stock-ID replacement. No file changes.
+                reports['before-restore'] = capture_trial(args.output / 'before-restore', 'sweep', -30, rig)
             (args.output / 'captures.json').write_text(json.dumps(reports, indent=2) + '\n')
         finally:
             if not session.protocol_ok:
@@ -372,9 +382,14 @@ def main():
             print('Original temporary patch restored', flush=True)
             # Parameter readback alone cannot establish that the DSP resumed
             # stock processing. Verify actual audio before binary removal.
+            # Let the MIDI-port close/graph change settle before recording.
+            time.sleep(0.25)
             restored = capture_trial(args.output / 'restored', 'sweep', -30, rig)
             require_loopback(restored)
-            (args.output / 'AUDIO_RESTORED').write_text('Both calibrated stock loopback paths verified.\n')
+            proof = args.output / 'restored/report.json'
+            (args.output / 'AUDIO_RESTORED').write_text(json.dumps(dict(
+                report='restored/report.json', report_sha256=hashlib.sha256(proof.read_bytes()).hexdigest(),
+                return_sha256=hashlib.sha256(proof.with_name('return.wav').read_bytes()).hexdigest()), indent=2) + '\n')
 
 
 if __name__ == '__main__':

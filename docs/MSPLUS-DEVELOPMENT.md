@@ -2,8 +2,10 @@
 
 Experimental ports on branch `feat/ms70cdr-plus`, tested on an actual MS-70CDR+
 firmware **1.10**. All **22 original musical effects** and **12 Matujuice v1.5
-effects** now build as ZD2. Hardware testing is paused pending a physical
-pedal restart after the DubSiren repeat campaign lost the stock audio path.
+effects** now build as ZD2. Hardware testing resumed after a physical
+restart, then stopped on a newly caught SyncEQ stock-restoration failure. The
+latest audit has one valid SyncEQ binary/icon installed, with only stock saved
+patches. See the October 29 update below.
 Released `dist/*.ZDL` files and the browser editor still target the original
 pedals. No Plus release binaries have been published.
 
@@ -11,15 +13,15 @@ pedals. No Plus release binaries have been published.
 
 The original 22 are Flower, Klang, Scorch, Corrupt, Howl, Dustbox, GenLoss,
 Microlm, Shatter, Arrakis, Taffy, Dissolve, Mangle, Rooms, Hydra, Spiral,
-Stasis, Rewire, Gyre, Galactic, Spool and Oxide. All except Spiral have run
+Stasis, Rewire, Gyre, Galactic, Spool and Oxide. All have run
 individually on this pedal with finite, unclipped, xrun-free recordings at selected
-settings. Spiral is built/native-tested and still requires its first pedal test.
+settings. Spiral passed its first pedal test on October 29.
 A stricter activity check found that Rewire's default bit crusher silences the
 very quiet test input; its test profile now lowers Bits without changing its
-musical defaults. Rooms DIGIT/GATE also need threshold-aware reruns: the native
+musical defaults. Rooms DIGIT/GATE needed threshold-aware test settings: the native
 reference confirms that Time=100, Depth=0 and the existing -20 dBFS send ceiling
 produce measurable output. Neither source defaults nor safety limits changed.
-Those hardware reruns remain pending.
+The reviewed Rewire/Rooms reruns passed on October 29.
 
 Matujuice adds WaveFold, DualShft, Choral, EuGate, DubSiren, S.GN_L, Scrub,
 GridDly, SyncEQ, Breather, DirtBox and Sweep. Their pristine MIT-licensed C DSP
@@ -47,16 +49,63 @@ relaxing its comparison thresholds.
 These checks qualify selected standalone cases, not all knob transitions,
 long-duration endurance, every source feature or multi-effect chains.
 
-The [34-port evidence report](MSPLUS-HIL-34-20261028.json) records each port's
-actual status. **22 effects** currently pass selected standalone hardware checks
-including the stricter signal-activity audit: 18 original effects plus WaveFold,
-DualShft, Choral and EuGate. Rewire/Rooms need the revised profiles; Scorch has
-its unresolved numerical mismatch; Spiral and seven Matujuice effects await
-hardware tests. DubSiren generated its intended burst on the first run, but its
-repeat campaign is not qualified because the stock baseline was already invalid.
-Do not install the full 34-effect set for manual audition yet.
+The [current evidence report](MSPLUS-HIL-34.json) records the latest per-port
+status as of October 29. Previous snapshots remain in Git history.
+**26 effects** pass selected standalone hardware checks. SyncEQ's steady-state
+checks also pass, but its return to stock fails and is not qualified. Scorch's
+numerical mismatch and DubSiren's transition failure remain unresolved. Five
+Matujuice effects still await hardware tests. Retention now additionally requires
+an actual verified stock-audio return for each port; only four campaigns currently
+have that evidence under the latest guard. Do not retain the full set yet.
 
-## Bench incident and required continuation
+## October 29 continuation
+
+A physical power cycle re-enumerated the pedal as USB device 075. The full audit
+confirmed the factory catalogue and all saved patches unchanged. Both stock
+stereo paths recovered at approximately -20 dB gain and 0.957 correlation. A
+capture taken during file auditing was interrupted; audio capture and pedal-file
+operations must be serialized, including read-only file operations.
+
+Spiral and the threshold-adjusted Rewire passed, including actual stereo audio
+after stock restoration. Rooms passed all six modes at the reviewed settings.
+An xrun invalidated only its post-restoration recording; the runner stopped before
+removal. A separate complete stock preflight then passed, and the original failed
+recording was retained. Rooms was removed only after this independent positive
+audio verification. S.GN_L subsequently passed its complete campaign and removal.
+
+SyncEQ passed default/boost/cut and zero-input checks, then returned only noise
+after stock metadata restoration. The runner caught this **before uninstall** and
+left the binary available. Re-enabling stock, reselecting SyncEQ, and toggling
+bypass did not restore audio. USB power management remained on/active. This rules
+out deletion of the custom file as a necessary trigger; it does not yet establish
+the DSP failure's cause. All diagnostic edits were temporary and documented MIDI.
+
+Restoration now bypasses the experiment and waits 250 ms for the fade before
+replacing its ID. Previously it replaced an active experiment directly. An offline
+test enforces that order; this proposed fix is **not hardware-qualified yet**.
+SyncEQ and DubSiren also get a live-input capture immediately before restoration,
+so the next run can distinguish failure during silence processing from failure
+during replacement. The independent post-restoration audio gate remains mandatory.
+
+The fresh storage audit is `build/msplus/audit-synceq-transition-01/VERIFIED.json`:
+autosave OFF, all 100 saved patches unchanged, all factory catalogue entries intact,
+and exactly one valid custom binary/icon, SyncEQ, byte-identical to its build.
+The current patch metadata is stock-only. File sessions closed cleanly. A further
+physical restart has been requested to test the revised transition; no firmware,
+bootloader or undocumented recovery commands were attempted.
+
+`install_set.py` prepares the requested final manual-audition set, but refuses
+before any pedal operations until every musical port has passing required audio
+checks, a valid stock baseline, verified stock-audio restoration, and current
+binary/source hashes matching its exact hardware evidence. Restoration markers
+link to the actual gain/correlation report and recording by SHA-256; a marker
+without intact, passing audio evidence is insufficient. It reuses upstream
+classification/install/readback, validates all artifacts before the first write,
+then audits the entire retained set and stock audio. Sixteen offline
+measurement/safety tests cover these gates and stopping on uncertain transfers.
+The tool is implemented; it has **not** installed the final set.
+
+## October 28 bench incident and initial continuation
 
 After the first DubSiren campaign's restoration/removal, its repeat campaign
 recorded a siren-like transient during what should have been a stock baseline,
@@ -76,7 +125,7 @@ installation and before custom-ID selection. After restoring the stock metadata,
 it records another stereo sweep and requires `AUDIO_RESTORED` before uninstalling.
 If that check fails, the runner stops with the binary still installed; inspect
 logs and storage safety before further actions. Finite ADC noise is insufficient
-for passing. Thirteen offline measurement/safety tests include invalid/noisy baselines,
+for passing. Sixteen offline measurement/safety tests include invalid/noisy baselines,
 catalogue changes, corrupted readbacks, and refusal to uninstall after metadata-only
 restoration. Saved-patch dumps alone do not prove that stock DSP is running.
 
@@ -296,9 +345,9 @@ $PY tools/msplus/run.py --backup build/msplus/backup-20261028 \
 
 ## Final pedal state and architecture review
 
-The latest full storage audit is
-`build/msplus/audit-after-dubsiren-02/VERIFIED.json`: autosave OFF, stock scratch,
-100 saved patches unchanged, factory effect list byte-identical and all 37
+The last empty-custom storage audit is
+`build/msplus/audit-after-power-cycle-01/VERIFIED.json`: autosave OFF, stock scratch,
+100 saved patches unchanged, factory effect list byte-identical and all 38
 experimental/diagnostic ZD2/ZIC pairs absent. Further documented stock selections
 also preserved all saved patches (`build/msplus/stock-reload-02/VERIFIED`).
 Factory files were never overwritten or deleted. The verified baseline backup is
@@ -309,10 +358,11 @@ qualification: it validates the catalogue with upstream's grammar, requires ever
 factory entry unchanged plus exactly the named custom entries (including version,
 ID and installed flag), and reads every expected custom binary/icon back for
 byte equality. Diagnostics must be absent. It also rechecks all saved patches.
-This is read-only verification, not a bulk installer or permission to bypass tests.
+This is read-only verification. `install_set.py` separately provides the guarded
+retained-set installation described above; it refuses incomplete or stale evidence.
 
 Architecture comparison against `pre-msplus` reduced duplication from 12.24% to
-11.13%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
+11.05%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
 cycles. The maximum increase is the existing Oxide kernel with both mutually
 exclusive ABIs and necessary coefficient/arena/output guards; these checks remain.
 The shared Matujuice kernel and control helpers avoid duplicating DSP entry logic;
