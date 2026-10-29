@@ -2,10 +2,15 @@
 
 Experimental ports on branch `feat/ms70cdr-plus`, tested on an actual MS-70CDR+
 firmware **1.10**. All **22 original musical effects** and **12 Matujuice v1.5
-effects** now build as ZD2. Hardware testing resumed after a physical
-restart, then stopped on a newly caught SyncEQ stock-restoration failure. The
-latest audit has one valid SyncEQ binary/icon installed, with only stock saved
-patches. See the October 29 update below.
+effects** now build as ZD2 and pass selected standalone hardware checks. All 34
+are installed with their icons for manual audition. The retained-set audit read
+back all 68 files, confirmed all 100 saved patches unchanged, preserved factory
+catalogue entries and verified stock stereo audio with autosave OFF. The exact
+installation evidence is `build/msplus/retained-34-20261029-01/`. A fresh full
+readback verified all 305 original files except the deliberately updated effect
+list byte-for-byte, including all 302 factory effect/icon/IR files. The final
+post-readback stereo audio check also passed. See
+`build/msplus/final-audit-34-20261029-01/COMPLETE.json`.
 Released `dist/*.ZDL` files and the browser editor still target the original
 pedals. No Plus release binaries have been published.
 
@@ -14,7 +19,8 @@ pedals. No Plus release binaries have been published.
 The original 22 are Flower, Klang, Scorch, Corrupt, Howl, Dustbox, GenLoss,
 Microlm, Shatter, Arrakis, Taffy, Dissolve, Mangle, Rooms, Hydra, Spiral,
 Stasis, Rewire, Gyre, Galactic, Spool and Oxide. All have run
-individually on this pedal with finite, unclipped, xrun-free recordings at selected
+individually on this pedal with finite recordings, no ADC full-scale clipping and
+no xruns at selected
 settings. Spiral passed its first pedal test on October 29.
 A stricter activity check found that Rewire's default bit crusher silences the
 very quiet test input; its test profile now lowers Bits without changing its
@@ -41,10 +47,12 @@ Native checks cover all 34 kernels, invalid coefficients, initialization and
 arena canaries, selected control extremes, original-versus-Plus sample math,
 and independent references for several simpler effects. Hardware checks also
 include Klang sidebands, Corrupt sub/master/harmony, Stasis capture/hold while
-bypassed/release, and selected Matujuice signatures. Scorch's detailed calibrated
-harmonic comparison still fails; it produces stable distortion, but numerical
-hardware/reference equivalence is unresolved. Preserve that failure rather than
-relaxing its comparison thresholds.
+bypassed/release, and selected Matujuice signatures. Scorch now passes its
+calibrated maximum-Gain comparison inside the independently measured output
+linear range. Fundamental errors are -0.044/-0.021 dB; compared harmonics differ
+by at most 1.24 dB, within the unchanged tolerances. Its high-output capture still
+shows the separately measured output-chain compression and remains explicitly
+outside the direct linear reference comparison.
 
 These checks qualify selected standalone cases, not all knob transitions,
 long-duration endurance, every source feature or multi-effect chains.
@@ -67,15 +75,14 @@ $PY tools/msplus/report.py --previous docs/MSPLUS-HIL-34.json \
   build/msplus/remaining-ports-campaign-20261029-04
 ```
 
-**33 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
+**34 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
 pass actual stock-audio restoration with protected control-state storage. All ten
 Matujuice ports tested in `matu-packed-campaign-01` passed and were removed safely.
 Scrub and GridDly subsequently passed hardware tests with full-length, 15-bit
-histories; see the precision note below. Scorch's numerical comparison remains
-unresolved, with high-level output compression now independently measured.
-Retention additionally requires current binary/source provenance and an actual
-verified stock-audio return for every port. The older original-effect campaigns
-are being repeated under that guard. Do not retain the full set yet.
+histories; see the precision note below. Scorch passed after separating DSP
+comparison from independently measured high-level output compression.
+All 34 have current binary/source provenance and verified stock-audio restoration;
+the accepted campaigns contain 271 recordings. The complete set is now retained.
 
 ## Verified restoration fix and remaining history adapters
 
@@ -118,9 +125,9 @@ in `remaining-ports-campaign-20261029-03`.
 The output-linearity diagnostic was safely removed after its completed campaign.
 It measured less than 0.053 dB gain change through DSP peak 0.275, then
 1.48/1.12 dB compression at peak 0.55. Its strict 0.5 dB linearity check correctly
-fails. This supports investigating the output stage as the cause of Scorch's
-high-amplitude harmonic mismatch; it does not yet qualify Scorch or justify
-relaxing its DSP comparison tolerances.
+fails. This identified a confounder in Scorch's high-amplitude comparison and
+motivated the independently bounded comparison below; it did not justify relaxing
+the DSP comparison tolerances.
 
 The prepared Scorch comparison retains maximum Gain and the existing wet-only
 high-level capture, and adds Mix=50 for a direct DSP comparison below the measured
@@ -131,15 +138,16 @@ remain visible and explicitly marked outside that range; they are not described
 as equivalent. The extra maximum-Gain capture must actually lie within the range
 and pass the unchanged 1 dB fundamental / 3 dB harmonic tolerances. Missing or
 out-of-range reference captures fail. Synthetic tests detect a deliberately
-incorrect low-level DSP output and reject a changed calibration. Actual Scorch
-hardware validation is pending. Trial edits are now recorded in `CASES.json`.
+incorrect low-level DSP output and reject a changed calibration. Scorch passed
+the actual `scorch-linear-range-hil-01` campaign, including stock restoration and
+removal before the retained-set install. Trial edits are recorded in `CASES.json`.
 
 `audit-after-packed-matu-01/VERIFIED.json` verifies an empty experimental set,
 byte-identical factory effect list, all saved patches unchanged and autosave OFF
 after that campaign. The next serialized campaign covers the remaining original
 effects plus the two PCM-history ports. No firmware or recovery commands are used.
 
-## October 29 continuation
+## October 29 restoration investigation (historical sequence)
 
 A physical power cycle re-enumerated the pedal as USB device 075. The full audit
 confirmed the factory catalogue and all saved patches unchanged. Both stock
@@ -190,18 +198,18 @@ not a DSP fix or evidence that effect replacement is safe.
 The fresh storage audit is `build/msplus/audit-synceq-bypass-boundary-01/VERIFIED.json`:
 autosave OFF, all 100 saved patches unchanged, all factory catalogue entries intact,
 and exactly one valid custom binary/icon, SyncEQ, byte-identical to its build.
-The current patch metadata is stock-only. File sessions closed cleanly. A further
-physical restart is required to resume audio testing; no firmware,
+At that point the patch metadata was stock-only and file sessions closed cleanly.
+A further physical restart was needed to resume audio testing; no firmware,
 bootloader or undocumented recovery commands were attempted.
 
 The USB-078 step trace subsequently isolated audio loss to the stock-ID edit,
-before any stock knob was restored. The candidate SyncEQ build now uses lossless
+before any stock knob was restored. The initial SyncEQ candidate used lossless
 packed control-state storage between callbacks to keep NaN integer sentinels out
-of reused audio memory. It passes 19 native tests and a bit-identical 114,688-sample
-comparison with the earlier wrapper. It is not installed or hardware-qualified.
+of reused audio memory. It passed 19 native tests and a bit-identical 114,688-sample
+comparison with the earlier wrapper before the successful hardware runs above.
 See [the memory investigation](MSPLUS-MEMORY-RESEARCH.md#stock-replacement-and-non-audio-arena-state-october-29)
 for the hypothesis, exact storage layout, evidence and remaining PCM-ring concern.
-Only SyncEQ currently opts in; no other musical algorithm was changed.
+Only SyncEQ opted in at that stage; the other ports were protected subsequently.
 
 `install_set.py` prepares the requested final manual-audition set, but refuses
 before any pedal operations until every musical port has passing required audio
@@ -212,7 +220,10 @@ without intact, passing audio evidence is insufficient. It reuses upstream
 classification/install/readback, validates all artifacts before the first write,
 then audits the entire retained set and stock audio. Sixteen offline
 measurement/safety tests cover these gates and stopping on uncertain transfers.
-The tool is implemented; it has **not** installed the final set.
+The complete retained-set run is `build/msplus/retained-34-20261029-01/`.
+Its `INSTALLED.json`, `audit/VERIFIED.json` and final stock-audio recording verify
+34 installed musical ports, 68 byte-identical binaries/icons, all saved patches
+unchanged, all diagnostics absent, stock scratch and autosave OFF.
 
 The latest storage audit reports 1,190,190 bytes available with SyncEQ installed.
 All 34 current ZD2/ZIC pairs total 499,073 bytes, so their file sizes fit within
@@ -260,9 +271,10 @@ memory, never changes descriptor fields, and initializes only its own arena.
 See [memory evidence and limits](MSPLUS-MEMORY-RESEARCH.md). Hydra and Stasis
 clear large buffers in bounded steps.
 
-The 34 ZD2/ZIC pairs total approximately **499 KB** against **1.21 MB free** in
-the verified baseline. File sizes suggest enough space to keep all 34 alongside all
-factory effects; actual allocated usage must be verified after installation. This is separate from simultaneous processing: the pedal has
+The 34 ZD2/ZIC pairs total **506,929 bytes**. They are all installed alongside
+the factory set, with **580,780 bytes free** after filesystem allocation. Capacity
+to retain all 34 is therefore hardware-verified. Simultaneous processing has
+separate limits: the pedal has
 six effect slots, DSP loads are conservative placeholders, and multi-slot arena
 ownership/aggregate CPU capacity have not yet been hardware-qualified. Start
 manual testing with one custom effect at a time.
@@ -406,68 +418,63 @@ and the reviewed Rooms DIGIT/GATE profiles at -20 dBFS. Earlier +12 dB return tr
 rejected. A quiet bounded triangle diagnostic measured the return change as
 -12.001/-12.001 dB. Do not change return gains mid-campaign.
 
-## Scorch reference limitation
+## Scorch calibration and output-chain compression
 
-The diagnostic emits known triangles (997/1499 Hz, DSP peak at most 0.001),
-using only verified small state. `reference.py` estimates DSP-bus-to-return
-scaling, then compares Scorch's hardware harmonics against the actual C kernel
-compiled natively. It uses the stock-bypass tone to infer input amplitude.
+The quiet diagnostic emits known triangles (997/1499 Hz, DSP peak at most 0.001),
+using verified small state. `reference.py` estimates DSP-bus-to-return scaling,
+then compares hardware harmonics against the actual C kernel compiled natively.
+The stock-bypass tone supplies the input amplitude. Jointly fitting ten harmonics
+plus DC avoids leakage into weak harmonics at arbitrary capture phases.
 
 ```sh
 $PY tools/msplus/reference.py build/msplus/calibrate-hil-0db
-$PY tools/msplus/analyze.py build/msplus/campaign-0db-01/scorch/hil \
-  --effect scorch --calibration build/msplus/calibrate-hil-0db/calibration.json
-# The same --calibration option can be supplied to run.py.
+$PY tools/msplus/analyze.py build/msplus/scorch-linear-range-hil-01/scorch/hil \
+  --effect scorch --calibration build/msplus/calibrate-hil-0db/calibration.json \
+  --output-probe build/msplus/matu-packed-campaign-01/linearity/hil
+# run.py accepts the same --calibration and --output-probe options.
 ```
 
-The current comparison fails: fundamental output is about 1.5 dB below the
-model, third harmonic about 2.7 dB below, and fourth harmonic about 3.5 dB below.
-Both return channels show the same pattern. The original single-harmonic fit
-reported a 6.4 dB fourth-harmonic error. Jointly fitting ten sine/cosine pairs
-plus DC removes leakage between the strong fundamental and weak harmonics in
-noninteger-period windows. A synthetic test verifies weak-harmonic extraction
-at multiple arbitrary phases. The 1 dB fundamental / 3 dB harmonic limits and
-noise threshold remain unchanged; correcting the estimator does not pass Scorch. The exact installed binary/source hashes are preserved. Native
-Scorch agrees with an independent scipy filter model; hardware dry-path gain
-and capture integrity pass. A simple input/output scale fit did not explain
-all harmonics. Calibration/model assumptions, target floating-point behavior
-and firmware staging remain possible causes, not established diagnoses.
-No acceptance thresholds or effect math were changed to conceal this failure.
-Do not consider Scorch quantitatively qualified until this is resolved.
+The initial Mix=100 comparison had a -1.5 dB fundamental error and a -3.5 dB
+fourth-harmonic error. Correcting the estimator alone did not pass it. The bounded
+`linearity` diagnostic then independently measured the output chain: gain changes
+stay below 0.053 dB through DSP peak 0.275, but reach -1.48/-1.12 dB at peak 0.55.
+Its strict 0.5 dB linearity test correctly reports failure. The diagnostic was
+removed safely and is absent from the retained musical set.
 
-
-A new `linearity` diagnostic is built and validated **offline only** to investigate
-whether the output stage compresses louder signals. It shares the quiet triangle
-source, defaults to Level=0, and uses reviewed levels 1/2/5/10/25/50/75/100 followed
-by 0. The DSP peak is bounded to 0.55 (first step 0.0055); no external input or
-large-memory descriptor is used. Tests verify default silence, the level ceiling,
-known RMS, invalid-coefficient rejection, and detection of a saturating output
-stage. Its ID is `07001290`, file `XXZLINE.ZD2`; it is **not** one of the 34 musical
-ports and has never been uploaded. Refactoring the triangle source preserved the
-quiet calibrator's 640-byte `.audio` machine code exactly.
-
-After stock audio is restored, the existing guarded runner can measure this
-probe and remove it, with the same backup, autosave, readback and audio-restoration
-gates. Comparison reports each channel's gain change from the quiet first step;
-changes over 0.5 dB fail the diagnostic rather than being normalized away. A missing
-or implausibly scaled quiet reference also fails. This measures a suspected cause,
-not an established explanation of the Scorch mismatch.
-
-```sh
-# Only after the physical restart and a healthy stock stereo loopback.
-$PY tools/msplus/run.py --backup build/msplus/backup-20261028 \
-  --output build/msplus/linearity-hil-01 linearity
-```
+The final Scorch test keeps Gain=100 and records both Mix=100 and Mix=50. The
+latter's predicted DSP peaks are 0.2728/0.2724, within the independently measured
+0.275 linear limit. Its fundamental errors are -0.044/-0.021 dB and all compared
+harmonics fall within 1.24 dB. It passes the unchanged 1 dB fundamental / 3 dB
+harmonic tolerances and noise threshold. The Mix=100 harmonic measurements remain
+in the report, explicitly outside the measured linear range; they are not claimed
+to match a linear output model. Missing, invalid or out-of-range calibration and
+reference recordings fail qualification. No Scorch DSP math or acceptance
+tolerance was changed. Actual audio restoration and guarded removal also passed
+before its qualified binary was reinstalled for manual audition.
 
 ## Final pedal state and architecture review
 
-The last empty-custom storage audit is
-`build/msplus/audit-after-power-cycle-01/VERIFIED.json`: autosave OFF, stock scratch,
-100 saved patches unchanged, factory effect list byte-identical and all 38
-experimental/diagnostic ZD2/ZIC pairs absent. Further documented stock selections
-also preserved all saved patches (`build/msplus/stock-reload-02/VERIFIED`).
-Factory files were never overwritten or deleted. The verified baseline backup is
-`build/msplus/backup-20261028` (306 files, including 300 ZD2/ZIC envelopes).
+The complete set remains installed, with a stock-only scratch patch selected
+and autosave OFF. `build/msplus/retained-34-20261029-01/INSTALLED.json` identifies
+all 34 exact binaries; its audit read back all 68 binaries/icons, checked the
+factory catalogue, all 100 saved patches and the absence of all four diagnostics.
+The full readback `build/msplus/final-factory-readback-20261029-01/` contains 374
+CRC-checked files and 100 stock-only saved patches. Compared with the original
+306-file backup, all 305 original files except the effect list are byte-identical,
+including 149 ZD2, 151 ZIC and two ZIR files. The effect list contains the original
+factory entries plus exactly the 34 expected custom entries. Every custom binary
+and icon also matches its current build byte-for-byte.
+
+`build/msplus/final-audit-34-20261029-01/FACTORY_MATCH.json` records the content
+comparison; `COMPLETE.json` binds the accepted report, full backup and final audio
+recording by SHA-256. Both final stereo paths passed after all file sessions had
+closed. All 100 saved patches remained unchanged, autosave OFF was acknowledged
+again, and PipeWire's original forced quantum of 128 was restored. There are
+580,780 bytes free. The pedal is ready for unplugged standalone manual audition.
+Do not save a patch containing an experimental effect. Start with one custom
+effect at a time; multi-instance memory ownership and aggregate CPU use remain
+unqualified. Cross-effect FOLLOW/Mozaic sync and original screen artwork/value
+labels remain unported. Scrub/GridDly use the documented 15-bit histories.
 
 `verify.py --installed <port names...>` can audit an exact retained set after
 qualification: it validates the catalogue with upstream's grammar, requires every
@@ -478,13 +485,16 @@ This is read-only verification. `install_set.py` separately provides the guarded
 retained-set installation described above; it refuses incomplete or stale evidence.
 
 Architecture comparison against `pre-msplus` reduced duplication from 12.24% to
-11.05%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
-cycles. The maximum increase is the existing Oxide kernel with both mutually
+10.92%, average complexity 4.66→4.83, maximum 122→136, and no additional dependency
+cycles (six before and after). The analyzer classifies the maximum/clone-count
+increases as a regression. The maximum increase is the existing Oxide kernel with both mutually
 exclusive ABIs and necessary coefficient/arena/output guards; these checks remain.
 The shared Matujuice kernel and control helpers avoid duplicating DSP entry logic;
 the remaining adapter similarities are fixed parameter translations and original
 control glue. The analysis orchestrator now dispatches specific checks through a
-registry. New tooling reuses upstream packaging, validation and transfers rather
+registry. The report generator reuses the retained-install gates, and restoration
+proof verification and output-linearity measurement each have one shared
+implementation. New tooling reuses upstream packaging, validation and transfers rather
 than implementing another protocol. The remaining metric increases reflect the
 explicit safety branches, ABI coexistence and added validation, not an altered
 musical algorithm or deletion of necessary guards.

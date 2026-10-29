@@ -422,11 +422,36 @@
       "build_report": "src/msplus/galactic/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
-      "ready_for_retention": false,
-      "stock_baseline_healthy": false,
-      "status": "UNQUALIFIED: latest hardware attempt has no completed analysis",
+      "ready_for_retention": true,
+      "stock_baseline_healthy": true,
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
       "evidence": "build/msplus/remaining-ports-campaign-20261029-04/galactic/hil/analysis.json",
-      "audio_restoration_marker_present": false
+      "audio_restoration_marker_present": true,
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "analysis_errors": [],
+      "capture_count": 7,
+      "tested_binary_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
+      "source_fingerprints": {
+        "src/msplus/galactic/manifest.json": "a3a25f7311f692be00a9476ff3c66c7ae50eacd30ea07fb4b1ab140612cf6ce6",
+        "src/msplus/galactic/galactic.c": "a7d1c290a6a780764ec87d5cdfbc1ad4dc3bd867995bc238ab9bae9d654ce4e1",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
+        "src/airwindows/galactic/manifest.json": "2db6c7e26e764be93eb19dad38ae4bcc161beaf90903604ca8e76fca7a5d1c17",
+        "src/airwindows/galactic/galactic.c": "6b5e818b4d74a03b95de793fe62ff4532e9e0bae9d7252dad4887164b3d34736",
+        "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
+        "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      }
     },
     {
       "port": "genloss",
@@ -730,11 +755,11 @@
       "build_report": "src/msplus/oxide/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: Verified stock-audio restoration is missing",
-      "evidence": "build/msplus/airwindows-campaign-01/oxide/hil/analysis.json",
-      "audio_restoration_marker_present": false,
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/oxide/hil/analysis.json",
+      "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -743,19 +768,23 @@
       ],
       "configured_passed": true,
       "analysis_errors": [],
-      "capture_count": 6,
+      "capture_count": 7,
       "tested_binary_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
       "source_fingerprints": {
         "src/msplus/oxide/manifest.json": "363b29a4bb8110c68164691ef612586643e9865e5ed8ecf4990dc5db9ab33dfd",
         "src/msplus/oxide/oxide.c": "dd873d6564c97350c67d837883885ad00518762ca3ec976f05bed6c7a7c40ac9",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/airwindows/totape9/manifest.json": "b75d0f863509d666536f6b9fc864abd4bd875e5c764024a1de5bf2907eb1a145",
         "src/airwindows/totape9/totape9.c": "2af8b64be7700d6b5b8993ba4300a8d8f72ac9311fbd0bf54e67666e83e30da0",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
-      },
-      "qualification_error": "Verified stock-audio restoration is missing"
+      }
     },
     {
       "port": "rewire",
@@ -837,11 +866,11 @@
       "build_report": "src/msplus/scorch/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: scorch: hardware evidence has failed checks",
-      "evidence": "build/msplus/campaign-0db-01/scorch/hil/analysis.json",
-      "audio_restoration_marker_present": false,
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/scorch-linear-range-hil-01/scorch/hil/analysis.json",
+      "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -849,22 +878,22 @@
         "native_DSP_harmonics",
         "zero_input_stability"
       ],
-      "configured_passed": false,
-      "analysis_errors": [
-        "Scorch reference mismatch: {'channel': 0, 'harmonic': 1, 'predicted_rms': 0.39229880161001585, 'measured_rms': 0.33012053541387776, 'error_db': -1.4988888128976607}",
-        "Scorch reference mismatch: {'channel': 0, 'harmonic': 4, 'predicted_rms': 0.00038952826727722015, 'measured_rms': 0.0002604344153787552, 'error_db': -3.4968121006998896}",
-        "Scorch reference mismatch: {'channel': 1, 'harmonic': 1, 'predicted_rms': 0.3947073708980523, 'measured_rms': 0.33358162248218276, 'error_db': -1.4614623989930433}",
-        "Scorch reference mismatch: {'channel': 1, 'harmonic': 4, 'predicted_rms': 0.0003974344733894058, 'measured_rms': 0.00026402291046542456, 'error_db': -3.5524784164025376}"
-      ],
-      "capture_count": 7,
+      "configured_passed": true,
+      "analysis_errors": [],
+      "capture_count": 9,
       "tested_binary_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
       "source_fingerprints": {
         "src/msplus/scorch/manifest.json": "ece65afd972027784fe5c7ac84bc80fe5a969ee0184c535f33308d78ebbdde7e",
         "src/msplus/scorch/scorch.c": "01916f2591326810547ce7f78b3e401c55f0fa4021b344b5904d2eaf82266f53",
-        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
-      },
-      "qualification_error": "scorch: hardware evidence has failed checks"
+      }
     },
     {
       "port": "scrub",
@@ -1025,11 +1054,11 @@
       "build_report": "src/msplus/spool/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: Verified stock-audio restoration is missing",
-      "evidence": "build/msplus/airwindows-campaign-01/spool/hil/analysis.json",
-      "audio_restoration_marker_present": false,
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/spool/hil/analysis.json",
+      "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -1038,19 +1067,23 @@
       ],
       "configured_passed": true,
       "analysis_errors": [],
-      "capture_count": 6,
+      "capture_count": 7,
       "tested_binary_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
       "source_fingerprints": {
         "src/msplus/spool/manifest.json": "8561fbbebbb543c36e3175c56fc2094038ec1ded8a2005e71c56c3d8a9b348d7",
         "src/msplus/spool/spool.c": "1450aa0f9ef684927242149d07e149859d243fbe2f0439f744c5786655168470",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/airwindows/tapeecho4/manifest.json": "dc328918ac11390aa86e8713f9e4a35def702c19703a7b151131dc2a1a19ec21",
         "src/airwindows/tapeecho4/tapeecho4.c": "e113ec842938821d56e607ba65ddd6ae53f11117257fbd657a06bb0e0a57d6f8",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
-      },
-      "qualification_error": "Verified stock-audio restoration is missing"
+      }
     },
     {
       "port": "stasis",
@@ -1286,13 +1319,8 @@
     "quiet_calibrator_machine_code_preserved_bytes": 640
   },
   "current_blocker": {
-    "ports": [
-      "galactic",
-      "oxide",
-      "scorch",
-      "spool"
-    ],
-    "finding": "Current qualification gates are incomplete"
+    "ports": [],
+    "finding": "All musical ports have current standalone hardware qualification"
   },
   "verification_logs": {
     "native": {

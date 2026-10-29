@@ -113,7 +113,7 @@ have passing standalone hardware evidence. The exact old binary/icon pair remain
 archived under `build/msplus/synceq-before-packed-state-build`. Never overwrite an
 installed filename with a new build.
 
-Scrub/GridDly require protection of their PCM histories too. Their proposed
+Scrub/GridDly require protection of their PCM histories too. Their hardware-tested
 full-length 15-bit encoding, precision cost and reference tests are documented in
 [the development report](MSPLUS-DEVELOPMENT.md#verified-restoration-fix-and-remaining-history-adapters).
 GenLoss and Mangle instead move their single RNG integer to small state; their

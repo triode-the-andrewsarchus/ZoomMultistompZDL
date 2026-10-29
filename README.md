@@ -41,10 +41,10 @@ Zoom Effect Manager installs the effects. See the [installation guide](docs/INST
   ([#4](https://github.com/themanro/ZoomMultistompZDL/issues/4)); NAM and CabIR
   are untested there.
 * **Experimental MS-70CDR+ source ports:** all 22 release effects plus the
-  12 Matujuice v1.5 effects build using Stomphacks. Hardware validation is in
-  progress: 33 effects, including all 12 Matujuice ports, pass selected standalone
-  hardware checks. The SyncEQ and DubSiren restoration failures are fixed;
-  Scorch's detailed reference and final installation checks remain in progress. See
+  12 Matujuice v1.5 effects build using Stomphacks. All 34 pass selected standalone
+  hardware tests and are installed on
+  the test pedal, with saved patches preserved and autosave off. Scrub/GridDly use
+  15-bit histories; cross-effect FOLLOW sync remains unsupported. See
   [development, limitations and hardware results](docs/MSPLUS-DEVELOPMENT.md).
 * **Untested/unsupported:** MS-50G+, MS-60B+ and the Four series. These require
   ZD2; released ZDL files cannot be loaded on them.
