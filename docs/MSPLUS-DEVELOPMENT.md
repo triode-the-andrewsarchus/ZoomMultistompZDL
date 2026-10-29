@@ -76,7 +76,7 @@ installation and before custom-ID selection. After restoring the stock metadata,
 it records another stereo sweep and requires `AUDIO_RESTORED` before uninstalling.
 If that check fails, the runner stops with the binary still installed; inspect
 logs and storage safety before further actions. Finite ADC noise is insufficient
-for passing. Eleven offline safety tests include invalid/noisy baselines,
+for passing. Thirteen offline measurement/safety tests include invalid/noisy baselines,
 catalogue changes, corrupted readbacks, and refusal to uninstall after metadata-only
 restoration. Saved-patch dumps alone do not prove that stock DSP is running.
 
@@ -256,14 +256,43 @@ $PY tools/msplus/analyze.py build/msplus/campaign-0db-01/scorch/hil \
 ```
 
 The current comparison fails: fundamental output is about 1.5 dB below the
-model; fourth-harmonic error is about -6.4 dB. Both return channels show the
-same pattern. The exact installed binary/source hashes are preserved. Native
+model, third harmonic about 2.7 dB below, and fourth harmonic about 3.5 dB below.
+Both return channels show the same pattern. The original single-harmonic fit
+reported a 6.4 dB fourth-harmonic error. Jointly fitting ten sine/cosine pairs
+plus DC removes leakage between the strong fundamental and weak harmonics in
+noninteger-period windows. A synthetic test verifies weak-harmonic extraction
+at multiple arbitrary phases. The 1 dB fundamental / 3 dB harmonic limits and
+noise threshold remain unchanged; correcting the estimator does not pass Scorch. The exact installed binary/source hashes are preserved. Native
 Scorch agrees with an independent scipy filter model; hardware dry-path gain
 and capture integrity pass. A simple input/output scale fit did not explain
 all harmonics. Calibration/model assumptions, target floating-point behavior
 and firmware staging remain possible causes, not established diagnoses.
 No acceptance thresholds or effect math were changed to conceal this failure.
 Do not consider Scorch quantitatively qualified until this is resolved.
+
+
+A new `linearity` diagnostic is built and validated **offline only** to investigate
+whether the output stage compresses louder signals. It shares the quiet triangle
+source, defaults to Level=0, and uses reviewed levels 1/2/5/10/25/50/75/100 followed
+by 0. The DSP peak is bounded to 0.55 (first step 0.0055); no external input or
+large-memory descriptor is used. Tests verify default silence, the level ceiling,
+known RMS, invalid-coefficient rejection, and detection of a saturating output
+stage. Its ID is `07001290`, file `XXZLINE.ZD2`; it is **not** one of the 34 musical
+ports and has never been uploaded. Refactoring the triangle source preserved the
+quiet calibrator's 640-byte `.audio` machine code exactly.
+
+After stock audio is restored, the existing guarded runner can measure this
+probe and remove it, with the same backup, autosave, readback and audio-restoration
+gates. Comparison reports each channel's gain change from the quiet first step;
+changes over 0.5 dB fail the diagnostic rather than being normalized away. A missing
+or implausibly scaled quiet reference also fails. This measures a suspected cause,
+not an established explanation of the Scorch mismatch.
+
+```sh
+# Only after the physical restart and a healthy stock stereo loopback.
+$PY tools/msplus/run.py --backup build/msplus/backup-20261028 \
+  --output build/msplus/linearity-hil-01 linearity
+```
 
 ## Final pedal state and architecture review
 
@@ -283,7 +312,7 @@ byte equality. Diagnostics must be absent. It also rechecks all saved patches.
 This is read-only verification, not a bulk installer or permission to bypass tests.
 
 Architecture comparison against `pre-msplus` reduced duplication from 12.24% to
-11.21%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
+11.13%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
 cycles. The maximum increase is the existing Oxide kernel with both mutually
 exclusive ABIs and necessary coefficient/arena/output guards; these checks remain.
 The shared Matujuice kernel and control helpers avoid duplicating DSP entry logic;

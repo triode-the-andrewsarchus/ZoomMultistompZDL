@@ -33,6 +33,43 @@ class BackupTests(unittest.TestCase):
 
 
 class AudioTests(unittest.TestCase):
+    def test_linearity_measurement_detects_a_saturated_output_stage(self):
+        import soundfile as sf
+        from analyze import validate_linearity
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wave = np.tile(np.linspace(-1, 1, 100, endpoint=False), 60)
+            def recording(name, samples):
+                path = root / name
+                path.mkdir(exist_ok=True)
+                sf.write(path / 'return.wav', np.repeat(samples[:, None], 2, axis=1), 1000, subtype='FLOAT')
+            recording('baseline', np.zeros(len(wave)))
+            for level in (1, 2, 5, 10, 25, 50, 75, 100):
+                recording(f'peak{level:02}', wave*.55*level/100)
+            rows, errors = validate_linearity(root)
+            self.assertFalse(errors)
+            self.assertEqual(len(rows), 8)
+            recording('peak100', np.clip(wave*.55, -.3, .3))
+            _, errors = validate_linearity(root)
+            self.assertEqual(len(errors), 1)
+            self.assertIn('level', errors[0])
+            recording('peak01', np.zeros(len(wave)))
+            _, errors = validate_linearity(root)
+            self.assertIn('Quiet diagnostic amplitude is missing', errors[0])
+
+    def test_harmonic_fit_resolves_weak_tones_at_arbitrary_window_phases(self):
+        from reference import harmonic_rms
+        rate, frequency = 48000, 997
+        t = np.arange(int(.8 * rate)) / rate
+        amplitudes = np.array([.4, .0006, .15, .0002, .017, .009, .004, .002, .001, .0005])
+        for phase in (0, .41, 1.9):
+            audio = .01 + sum(amplitude * np.sin(2*np.pi*frequency*harmonic*t + phase*harmonic)
+                              for harmonic, amplitude in enumerate(amplitudes, 1))
+            np.testing.assert_allclose(harmonic_rms(audio, rate, frequency), amplitudes/np.sqrt(2),
+                                       atol=1e-12, rtol=1e-9)
+        with self.assertRaises(ValueError):
+            harmonic_rms(audio, rate, frequency, count=25)
+
     def test_loopback_health_rejects_finite_noise_and_wrong_channel_paths(self):
         report = dict(finite=True, clipped=False, xruns=[], paths=[])
         with self.assertRaises(RuntimeError):

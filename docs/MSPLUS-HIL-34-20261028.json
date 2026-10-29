@@ -3,8 +3,8 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 16,
-  "tool_fault_tests": 11,
+  "native_tests": 17,
+  "tool_fault_tests": 13,
   "return_gain_db": 0,
   "ports": [
     {
@@ -643,6 +643,7 @@
       "evidence": "build/msplus/campaign-0db-01/scorch/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
+        "signal_above_noise",
         "dry_path_gain",
         "native_DSP_harmonics",
         "zero_input_stability"
@@ -659,7 +660,85 @@
         "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
         "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
       },
-      "stock_baseline_healthy": true
+      "stock_baseline_healthy": true,
+      "joint_harmonic_reference": [
+        {
+          "channel": 0,
+          "harmonic": 1,
+          "predicted_rms": 0.39229880161001585,
+          "measured_rms": 0.33012053541387776,
+          "error_db": -1.4988888128976607
+        },
+        {
+          "channel": 0,
+          "harmonic": 2,
+          "predicted_rms": 0.0005712658615030709,
+          "measured_rms": 0.0006727570796819258,
+          "error_db": 1.4204001008684688
+        },
+        {
+          "channel": 0,
+          "harmonic": 3,
+          "predicted_rms": 0.15958039352968795,
+          "measured_rms": 0.11645949032882481,
+          "error_db": -2.7360929316577174
+        },
+        {
+          "channel": 0,
+          "harmonic": 4,
+          "predicted_rms": 0.00038952826727722015,
+          "measured_rms": 0.0002604344153787552,
+          "error_db": -3.4968121006998896
+        },
+        {
+          "channel": 0,
+          "harmonic": 5,
+          "predicted_rms": 0.017042881090697876,
+          "measured_rms": 0.014153277892580045,
+          "error_db": -1.6137195999340148
+        },
+        {
+          "channel": 1,
+          "harmonic": 1,
+          "predicted_rms": 0.3947073708980523,
+          "measured_rms": 0.33358162248218276,
+          "error_db": -1.4614623989930433
+        },
+        {
+          "channel": 1,
+          "harmonic": 2,
+          "predicted_rms": 0.0005735198136923423,
+          "measured_rms": 0.0006933624555972844,
+          "error_db": 1.6482379069743602
+        },
+        {
+          "channel": 1,
+          "harmonic": 3,
+          "predicted_rms": 0.1601386472019629,
+          "measured_rms": 0.11842432065495287,
+          "error_db": -2.621105066977279
+        },
+        {
+          "channel": 1,
+          "harmonic": 4,
+          "predicted_rms": 0.0003974344733894058,
+          "measured_rms": 0.00026402291046542456,
+          "error_db": -3.5524784164025376
+        },
+        {
+          "channel": 1,
+          "harmonic": 5,
+          "predicted_rms": 0.016958559479268224,
+          "measured_rms": 0.014519020954718333,
+          "error_db": -1.3490325382787718
+        }
+      ],
+      "reference_errors": [
+        "Scorch reference mismatch: {'channel': 0, 'harmonic': 1, 'predicted_rms': 0.39229880161001585, 'measured_rms': 0.33012053541387776, 'error_db': -1.4988888128976607}",
+        "Scorch reference mismatch: {'channel': 0, 'harmonic': 4, 'predicted_rms': 0.00038952826727722015, 'measured_rms': 0.0002604344153787552, 'error_db': -3.4968121006998896}",
+        "Scorch reference mismatch: {'channel': 1, 'harmonic': 1, 'predicted_rms': 0.3947073708980523, 'measured_rms': 0.33358162248218276, 'error_db': -1.4614623989930433}",
+        "Scorch reference mismatch: {'channel': 1, 'harmonic': 4, 'predicted_rms': 0.0003974344733894058, 'measured_rms': 0.00026402291046542456, 'error_db': -3.5524784164025376}"
+      ]
     },
     {
       "port": "scrub",
@@ -883,5 +962,19 @@
     "scorch_reference_mismatch": 1,
     "dubsiren_unqualified": 1,
     "not_yet_hardware_tested": 8
+  },
+  "offline_followup": {
+    "stock_audio_recheck": "build/msplus/stock-audio-recheck-03/report.json",
+    "stock_audio_paths_recovered": false,
+    "audio_interface_muted": false,
+    "scorch_comparison_method": "Joint least squares: ten harmonics plus DC; original acceptance limits preserved",
+    "output_linearity_diagnostic": {
+      "build_report": "src/msplus/linearity/build/REPORT.md",
+      "id": "07001290",
+      "installed": false,
+      "default_level": 0,
+      "maximum_dsp_peak": 0.55
+    },
+    "quiet_calibrator_machine_code_preserved_bytes": 640
   }
 }

@@ -229,9 +229,36 @@ def validate_activity(directory):
     return rows, errors
 
 
+def validate_linearity(directory):
+    """Measure return gain versus known DSP peaks; no correction is fitted away."""
+    baseline, rate = sf.read(directory / 'baseline/return.wav', always_2d=True)
+    noise = np.mean(baseline[-rate:]**2, axis=0)
+    rows, errors = [], []
+    quiet_gain = None
+    for level in (1, 2, 5, 10, 25, 50, 75, 100):
+        audio, actual_rate = sf.read(directory / f'peak{level:02}/return.wav', always_2d=True)
+        if actual_rate != rate:
+            raise ValueError('Linearity capture rates differ')
+        rms = np.sqrt(np.maximum(np.mean(audio[rate//2:5*rate]**2, axis=0) - noise, 0))
+        peak = .55 * level/100
+        gain = rms/(peak/np.sqrt(3))
+        if quiet_gain is None:
+            if np.any(rms < 5*np.sqrt(noise)) or np.any((gain < .5) | (gain > 2)):
+                return [], ['Quiet diagnostic amplitude is missing or inconsistent with the calibrated rig']
+            quiet_gain = gain
+        change = 20*np.log10(np.maximum(gain, 1e-15)/np.maximum(quiet_gain, 1e-15))
+        row = dict(level=level, dsp_peak=peak, bus_to_return_gain=gain.tolist(),
+                   change_from_quiet_db=change.tolist())
+        rows.append(row)
+        if np.any(abs(change) > .5):
+            errors.append(f'Output stage gain changes by more than 0.5 dB: {row}')
+    return rows, errors
+
+
 # Effect-specific evidence stays next to its test function, rather than adding
 # another branch to the orchestration for each new port.
 EFFECT_CHECKS = {
+    'linearity': ('output_linearity', 'known_amplitude_output_linearity', validate_linearity),
     'corrupt': ('tracking', 'master_sub_harmony_frequencies', validate_tracking),
     'klang': ('sidebands', 'ring_sideband_frequencies', validate_ring),
     'stasis': ('held_or_generated_audio', 'held_or_generated_audio',
@@ -253,7 +280,7 @@ def main():
     ap.add_argument('directory', type=Path)
     ap.add_argument('--gain-check', action='store_true')
     ap.add_argument('--calibration', type=Path)
-    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
+    ap.add_argument('--effect', choices=['gain', 'linearity', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
     results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS)

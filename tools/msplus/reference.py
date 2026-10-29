@@ -29,12 +29,21 @@ def calibrate(directory):
     return result
 
 
-def sine_rms(samples, rate, frequency):
+def harmonic_rms(samples, rate, frequency, count=10):
+    """Fit harmonics together so arbitrary capture phase cannot leak between them.
+
+    Each tone has both sine/cosine terms and the fit includes DC. Independent
+    single-tone fits are biased when a noninteger-period window contains a much
+    louder fundamental or other harmonics, particularly for Scorch's weak H4.
+    """
+    if count < 1 or frequency <= 0 or frequency * count >= rate / 2:
+        raise ValueError('Harmonics must be positive and below Nyquist')
     t = np.arange(len(samples)) / rate
-    basis = np.column_stack((np.sin(2 * np.pi * frequency * t),
-                             np.cos(2 * np.pi * frequency * t), np.ones(len(t))))
+    basis = np.column_stack([wave(2 * np.pi * frequency * harmonic * t)
+                             for harmonic in range(1, count + 1)
+                             for wave in (np.sin, np.cos)] + [np.ones(len(t))])
     coeff, *_ = np.linalg.lstsq(basis, samples, rcond=None)
-    return float(np.hypot(coeff[0], coeff[1]) / np.sqrt(2))
+    return np.hypot(coeff[:-1:2], coeff[1:-1:2]) / np.sqrt(2)
 
 
 def compare_scorch(directory, calibration):
@@ -51,7 +60,7 @@ def compare_scorch(directory, calibration):
         start = int((0.8 + ch * 2.5) * rate)
         recorded = actual[start:start + int(0.8 * rate), ch]
         original = base[start:start + len(recorded), ch]
-        amplitude = sine_rms(original, rate, 997) * np.sqrt(2) * scaling / gains[ch]
+        amplitude = harmonic_rms(original, rate, 997, count=1)[0] * np.sqrt(2) * scaling / gains[ch]
         kernel = Kernel('scorch')
         kernel.coeff[5:7] = [1, 1]  # reviewed tone case: Gain=100, Mix=100
         count = 44160
@@ -60,9 +69,11 @@ def compare_scorch(directory, calibration):
         samples[:, 1 - ch] = amplitude * np.sin(2 * np.pi * 997 * t)
         predicted = np.concatenate([kernel.block(b) for b in samples.reshape(-1, 16, 2)])
         predicted = predicted[-35280:, 1 - ch] * gains[ch]
+        predicted_levels = harmonic_rms(predicted, 44100, 997)
+        recorded_levels = harmonic_rms(recorded, rate, 997)
         for harmonic in range(1, 6):
-            expected = sine_rms(predicted, 44100, 997 * harmonic)
-            measured = sine_rms(recorded, rate, 997 * harmonic)
+            expected = float(predicted_levels[harmonic - 1])
+            measured = float(recorded_levels[harmonic - 1])
             error_db = float(20 * np.log10(max(measured, 1e-15) / max(expected, 1e-15)))
             rows.append(dict(channel=ch, harmonic=harmonic, predicted_rms=expected,
                              measured_rms=measured, error_db=error_db))

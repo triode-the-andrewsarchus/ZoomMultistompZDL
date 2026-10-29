@@ -27,6 +27,9 @@ from pedal_common import assert_autosave_off, editor_off
 
 # Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
 CASES = {
+    'XXZLINE': [(f'peak{level:02}', [(2, level)], 'silence')
+                for level in (1, 2, 5, 10, 25, 50, 75, 100)]
+               + [('reset', [(2, 0)], 'silence')],
     'XXZGENLS': [(name, [(2, 0), (3, 100), (4, 0), (5, mix)], 'sweep')
                  for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                 + [('wobble', [(2, 100)], 'sweep')],

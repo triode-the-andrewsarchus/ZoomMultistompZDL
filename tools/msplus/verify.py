@@ -57,7 +57,7 @@ def main():
     ap.add_argument('--installed', nargs='+', default=[], help='Exact musical ports expected to remain installed')
     args = ap.parse_args()
     paths = sorted((ROOT / 'src/msplus').glob('*/manifest.json'))
-    available = {p.parent.name for p in paths} - {'gain', 'calibrate', 'meminfo'}
+    available = {p.parent.name for p in paths} - {'gain', 'calibrate', 'meminfo', 'linearity'}
     if len(set(args.installed)) != len(args.installed) or set(args.installed) - available:
         ap.error('--installed requires distinct musical port names')
     manifests = [json.loads(p.read_text()) for p in paths if p.parent.name in args.installed]

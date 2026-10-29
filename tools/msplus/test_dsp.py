@@ -10,7 +10,7 @@ from native import Kernel, ROOT, MATU_PORTS
 
 class DSPTests(unittest.TestCase):
     def test_faults_fail_closed_and_stay_in_bounds(self):
-        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate', 'meminfo', 'genloss']:
+        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate', 'linearity', 'meminfo', 'genloss']:
             k = Kernel(name)
             canary = k.state[k.guard_word:].copy()
             k.state[k.guard_word] = 0
@@ -307,6 +307,16 @@ class DSPTests(unittest.TestCase):
         audio = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(1000)])
         self.assertLessEqual(np.max(abs(audio)), 0.001001)
         np.testing.assert_allclose(np.sqrt(np.mean(audio ** 2, axis=0)), 0.001 / np.sqrt(3), rtol=0.01)
+
+    def test_linearity_probe_starts_silent_and_respects_stepped_ceiling(self):
+        k = Kernel('linearity')
+        self.assertTrue((k.block(np.zeros((16, 2))) == 0).all())
+        for level in (1, 25, 100, 0):
+            k.coeff[5] = level/100
+            audio = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(1000)])
+            peak = .55 * level/100
+            self.assertLessEqual(np.max(abs(audio)), peak + 1e-7)
+            np.testing.assert_allclose(np.sqrt(np.mean(audio**2, axis=0)), peak/np.sqrt(3), rtol=.01)
 
 
 if __name__ == '__main__':

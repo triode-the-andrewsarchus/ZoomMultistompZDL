@@ -1,0 +1,9 @@
+{
+  "name": "ZDLLinear", "filename": "XXZLINE", "id": "07001290",
+  "version": "0.10", "display": "LINEARITY", "badge": "ZD",
+  "description": "Diagnostic only. Default silent; reviewed steps measure output linearity at bounded DSP peaks up to 0.55. Never save; remove after measurement.",
+  "dspload": 8, "kernel": "linearity.c", "state_bytes": 8,
+  "scaffold": "cleanroom",
+  "params": [{"name": "Level", "max": 100, "default": 0,
+              "explanation": "Diagnostic DSP peak = Level * 0.0055; start at 1, restore 0."}]
+}
