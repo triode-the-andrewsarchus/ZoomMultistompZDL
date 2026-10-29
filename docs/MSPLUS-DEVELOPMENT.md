@@ -51,6 +51,22 @@ long-duration endurance, every source feature or multi-effect chains.
 
 The [current evidence report](MSPLUS-HIL-34.json) records the latest per-port
 status as of October 29. Previous snapshots remain in Git history.
+`tools/msplus/report.py` refreshes it from explicitly ordered campaign directories,
+reusing the installer's actual measurement, restoration and source/binary gates.
+An incomplete or failed newer attempt supersedes an older pass. Test counts come
+from passing unittest logs, whose hashes are recorded. It opens no pedal or audio
+connection; supplying the same path for `--previous` and `--output` is supported.
+
+```sh
+$PY tools/msplus/report.py --previous docs/MSPLUS-HIL-34.json \
+  --output docs/MSPLUS-HIL-34.json \
+  --native-log build/msplus/native-rng-pcm15-all-01.log \
+  --tools-log build/msplus/tools-scorch-linear-03.log \
+  build/msplus/matu-packed-campaign-01 \
+  build/msplus/remaining-ports-campaign-20261029-03 \
+  build/msplus/remaining-ports-campaign-20261029-04
+```
+
 **33 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
 pass actual stock-audio restoration with protected control-state storage. All ten
 Matujuice ports tested in `matu-packed-campaign-01` passed and were removed safely.
