@@ -13,8 +13,8 @@ import sys
 from pathlib import Path
 
 from upstream import ROOT, STOMPHACKS
-from audition import TempPatch, verify_backup
-from audio import physical_ports
+from audition import TempPatch, verify_backup, capture_trial
+from audio import physical_ports, AudioRig, temporary_quantum, require_loopback
 from pedal_common import editor_off
 
 
@@ -49,6 +49,9 @@ def run_effect(name, backup, output, calibration=None):
     if not (hil / 'RESTORED').exists():
         raise RuntimeError(f'{name}: no verified restoration marker. STOP; inspect {output / "audition.log"}. '
                            'Effect remains installed. Do not power-cycle or issue further commands blindly.')
+    if not (hil / 'AUDIO_RESTORED').exists():
+        raise RuntimeError(f'{name}: stock metadata restored but audio health unverified. STOP before removal; '
+                           f'inspect {output / "audition.log"}. Effect remains installed.')
     # Only a verified stock temp patch permits removing its binary. Even an
     # ordinary audio failure gets this cleanup, but never an uncertain restore.
     upstream_operation(output, 'uninstall', artifact, dry=True)
@@ -77,6 +80,10 @@ def preflight(backup, output):
         finally:
             editor_off(session.pedal)
             session.pedal.disconnect()
+    with temporary_quantum(1024), AudioRig(
+            [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
+            [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]) as rig:
+        require_loopback(capture_trial(output / 'stock-audio-preflight', 'sweep', -30, rig))
 
 
 def main():

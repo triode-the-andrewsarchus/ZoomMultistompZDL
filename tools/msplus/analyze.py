@@ -2,6 +2,7 @@
 """Compare HIL captures to their stock-bypass reference; never opens hardware."""
 import argparse
 import json
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -63,7 +64,7 @@ def tone_metrics(directory, mono=False):
 def load_captures(directory, reference, rate, mono=False):
     results = {}
     for folder in sorted(directory.iterdir()):
-        if folder.name == 'baseline' or not (folder / 'return.wav').is_file():
+        if folder.name in ('baseline', 'restored') or not (folder / 'return.wav').is_file():
             continue
         report = json.loads((folder / 'report.json').read_text())
         if report['xruns'] or not report['finite'] or report['clipped']:
@@ -209,6 +210,44 @@ def check_silence(directory):
     return dict(peak=np.max(abs(audio), axis=0).tolist(), growth_db=growth.tolist()), errors
 
 
+def validate_activity(directory):
+    """A stable, unclipped recording is not proof that a kernel produced audio."""
+    baseline, rate = sf.read(directory / 'baseline/return.wav', always_2d=True)
+    noise = np.sqrt(np.mean(baseline[-rate:]**2, axis=0))
+    rows, errors = [], []
+    for path in sorted(directory.glob('*/report.json')):
+        label = path.parent.name
+        report = json.loads(path.read_text())
+        if label.startswith('baseline') or label in ('dry', 'zero') or report['kind'] == 'silence':
+            continue
+        audio, _ = sf.read(path.parent / 'return.wav', always_2d=True)
+        rms = np.sqrt(np.mean(audio**2, axis=0))
+        row = dict(capture=label, above_noise_db=(20*np.log10(np.maximum(rms, 1e-12)/noise)).tolist())
+        rows.append(row)
+        if np.any(rms < noise*5):
+            errors.append(f'{label}: no reliable musical output above the noise floor: {row}')
+    return rows, errors
+
+
+# Effect-specific evidence stays next to its test function, rather than adding
+# another branch to the orchestration for each new port.
+EFFECT_CHECKS = {
+    'corrupt': ('tracking', 'master_sub_harmony_frequencies', validate_tracking),
+    'klang': ('sidebands', 'ring_sideband_frequencies', validate_ring),
+    'stasis': ('held_or_generated_audio', 'held_or_generated_audio',
+               partial(validate_hold, labels=['hold', 'hold-off'])),
+    'scrub': ('held_or_generated_audio', 'held_or_generated_audio',
+              partial(validate_hold, labels=['wet'], tone=False)),
+    'griddly': ('held_or_generated_audio', 'held_or_generated_audio',
+                partial(validate_hold, labels=['tail'], tone=False, first=True)),
+    'dubsiren': ('held_or_generated_audio', 'held_or_generated_audio',
+                 partial(validate_hold, labels=['siren'], tone=False, first=True)),
+    'wavefold': ('folded_tone', 'fold_knee_frequency_doubling', validate_wavefold),
+    'eugate': ('modulation', 'rhythm_envelope_modulation', partial(validate_modulation, label='wet')),
+    'breather': ('modulation', 'rhythm_envelope_modulation', partial(validate_modulation, label='pump')),
+}
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('directory', type=Path)
@@ -220,6 +259,10 @@ def main():
     results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS)
     errors = validate_gain(args.directory, reference, results) if args.gain_check else []
     checks = ['capture_integrity']
+    rows, problems = validate_activity(args.directory)
+    results['signal_activity'] = rows
+    errors.extend(problems)
+    checks.append('signal_above_noise')
     if args.gain_check or args.effect == 'gain':
         errors = validate_gain(args.directory, reference, results)
         checks.append('gain_curve')
@@ -232,34 +275,12 @@ def main():
         results['software_reference'] = rows
         errors.extend(problems)
         checks.append('native_DSP_harmonics')
-    if args.effect == 'corrupt':
-        rows, problems = validate_tracking(args.directory)
-        results['tracking'] = rows
+    if args.effect in EFFECT_CHECKS:
+        key, label, validate = EFFECT_CHECKS[args.effect]
+        rows, problems = validate(args.directory)
+        results[key] = rows
         errors.extend(problems)
-        checks.append('master_sub_harmony_frequencies')
-    if args.effect == 'klang':
-        rows, problems = validate_ring(args.directory)
-        results['sidebands'] = rows
-        errors.extend(problems)
-        checks.append('ring_sideband_frequencies')
-    if args.effect in ('stasis', 'scrub', 'griddly', 'dubsiren'):
-        labels = {'stasis': ['hold', 'hold-off'], 'scrub': ['wet'],
-                  'griddly': ['tail'], 'dubsiren': ['siren']}[args.effect]
-        rows, problems = validate_hold(args.directory, labels, tone=args.effect == 'stasis',
-                                       first=args.effect in ('griddly', 'dubsiren'))
-        results['held_or_generated_audio'] = rows
-        errors.extend(problems)
-        checks.append('held_or_generated_audio')
-    if args.effect == 'wavefold':
-        rows, problems = validate_wavefold(args.directory)
-        results['folded_tone'] = rows
-        errors.extend(problems)
-        checks.append('fold_knee_frequency_doubling')
-    if args.effect in ('eugate', 'breather'):
-        rows, problems = validate_modulation(args.directory, 'wet' if args.effect == 'eugate' else 'pump')
-        results['modulation'] = rows
-        errors.extend(problems)
-        checks.append('rhythm_envelope_modulation')
+        checks.append(label)
     if (args.directory / 'silence/return.wav').exists():
         rows, problems = check_silence(args.directory)
         results['silence_stability'] = rows

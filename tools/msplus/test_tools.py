@@ -8,7 +8,7 @@ import mido
 import numpy as np
 from file_session import crc32_tail, pack7
 from backup import CheckedInput
-from audio import analyze
+from audio import analyze, require_loopback
 
 
 class BackupTests(unittest.TestCase):
@@ -33,6 +33,18 @@ class BackupTests(unittest.TestCase):
 
 
 class AudioTests(unittest.TestCase):
+    def test_loopback_health_rejects_finite_noise_and_wrong_channel_paths(self):
+        report = dict(finite=True, clipped=False, xruns=[], paths=[])
+        with self.assertRaises(RuntimeError):
+            require_loopback(report)
+        report['paths'] = [dict(send=ch, capture=ch, correlation=.95, gain_db=-20) for ch in range(2)]
+        require_loopback(report)
+        for field, value in [('correlation', .1), ('gain_db', -90), ('capture', 0)]:
+            invalid = dict(report, paths=[dict(p) for p in report['paths']])
+            invalid['paths'][1][field] = value
+            with self.assertRaises(RuntimeError):
+                require_loopback(invalid)
+
     def test_known_delay_gain_and_silence(self):
         rng = np.random.default_rng(42)
         x = rng.normal(0, 0.01, (2000, 2))
@@ -86,6 +98,64 @@ class AuditionSafetyTests(unittest.TestCase):
 
 
 class CampaignSafetyTests(unittest.TestCase):
+    def test_missing_audio_restoration_marker_stops_before_uninstall(self):
+        import json
+        from unittest.mock import patch
+        import run
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            effect = root / 'src/msplus/test'
+            (effect / 'build').mkdir(parents=True)
+            (effect / 'manifest.json').write_text(json.dumps(dict(filename='XXTEST')))
+            (effect / 'build/XXTEST.ZD2').write_bytes(b'test')
+            (effect / 'build/REPORT.md').write_text('test')
+            output = root / 'campaign'
+            def metadata_only(*args, **kwargs):
+                (output / 'hil').mkdir()
+                (output / 'hil/RESTORED').write_text('metadata only')
+                return Mock(returncode=0)
+            with patch.object(run, 'ROOT', root), patch.object(run, 'upstream_operation') as operation, \
+                    patch.object(run.subprocess, 'run', side_effect=metadata_only):
+                with self.assertRaisesRegex(RuntimeError, 'audio health unverified'):
+                    run.run_effect('test', root / 'backup', output)
+                self.assertEqual([c.args[1] for c in operation.call_args_list], ['install', 'install'])
+
+    def test_final_catalogue_requires_exact_additions_and_preserves_factory_entries(self):
+        from verify import check_catalogue
+        from zoomzt2 import ZT2
+        factory = dict(effect='FACTORY.ZD2', version='1.00', id=0x07000010, installed=1)
+        custom = dict(effect='XXTEST.ZD2', version='0.10', id=0x07001100, installed=1)
+        manifest = dict(filename='XXTEST', version='0.10', id='07001100')
+        def catalogue(effects):
+            return ZT2.build([dict(name='TEST'), [dict(group=7, groupname=7, effects=effects)]])
+        original = catalogue([factory])
+        check_catalogue(original, original, [])
+        check_catalogue(original, catalogue([factory, custom]), [manifest])
+        for effects in ([custom], [factory], [factory, custom, custom],
+                        [dict(factory, installed=0), custom],
+                        [factory, dict(custom, version='0.11')]):
+            with self.assertRaises(RuntimeError):
+                check_catalogue(original, catalogue(effects), [manifest])
+
+    def test_final_readback_rejects_modified_custom_binary(self):
+        import json
+        from verify import check_files
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / 'test'
+            (folder / 'build').mkdir(parents=True)
+            path = folder / 'manifest.json'
+            path.write_text(json.dumps(dict(filename='XXTEST')))
+            (folder / 'build/XXTEST.ZD2').write_bytes(b'expected')
+            (folder / 'build/XXTEST.ZIC').write_bytes(b'icon')
+            session = Mock()
+            session.download.side_effect = [b'expected', b'icon']
+            absent, verified = check_files(session, [path], {'test'})
+            self.assertFalse(absent)
+            self.assertEqual(len(verified), 2)
+            session.download.side_effect = [b'corrupt']
+            with self.assertRaises(RuntimeError):
+                check_files(session, [path], {'test'})
+
     def test_uncertain_install_stops_without_followup(self):
         from unittest.mock import patch
         from run import upstream_operation

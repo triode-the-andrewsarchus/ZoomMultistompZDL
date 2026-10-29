@@ -15,7 +15,7 @@ from pathlib import Path
 import upstream  # noqa: F401
 import mido
 import zoomzt2
-from audio import AudioRig, run_capture, temporary_quantum
+from audio import AudioRig, run_capture, temporary_quantum, require_loopback
 from upstream import ROOT
 from native import MATU_PORTS
 from backup import CheckedInput, stock_patch
@@ -101,8 +101,18 @@ def reviewed_cases(manifest):
     knobs = {p['name']: i+2 for i, p in enumerate(manifest['params'])}
     cases = [(label, [(knobs['Mix'], mix)], 'sweep')
              for label, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+    if name == 'rewire':
+        # At this deliberately quiet send level the original default Bits=55
+        # quantizer rounds every input sample to zero. Keep source defaults;
+        # lower crushing only in the transient hardware test.
+        cases = [(label, [(knobs['Bits'], 0)] + edits, kind) for label, edits, kind in cases]
     if name == 'rooms':
-        cases.extend((f'mode{value}', [(knobs['Mode'], value)], 'sweep')
+        # DIGIT and GATE need sufficient wet energy to cross their original
+        # thresholds. A native reference confirms these bounded settings open
+        # both modes with the existing -20 dBFS send ceiling.
+        cases.extend((f'mode{value}', [(knobs['Mode'], value),
+                      (knobs['Time'], 100 if value in (20, 60) else 55),
+                      (knobs['Depth'], 0 if value in (20, 60) else 45)], 'sweep')
                      for value in [20, 40, 60, 80, 100])
     elif name == 'stasis':
         cases = [('dry', [(knobs['Capture'], 1), (knobs['Mix'], 0)], 'sweep'),
@@ -325,6 +335,7 @@ def main():
             session.edit(0, 0)
             reports = {'baseline': capture_trial(args.output / 'baseline', 'sweep', -30, rig),
                        'baseline-tone': capture_trial(args.output / 'baseline-tone', 'tone', -30, rig)}
+            require_loopback(reports['baseline'])
             session.edit(1, int(manifest['id'], 16))
             session.edit(0, 1)
             for label, edits, kind in cases:
@@ -334,9 +345,14 @@ def main():
                 level = -30
                 if manifest['filename'] == 'XXZCRRPT' and label == 'tone':
                     level = -20
+                if args.effect.name == 'rooms' and label in ('mode20', 'mode60'):
+                    level = -20
                 reports[label] = capture_trial(args.output / label, kind, level, rig)
                 print(label, {k: reports[label][k] for k in ('silent', 'clipped', 'xruns')}, flush=True)
-            session.edit(0, 1)
+            # An on transition intentionally triggers DubSiren. End its test
+            # switched off so the final silence run measures decay, not a new
+            # requested siren burst.
+            session.edit(0, 0 if args.effect.name == 'dubsiren' else 1)
             reports['silence'] = capture_trial(args.output / 'silence', 'silence', -30, rig)
             (args.output / 'captures.json').write_text(json.dumps(reports, indent=2) + '\n')
         finally:
@@ -351,6 +367,11 @@ def main():
             session.pedal.disconnect()
             (args.output / 'RESTORED').write_text('Original temp effect settings restored; all defined saved-patch bytes unchanged.\n')
             print('Original temporary patch restored', flush=True)
+            # Parameter readback alone cannot establish that the DSP resumed
+            # stock processing. Verify actual audio before binary removal.
+            restored = capture_trial(args.output / 'restored', 'sweep', -30, rig)
+            require_loopback(restored)
+            (args.output / 'AUDIO_RESTORED').write_text('Both calibrated stock loopback paths verified.\n')
 
 
 if __name__ == '__main__':

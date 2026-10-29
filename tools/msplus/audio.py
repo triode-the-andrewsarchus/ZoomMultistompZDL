@@ -70,6 +70,19 @@ def stimulus(rate, level_db, kind):
     return result
 
 
+def require_loopback(report):
+    """Qualify both calibrated stock-bypass paths, not just finite ADC noise."""
+    if report['xruns'] or not report['finite'] or report['clipped']:
+        raise RuntimeError('Invalid stock loopback capture')
+    for channel in range(2):
+        paths = [p for p in report['paths'] if p['send'] == channel and p['capture'] == channel]
+        if len(paths) != 1:
+            raise RuntimeError(f'Stock audio path {channel} is missing; stop before further effect operations')
+        path = paths[0]
+        if path['correlation'] < .8 or not -30 < path['gain_db'] < -10:
+            raise RuntimeError(f'Stock audio path differs from the calibrated rig: {path}')
+
+
 class AudioRig:
     """One JACK client and fixed connections for an entire measurement session."""
     def __init__(self, sends, returns):
