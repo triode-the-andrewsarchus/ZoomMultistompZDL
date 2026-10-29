@@ -9,6 +9,34 @@ from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
+    def test_wavefold_symmetry_range_tracks_input_level(self):
+        # The original piecewise-linear folder needs a threshold crossing.
+        # Auto-level makes straight sections sound dry at quiet input levels;
+        # this is not a bypass or an unmapped SYMM value in the Plus adapter.
+        packed = Kernel('wavefold', arena_bytes=705600)
+        raw = Kernel('wavefold', arena_bytes=705600, raw_state=True)
+        phase = 2*np.pi*1000*np.arange(44160)/44100
+        sine, cosine = np.sin(phase[-4410:]), np.cos(phase[-4410:])
+        for amplitude, drive, expected in ((.0025, 37, [5, 35, 65, 95]),
+                                           (.05, 100, list(range(101)))):
+            folded = []
+            source = np.column_stack([np.zeros(len(phase)), amplitude*np.sin(phase)])
+            for symmetry in range(101):
+                for kernel in (packed, raw):
+                    kernel.state[:] = 0
+                    kernel.state[kernel.guard_word] = kernel.guard
+                    kernel.coeff[5:10] = [drive/100, symmetry/100, 1, .5, 1]
+                actual = np.concatenate([packed.block(b) for b in source.reshape(-1, 16, 2)])
+                reference = np.concatenate([raw.block(b) for b in source.reshape(-1, 16, 2)])
+                np.testing.assert_array_equal(actual, reference)
+                wet = actual[-4410:, 1]  # Bus B is physical left.
+                fundamental = 2*(np.dot(wet, sine)*sine + np.dot(wet, cosine)*cosine)/len(wet)
+                residual = wet - wet.mean() - fundamental
+                thd = np.sqrt(np.mean(residual**2)/np.mean(fundamental**2))
+                if thd > .01:
+                    folded.append(symmetry)
+            self.assertEqual(folded, expected, (amplitude, drive))
+
     def test_packed_matujuice_controls_match_raw_state_audio_exactly(self):
         rng = np.random.default_rng(301)
         source = rng.normal(0, .01, (16384, 2)).astype(np.float32)

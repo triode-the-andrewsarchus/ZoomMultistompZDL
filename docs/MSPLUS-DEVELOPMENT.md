@@ -84,6 +84,33 @@ comparison from independently measured high-level output compression.
 All 34 have current binary/source provenance and verified stock-audio restoration;
 the accepted campaigns contain 271 recordings. The complete set is now retained.
 
+### WaveFold input sensitivity
+
+Manual audition exposed a gap in the selected hardware checks: the WaveFold
+test used SYMM 95, which lies exactly on a folding threshold. That check does
+not establish audible folding throughout the SYMM range at quiet input levels.
+The pristine Matujuice algorithm has straight transfer sections between its
+thresholds. SYMM adds a DC offset; the DC blocker removes that offset, and
+automatic level matching makes a straight section sound close to the original
+signal (sometimes with inverted polarity). Input amplitude times Drive must
+cross a threshold to produce pronounced folding. This behavior is preserved
+by the Plus port.
+
+A native sweep of every integer SYMM value, with Tone 100, Level 50 and Mix 100,
+reproduced this behavior. At DSP input peak 0.0025 and Drive 37, only SYMM
+5, 35, 65 and 95 exceeded 1% harmonic distortion. At input peak 0.05 and
+Drive 100, all 101 values exceeded 1%. These are internal DSP amplitudes,
+not interface output settings. All 202 cases matched the unprotected original
+DSP core bit for bit; `test_wavefold_symmetry_range_tracks_input_level`
+retains this coverage. This is native evidence, not an additional hardware
+sweep. No effect binary or gain scaling was changed.
+
+For audition, try Drive 100 and Mix 100, with Level near 50 to keep the
+output matched. A quiet source can still leave broad straight sections;
+raising the interface's **return** gain cannot increase folding because it
+is downstream of the effect. Making the effect more sensitive would require
+changing its original input-gain range.
+
 ## Verified restoration fix and remaining history adapters
 
 After the USB-079 restart, a healthy stock preflight permitted removing the old
