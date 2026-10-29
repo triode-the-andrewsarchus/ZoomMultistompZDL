@@ -1,0 +1,887 @@
+{
+  "schema": 1,
+  "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
+  "firmware": "1.10",
+  "branch": "feat/ms70cdr-plus",
+  "native_tests": 16,
+  "tool_fault_tests": 11,
+  "return_gain_db": 0,
+  "ports": [
+    {
+      "port": "arrakis",
+      "display": "ZDL ARRAKIS",
+      "id": "070011c0",
+      "family": "original",
+      "build_report": "src/msplus/arrakis/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/arrakis/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "408edfc32df926ecf9e106842e29bc652725599c0f6f874aa3e25014b305045f",
+      "tested_binary_sha256": "408edfc32df926ecf9e106842e29bc652725599c0f6f874aa3e25014b305045f",
+      "source_fingerprints": {
+        "src/msplus/arrakis/manifest.json": "3a4795ada1dfbcea60cd93e4d34fa246013e1ab4407ba5e5c3d4f0f7869c87e0",
+        "src/msplus/arrakis/arrakis.c": "917d93f83757b0db09a5bac7004a8927df0e7b44f7779e10bc07f5965e8e9ec7",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/arrakis/arrakis.c": "1307aa858171492b9f689a501049943659d89b00487dba1bd6a0e2730b38d4a3"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "breather",
+      "display": "MJ BREATHER",
+      "id": "07001390",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/breather/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "7cbee33ed56ddb50502050a7e9873b8da1a835858467c5b4c98e421cfbd093bb"
+    },
+    {
+      "port": "corrupt",
+      "display": "ZDL CORRUPT",
+      "id": "07001140",
+      "family": "original",
+      "build_report": "src/msplus/corrupt/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/corrupt/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "master_sub_harmony_frequencies",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
+      "tested_binary_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
+      "source_fingerprints": {
+        "src/msplus/corrupt/manifest.json": "cb7ab2845b50886162bb1d5fa220774894c7b4c600e836771394de58ac0ef930",
+        "src/msplus/corrupt/corrupt.c": "d4c4e832d0bbecbc4dd7b5c96a2bfd9a9ed646061b725312e54fdce8b8ac61c9",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/corrupt/corrupt.c": "7e5782e55dd7e60191e26184aec640faf5022107239fc8cc06d2e60fbe65d3da"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "dirtbox",
+      "display": "MJ DIRTBOX",
+      "id": "070013a0",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/dirtbox/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "0dd24f08020eec3bdbb4c1a68932f43bc6ccb2a076f452019d58b85c0edac7a0"
+    },
+    {
+      "port": "dissolve",
+      "display": "ZDL DISSOLVE",
+      "id": "070011e0",
+      "family": "original",
+      "build_report": "src/msplus/dissolve/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/dissolve/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "4a447d2b6feb0e6048dc725ea1507d694f95a6fd4d4989884949c6c612008acb",
+      "tested_binary_sha256": "4a447d2b6feb0e6048dc725ea1507d694f95a6fd4d4989884949c6c612008acb",
+      "source_fingerprints": {
+        "src/msplus/dissolve/manifest.json": "dc2ebc8b6a92ee32ffa7e1fecbb366ffbaa8a3b3bf26cc5f7d1393dbd24ca3ee",
+        "src/msplus/dissolve/dissolve.c": "24f5db169dd29b47cc849835cec40962721b8cfbc146497816919a009c894259",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/dissolve/dissolve.c": "a6cbbf109ba97e5688c58ca9c76e55cf250ab473d7998c5711206a27d97fc647"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "dualshft",
+      "display": "MJ DUALSHFT",
+      "id": "07001310",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/dualshft/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/matujuice-campaign-01/dualshft/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "3f730afde4bf02fd71ed88b148448c9fb0b2f476e85daa5ea0097980784d004b",
+      "tested_binary_sha256": "3f730afde4bf02fd71ed88b148448c9fb0b2f476e85daa5ea0097980784d004b",
+      "source_fingerprints": {
+        "src/msplus/dualshft/manifest.json": "9f3e4248fd359aa028da87cc438ba45abb8965a3b92830b93162cb90697544ee",
+        "src/msplus/dualshft/dualshft.c": "dded738c0998506a1b064dd9c534bb1df20071f965bc035edef7c9ade5797dd3",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "build/msplus/matujuice/src/custom/dualshft/manifest_pedal.json": "48668d2e42ac265a74a5ee70c6e5c8ed6fc265455910c8e980ceda1a5477aa0d",
+        "build/msplus/matujuice/src/custom/dualshft/dualshft.c": "d0b79ac32e0d377cb34046f156caade3fb0ac1800f2eb5c18be1759b1f4c5c17",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "dubsiren",
+      "display": "MJ DUBSIREN",
+      "id": "07001340",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/dubsiren/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/matujuice-campaign-02/dubsiren/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "held_or_generated_audio",
+        "zero_input_stability"
+      ],
+      "configured_passed": false,
+      "additional_activity_errors": [
+        "prime: no reliable musical output above the noise floor: {'capture': 'prime', 'above_noise_db': [2.1240847331502377, 1.8094654179250549]}"
+      ],
+      "capture_count": 6,
+      "status": "NOT QUALIFIED: repeat run has invalid stock baseline; bench audio unavailable afterward; cause unresolved",
+      "current_build_sha256": "9a9cf75cc861edd6cc6017b9d93aae4bb95a82a55c2beb0987b17e0c3f9b2166",
+      "tested_binary_sha256": "9a9cf75cc861edd6cc6017b9d93aae4bb95a82a55c2beb0987b17e0c3f9b2166",
+      "source_fingerprints": {
+        "src/msplus/dubsiren/manifest.json": "38811b51474bbd860392cf08099b1bdeb7475afd77c402c97516237555c5e18a",
+        "src/msplus/dubsiren/dubsiren.c": "191f796ef4ad6d6e092fb0f0731f24a7a9488c299631bd4c1f15c73c52ebaf77",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "build/msplus/matujuice/src/custom/dubsiren/manifest_pedal.json": "d4ceac6fea421e357e97d88a653c21fb4fef67206c4e928b59327b058f96daf5",
+        "build/msplus/matujuice/src/custom/dubsiren/dubsiren.c": "50e7bb8b94af0dad750531151fafb1f042f72f0506b7169a0b1a53ddf84ddbe7",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": false
+    },
+    {
+      "port": "dustbox",
+      "display": "ZDL DUSTBOX",
+      "id": "07001160",
+      "family": "original",
+      "build_report": "src/msplus/dustbox/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/dustbox/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+      "tested_binary_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+      "source_fingerprints": {
+        "src/msplus/dustbox/manifest.json": "0b4915c18b1853a4ea8670f3346e5e8916d40a261471b479678f2ddd0ce24188",
+        "src/msplus/dustbox/dustbox.c": "f1655219ce6d0644622c3e5a5752a4742858e01dd02228a9f2ba4755262f71ac",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/dustbox/dustbox.c": "9842544e2152699725ded1bc2fe4cac0328f1ea8e0247559ec5129d295914a29"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "eugate",
+      "display": "MJ EUGATE",
+      "id": "07001330",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/eugate/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/matujuice-campaign-01/eugate/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "rhythm_envelope_modulation",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "7306300cab4493259645edcf13800f4dd659cb5709da10f8b289882412ce3517",
+      "tested_binary_sha256": "7306300cab4493259645edcf13800f4dd659cb5709da10f8b289882412ce3517",
+      "source_fingerprints": {
+        "src/msplus/eugate/manifest.json": "fec540d4f705b2fbb61bd149b2da6dce56c948ad430635e23d5ee9452e067b70",
+        "src/msplus/eugate/eugate.c": "e57d787fd1857b74c0ca7f02981916bdf44fb9810de405ff1bd2f8e125cafa2f",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "build/msplus/matujuice/src/custom/eugate/manifest_pedal.json": "a573aea29b9d8f72985422d070e92c46fa2d64be5143868c4926faadab6c42f4",
+        "build/msplus/matujuice/src/custom/eugate/eugate.c": "a53619b2022d3092f8541c668fa548a60ffdab43ddc92521d0ffddd2cbbedec7",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "flower",
+      "display": "ZDL FLOWER",
+      "id": "07001110",
+      "family": "original",
+      "build_report": "src/msplus/flower/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/flower/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
+      "tested_binary_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
+      "source_fingerprints": {
+        "src/msplus/flower/manifest.json": "92cdfcd5c5773540dd4138832eedc8be7047db05895e9b22365c8ff892be2657",
+        "src/msplus/flower/flower.c": "b0d89fecfed01dc3f41d327acb2c5287708d170c5b53a895f061e4f6654726ae",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/flower/flower.c": "509f252da9d9c175582a9a05645f8e261638c066910207bea7b82cb14b2e57d6"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "formant",
+      "display": "MJ CHORAL",
+      "id": "07001320",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/formant/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/matujuice-campaign-01/formant/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "7c7bb6b915289cf86f17a3cccfb9a2954956bf659dc7d812a37fc162e6a924b0",
+      "tested_binary_sha256": "7c7bb6b915289cf86f17a3cccfb9a2954956bf659dc7d812a37fc162e6a924b0",
+      "source_fingerprints": {
+        "src/msplus/formant/manifest.json": "0425e0085dd3ffb826370458960f7e909553faa2ff31e1227a871c971471f7fd",
+        "src/msplus/formant/formant.c": "79fded75aa811ca45d1f38699887e53bbaf042ddf86d70d62f3bdda49edb25ff",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "build/msplus/matujuice/src/custom/formant/manifest_pedal.json": "71b5ceefb586b58df37d901490f25a17750a424ef2e4d21bd28e23c5ef7f89c2",
+        "build/msplus/matujuice/src/custom/formant/formant.c": "cdc2bfcd36f0edb825f97ea49981bdc12edbec9e63d7706fbb2162eb228ecfb3",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "galactic",
+      "display": "ZDL GALACTIC",
+      "id": "07001260",
+      "family": "original",
+      "build_report": "src/msplus/galactic/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/airwindows-campaign-01/galactic/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
+      "tested_binary_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
+      "source_fingerprints": {
+        "src/msplus/galactic/manifest.json": "a3a25f7311f692be00a9476ff3c66c7ae50eacd30ea07fb4b1ab140612cf6ce6",
+        "src/msplus/galactic/galactic.c": "a7d1c290a6a780764ec87d5cdfbc1ad4dc3bd867995bc238ab9bae9d654ce4e1",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/airwindows/galactic/manifest.json": "2db6c7e26e764be93eb19dad38ae4bcc161beaf90903604ca8e76fca7a5d1c17",
+        "src/airwindows/galactic/galactic.c": "6b5e818b4d74a03b95de793fe62ff4532e9e0bae9d7252dad4887164b3d34736",
+        "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
+        "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "genloss",
+      "display": "ZDL GENLOSS",
+      "id": "07001190",
+      "family": "original",
+      "build_report": "src/msplus/genloss/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/genloss-hil-01/genloss/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "8640b792d2f697dcb88d0b449c1ec4552d8f47396b3e196551d9748fe3b9068f",
+      "tested_binary_sha256": "8640b792d2f697dcb88d0b449c1ec4552d8f47396b3e196551d9748fe3b9068f",
+      "source_fingerprints": {
+        "src/msplus/genloss/manifest.json": "e6967427d5769daa0320c0fb158f65f7ec473b0792bae74b25dce58f259e5d57",
+        "src/msplus/genloss/genloss.c": "4c54b48dcdd4059c90d1a51a228d9ebd1bcb357215ac12bb161aeb36498c0838",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/genloss/genloss.c": "e5162633b699d7f2942c9692216b8d63f7cb4432a98e1d8d14125070c453ca32"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "griddly",
+      "display": "MJ GRIDDLY",
+      "id": "07001370",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/griddly/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "dd2c9dce285ee9c9f345e76ea98f0694d47121920895cbefa12122a4a87936a2"
+    },
+    {
+      "port": "gyre",
+      "display": "ZDL GYRE",
+      "id": "07001250",
+      "family": "original",
+      "build_report": "src/msplus/gyre/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/gyre/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "27479645b204afbf0156379608e5b48580803d29dcf55a23545d295e8c5fca70",
+      "tested_binary_sha256": "27479645b204afbf0156379608e5b48580803d29dcf55a23545d295e8c5fca70",
+      "source_fingerprints": {
+        "src/msplus/gyre/manifest.json": "2184a90f45ec3e6ec423dd8659c923e07eac1c5ee936578e8356d8b3b8eae500",
+        "src/msplus/gyre/gyre.c": "eb93ddf130cbbffbc75cc1de54bd2ee0848f629f8ddb02316e1ce4c4dedfc986",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/gyre/gyre.c": "93ccf567adea3623523796f08f4962895d9f10e0577d816b3255795ce915bae7"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "howl",
+      "display": "ZDL HOWL",
+      "id": "07001150",
+      "family": "original",
+      "build_report": "src/msplus/howl/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/howl/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
+      "tested_binary_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
+      "source_fingerprints": {
+        "src/msplus/howl/manifest.json": "a755d99ba39a3133385f01442614f0ed7e958da249991149a6a5fc4e6f7aad64",
+        "src/msplus/howl/howl.c": "1e92ff368f24582ecaf6bfdda1197fe2c836dc1d6fc49b2b276aa40ffb624c7c",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/howl/howl.c": "ce118f36d911c6b5b4e2d9c01e2e1a7daeea4fc0f6bcddb97d4e5b551fe94b68"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "hydra",
+      "display": "ZDL HYDRA",
+      "id": "07001210",
+      "family": "original",
+      "build_report": "src/msplus/hydra/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/airwindows-campaign-01/hydra/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "85d69b0a8bb44e157070d4ac79b59eae02a9f87eb648376d83cf3134f44371a6",
+      "tested_binary_sha256": "85d69b0a8bb44e157070d4ac79b59eae02a9f87eb648376d83cf3134f44371a6",
+      "source_fingerprints": {
+        "src/msplus/hydra/manifest.json": "494f85efd9eca154fd445b5425fe1c842fa913a2855fc648168ef8c3bde68b31",
+        "src/msplus/hydra/hydra.c": "358528e394cf71fbd1e5def0fbd21687778fe94716f4ccb8ce93be689816dc49",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/custom/hydra/hydra.c": "67cd433c780490ab7a90d69fdce9842bc21537ca16335347508275b49aaea7f1"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "klang",
+      "display": "ZDL KLANG",
+      "id": "07001120",
+      "family": "original",
+      "build_report": "src/msplus/klang/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/klang/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "ring_sideband_frequencies",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
+      "tested_binary_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
+      "source_fingerprints": {
+        "src/msplus/klang/manifest.json": "f4eb057625aeaa7782af6345bd725b8ea4b4424a14ad613e012745d8e5ef9691",
+        "src/msplus/klang/klang.c": "deb16cdc42199ddd49ab6e2a91c097fd98b837c7a9e9a9128268263a59837ee9",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/klang/klang.c": "a9fee170b31849addd07656c2e386bb95ed1a26865184214e9c5d3d375232206"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "mangle",
+      "display": "ZDL MANGLE",
+      "id": "070011f0",
+      "family": "original",
+      "build_report": "src/msplus/mangle/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/mangle/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "2b920b09a81bc836e48839f10b93c0040483c0af801872b16cc0c6e257ede5aa",
+      "tested_binary_sha256": "2b920b09a81bc836e48839f10b93c0040483c0af801872b16cc0c6e257ede5aa",
+      "source_fingerprints": {
+        "src/msplus/mangle/manifest.json": "ca8da3c5a08cf677db6ffc5f9668b7f1259a71a2b4c1a642753e5dc58f2ffa1a",
+        "src/msplus/mangle/mangle.c": "25c45dba9c5ef4cdb8478fcc739b20dc0b6f51ac015b84f3a8a72144850fb362",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/mangle/mangle.c": "8a908ff5b83e6c58458634c811eadd7dd32d14cff7ab51a217532b85698014ed"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "microloom",
+      "display": "ZDL MICROLM",
+      "id": "070011a0",
+      "family": "original",
+      "build_report": "src/msplus/microloom/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/microloom/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
+      "tested_binary_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
+      "source_fingerprints": {
+        "src/msplus/microloom/manifest.json": "63f0fca52d03a79d12330d7b9f394f9968df8f2abba20edc4deff2e7c54220cd",
+        "src/msplus/microloom/microloom.c": "49604b96b8fad58846a802e0e92b0a8e668a91706c53ff055f432cc4930656fe",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/microloom/microloom.c": "87497f0029baf0cbaaa1d604575c82fdf325e4cc02606c869f854a2303e5e3c1"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "oxide",
+      "display": "ZDL OXIDE",
+      "id": "07001280",
+      "family": "original",
+      "build_report": "src/msplus/oxide/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/airwindows-campaign-01/oxide/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
+      "tested_binary_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
+      "source_fingerprints": {
+        "src/msplus/oxide/manifest.json": "363b29a4bb8110c68164691ef612586643e9865e5ed8ecf4990dc5db9ab33dfd",
+        "src/msplus/oxide/oxide.c": "dd873d6564c97350c67d837883885ad00518762ca3ec976f05bed6c7a7c40ac9",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/airwindows/totape9/manifest.json": "b75d0f863509d666536f6b9fc864abd4bd875e5c764024a1de5bf2907eb1a145",
+        "src/airwindows/totape9/totape9.c": "2af8b64be7700d6b5b8993ba4300a8d8f72ac9311fbd0bf54e67666e83e30da0",
+        "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
+        "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "rewire",
+      "display": "ZDL REWIRE",
+      "id": "07001240",
+      "family": "original",
+      "build_report": "src/msplus/rewire/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/rewire/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [
+        "wet: no reliable musical output above the noise floor: {'capture': 'wet', 'above_noise_db': [-3.02942316943778, -3.2761344192903503]}"
+      ],
+      "capture_count": 6,
+      "status": "RERUN PENDING: stricter activity check; reviewed transient test settings adjusted for low send level",
+      "current_build_sha256": "89934bc2b2d1eddaf15ce71db411d95b466c8bd0d82554f6a5f905bc16fb1e54",
+      "tested_binary_sha256": "89934bc2b2d1eddaf15ce71db411d95b466c8bd0d82554f6a5f905bc16fb1e54",
+      "source_fingerprints": {
+        "src/msplus/rewire/manifest.json": "bd167aeecd8bd6fddf3a9d59690232e5bdced9c8246227e7ea27d3f5160536d1",
+        "src/msplus/rewire/rewire.c": "5b9be74078d357c07db7064f62f66c04e521e3d1e9672708b8787a3bc91e42ae",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/rewire/rewire.c": "321c1b44389499b74299931c9f11c38065bfde72ae9e368bd64961b5ec1fafdd"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "rooms",
+      "display": "ZDL ROOMS",
+      "id": "07001200",
+      "family": "original",
+      "build_report": "src/msplus/rooms/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/rooms/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [
+        "mode20: no reliable musical output above the noise floor: {'capture': 'mode20', 'above_noise_db': [-2.184628870587692, -2.387881743009703]}",
+        "mode60: no reliable musical output above the noise floor: {'capture': 'mode60', 'above_noise_db': [4.203400501881125, 2.214893647293337]}"
+      ],
+      "capture_count": 11,
+      "status": "RERUN PENDING: stricter activity check; reviewed transient test settings adjusted for low send level",
+      "current_build_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
+      "tested_binary_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
+      "source_fingerprints": {
+        "src/msplus/rooms/manifest.json": "1f037c716a4b41a7fcbe849c61d1c445a3885efd27d78eec8226f8314d73e84d",
+        "src/msplus/rooms/rooms.c": "3dcef9040112fe4abd22ef9ea567db19ef55a7f20cb3e27372946554c03a177d",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/rooms/rooms.c": "141d54d94abf8a666793474c3e12be6c37a4d95a160dc276034c36647bb55d59"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "scorch",
+      "display": "ZDL SCORCH",
+      "id": "07001130",
+      "family": "original",
+      "build_report": "src/msplus/scorch/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/campaign-0db-01/scorch/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "dry_path_gain",
+        "native_DSP_harmonics",
+        "zero_input_stability"
+      ],
+      "configured_passed": false,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "RUNS: calibrated harmonic reference mismatch unresolved",
+      "current_build_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+      "tested_binary_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+      "source_fingerprints": {
+        "src/msplus/scorch/manifest.json": "ece65afd972027784fe5c7ac84bc80fe5a969ee0184c535f33308d78ebbdde7e",
+        "src/msplus/scorch/scorch.c": "01916f2591326810547ce7f78b3e401c55f0fa4021b344b5904d2eaf82266f53",
+        "src/msplus/common/compat.h": "cccc03ad845eb9a3d5aaa37f0f26cc747e129480c7da5631c7ebe713dc6c3210",
+        "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "scrub",
+      "display": "MJ SCRUB",
+      "id": "07001360",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/scrub/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "de383c83efc574f668b1639825bbd283a9cd97bdecdb65919752c30a79a6469b"
+    },
+    {
+      "port": "sgnl",
+      "display": "MJ SGNL",
+      "id": "07001350",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/sgnl/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "6140ed2cc455ae4fa25687e3885fde5f68e3690a07a63a07d84c818d7f04b68e"
+    },
+    {
+      "port": "shatter",
+      "display": "ZDL SHATTER",
+      "id": "070011b0",
+      "family": "original",
+      "build_report": "src/msplus/shatter/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/shatter/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
+      "tested_binary_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
+      "source_fingerprints": {
+        "src/msplus/shatter/manifest.json": "7dbfb58edebbdac879491dfc092b4b85cb852ea1cd7b7ba2a06c411980947397",
+        "src/msplus/shatter/shatter.c": "39f9b9838f5d6bca41be1a5b94f98cdfca14980fe39676ec15b9cc802bb1a43b",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/shatter/shatter.c": "ea65fffa8d98670597314d0814a80e62488880ed73208d63cb10acfc1bf32795"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "spiral",
+      "display": "ZDL SPIRAL",
+      "id": "07001220",
+      "family": "original",
+      "build_report": "src/msplus/spiral/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "b978492de267482028f720004cdefaaa62752c5336fcbcf62e5cf3cf8fb34471"
+    },
+    {
+      "port": "spool",
+      "display": "ZDL SPOOL",
+      "id": "07001270",
+      "family": "original",
+      "build_report": "src/msplus/spool/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/airwindows-campaign-01/spool/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
+      "tested_binary_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
+      "source_fingerprints": {
+        "src/msplus/spool/manifest.json": "8561fbbebbb543c36e3175c56fc2094038ec1ded8a2005e71c56c3d8a9b348d7",
+        "src/msplus/spool/spool.c": "1450aa0f9ef684927242149d07e149859d243fbe2f0439f744c5786655168470",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/airwindows/tapeecho4/manifest.json": "dc328918ac11390aa86e8713f9e4a35def702c19703a7b151131dc2a1a19ec21",
+        "src/airwindows/tapeecho4/tapeecho4.c": "e113ec842938821d56e607ba65ddd6ae53f11117257fbd657a06bb0e0a57d6f8",
+        "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
+        "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "stasis",
+      "display": "ZDL STASIS",
+      "id": "07001230",
+      "family": "original",
+      "build_report": "src/msplus/stasis/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/stasis-bypass-campaign-01/stasis/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "held_or_generated_audio",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 8,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
+      "tested_binary_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
+      "source_fingerprints": {
+        "src/msplus/stasis/manifest.json": "4a0f87e8724fe4c420c00ba8e5792908de93596c44391fd6e7d8948f231706e4",
+        "src/msplus/stasis/stasis.c": "4421e5a3796ded3e2e34111e2d2490d329bbbef2e351bbed86d1470fc5d82f5d",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/custom/stasis/stasis.c": "3a9179159c9a6d70e80738eede3eadff974e6b9e4831448242dfeeb012a4aafb"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "sweep",
+      "display": "MJ SWEEP",
+      "id": "070013b0",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/sweep/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "023bdeeca897e4bbeac07a9183849e72c3d1fb8509259aa83000330d3793844c"
+    },
+    {
+      "port": "synceq",
+      "display": "MJ SYNCEQ",
+      "id": "07001380",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/synceq/build/REPORT.md",
+      "build_validated": true,
+      "status": "BUILD AND NATIVE ONLY: hardware test pending",
+      "current_build_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5"
+    },
+    {
+      "port": "taffy",
+      "display": "ZDL TAFFY",
+      "id": "070011d0",
+      "family": "original",
+      "build_report": "src/msplus/taffy/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/buffered-campaign-01/taffy/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 6,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
+      "tested_binary_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
+      "source_fingerprints": {
+        "src/msplus/taffy/manifest.json": "b517eee08e0205485687edda63d9e1ad25e41c860417496d977c797d52195334",
+        "src/msplus/taffy/taffy.c": "b41ee757ac604083b47c30350182859b41c3303a74165a2dd6575ab940b758f0",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/custom/taffy/taffy.c": "26279405b8a3c96b9c15cd62d7c952c67c932fde14c3dae9042c4a77117a324f"
+      },
+      "stock_baseline_healthy": true
+    },
+    {
+      "port": "wavefold",
+      "display": "MJ WAVEFOLD",
+      "id": "07001300",
+      "family": "Matujuice v1.5",
+      "build_report": "src/msplus/wavefold/build/REPORT.md",
+      "build_validated": true,
+      "evidence": "build/msplus/matujuice-campaign-01/wavefold/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "fold_knee_frequency_doubling",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks and additional activity checks",
+      "current_build_sha256": "ef9b99d0b678be8d2c0f2397c6da0653b446a3af42341a09b7c7a338bf8986a6",
+      "tested_binary_sha256": "ef9b99d0b678be8d2c0f2397c6da0653b446a3af42341a09b7c7a338bf8986a6",
+      "source_fingerprints": {
+        "src/msplus/wavefold/manifest.json": "9fc087a14c68a281f38a8a20ed85fd399c04d92f2e97fdf3397a1f46cb6cebea",
+        "src/msplus/wavefold/wavefold.c": "9fa32b6c9cff2b68517b7c64cd643927e2539ad953276048a45869419ecfe1ef",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
+        "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true
+    }
+  ],
+  "bench_blocker": "Stock audio unavailable after DubSiren repeat campaign, despite responding MIDI and confirmed stock patch. Documented saved-stock patch changes did not restore audio. Physical restart requested; further installs stopped.",
+  "safety_audit": "build/msplus/audit-after-dubsiren-02/VERIFIED.json",
+  "saved_patches_after_stock_reload": "build/msplus/stock-reload-02/VERIFIED",
+  "experiments_left_installed": 0,
+  "limitations": [
+    "Matujuice legacy dry-tag FOLLOW/Mozaic tempo relay has no verified Plus mapping",
+    "Custom icons and value labels deferred",
+    "Multi-slot arena ownership and aggregate DSP load unqualified",
+    "Scorch quantitative comparison fails; acceptance thresholds preserved"
+  ],
+  "counts": {
+    "musical_builds": 34,
+    "selected_hardware_checks_passed": 22,
+    "hardware_rerun_pending": 2,
+    "scorch_reference_mismatch": 1,
+    "dubsiren_unqualified": 1,
+    "not_yet_hardware_tested": 8
+  }
+}

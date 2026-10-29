@@ -1,36 +1,106 @@
 # MS-70CDR+ development
 
-Experimental source ports on branch `feat/ms70cdr-plus`, tested on an actual
-MS-70CDR+ firmware **1.10**. Six of the 22 release effects now build and run,
-plus a gain proof of concept. Scorch still fails a detailed reference comparison.
-Released `dist/*.ZDL` files and the browser editor target the original generation;
-no Plus release binaries have been published.
+Experimental ports on branch `feat/ms70cdr-plus`, tested on an actual MS-70CDR+
+firmware **1.10**. All **22 original musical effects** and **12 Matujuice v1.5
+effects** now build as ZD2. Hardware testing is paused pending a physical
+pedal restart after the DubSiren repeat campaign lost the stock audio path.
+Released `dist/*.ZDL` files and the browser editor still target the original
+pedals. No Plus release binaries have been published.
 
-## Port status
+## Port inventory and validation
 
-| Port | Mutable state | Hardware validation on 2026-10-28 |
-|---|---:|---|
-| Gain proof of concept | 4 bytes | Unity, half, quarter, zero and firmware bypass; stereo isolation |
-| Flower | 64 bytes | Dry/half/wet and extreme-rate sweeps; independent native reference |
-| Klang | 32 bytes | Dry/half/wet; predicted ring sidebands within 1 Hz; extreme settings |
-| Scorch | 64 bytes | Mono dry path, wet distortion and silence run; calibrated harmonics **fail**, unresolved |
-| Corrupt | 48 bytes | Dry/half/wet; sub/master/harmony at 498.5/997/1994 Hz; adjustable tracking gate |
-| Howl | 56 bytes | Dry/half/wet and extreme settings; independent native two-pole reference |
-| Dustbox | 84 bytes | Distortion, octave, motor and Power=0 captures; native state/guard checks |
+The original 22 are Flower, Klang, Scorch, Corrupt, Howl, Dustbox, GenLoss,
+Microlm, Shatter, Arrakis, Taffy, Dissolve, Mangle, Rooms, Hydra, Spiral,
+Stasis, Rewire, Gyre, Galactic, Spool and Oxide. All except Spiral have run
+individually on this pedal with finite, unclipped, xrun-free recordings at selected
+settings. Spiral is built/native-tested and still requires its first pedal test.
+A stricter activity check found that Rewire's default bit crusher silences the
+very quiet test input; its test profile now lowers Bits without changing its
+musical defaults. Rooms DIGIT/GATE also need threshold-aware reruns: the native
+reference confirms that Time=100, Depth=0 and the existing -20 dBFS send ceiling
+produce measurable output. Neither source defaults nor safety limits changed.
+Those hardware reruns remain pending.
 
-Every listed capture at the final 0 dB interface setting is finite, unclipped,
-and free of xruns. This is standalone validation at selected settings, not
-complete audio equivalence, all knob transitions, long-duration endurance, or
-aggregate DSP capacity. See [numeric results](MSPLUS-HIL-20261028.json).
-Native reference tests do not replace hardware comparison.
+Matujuice adds WaveFold, DualShft, Choral, EuGate, DubSiren, S.GN_L, Scrub,
+GridDly, SyncEQ, Breather, DirtBox and Sweep. Their pristine MIT-licensed C DSP
+cores come from the pinned v1.5 dependency; the repository contains only Plus
+adapters and its license. Two eight-sample calls per Plus callback preserve
+source clock cadence. Active output is mono from physical left input, copied
+to both outputs, matching the original mono DSP path. Ordinary bypass retains
+stereo. DubSiren and GridDly retain their own bypass/tail logic.
 
-The other 16 release effects are TapeEcho4, ToTape9, Galactic, Shatter,
-Arrakis, Microloom, GenLoss, Taffy, Dissolve, Mangle, Rooms, Hydra, Rewire,
-Stasis, Spiral and Gyre. Their delay/history buffers exceed Stomphacks' verified
-small-state allocation (188 user bytes plus guard). The Plus large-memory
-ownership, allocation size and lifetime contract is not established. No
-speculative writes to `instance[3]`, legacy arenas or unverified context slots
-were attempted. Establish that contract upstream before porting these effects.
+The legacy dry-buffer tempo-tag transport has **no verified Plus mapping**.
+Adapters use its supported no-tag path. Local tempo and twin-tempo changes are
+retained; cross-effect FOLLOW/Mozaic tempo relay is not implemented. Numeric
+parameter controls and placeholder name icons are provided; original artwork
+and custom value labels are deferred.
+
+Native checks cover all 34 kernels, invalid coefficients, initialization and
+arena canaries, selected control extremes, original-versus-Plus sample math,
+and independent references for several simpler effects. Hardware checks also
+include Klang sidebands, Corrupt sub/master/harmony, Stasis capture/hold while
+bypassed/release, and selected Matujuice signatures. Scorch's detailed calibrated
+harmonic comparison still fails; it produces stable distortion, but numerical
+hardware/reference equivalence is unresolved. Preserve that failure rather than
+relaxing its comparison thresholds.
+
+These checks qualify selected standalone cases, not all knob transitions,
+long-duration endurance, every source feature or multi-effect chains.
+
+The [34-port evidence report](MSPLUS-HIL-34-20261028.json) records each port's
+actual status. **22 effects** currently pass selected standalone hardware checks
+including the stricter signal-activity audit: 18 original effects plus WaveFold,
+DualShft, Choral and EuGate. Rewire/Rooms need the revised profiles; Scorch has
+its unresolved numerical mismatch; Spiral and seven Matujuice effects await
+hardware tests. DubSiren generated its intended burst on the first run, but its
+repeat campaign is not qualified because the stock baseline was already invalid.
+Do not install the full 34-effect set for manual audition yet.
+
+## Bench incident and required continuation
+
+After the first DubSiren campaign's restoration/removal, its repeat campaign
+recorded a siren-like transient during what should have been a stock baseline,
+then only ADC noise, including during live test input. MIDI remained responsive,
+reported the original bypassed CloneCho, and accepted ordinary edits. The cause
+is unresolved; this is an observation, not a diagnosis of a kernel crash.
+
+The guarded uninstaller completed without transfer errors. A subsequent audit
+confirmed autosave OFF, all 100 saved patches unchanged, the factory effect list
+byte-identical, and **no experimental files installed**. [Documented stock patch selection](https://github.com/thammer/zoom-explorer/blob/main/src/ZoomDevice.ts)
+(including selecting away and back) did not restore audio. No firmware,
+bootloader, rescue or undocumented reset operations were attempted. A physical
+power cycle has been requested only after the clean-storage audit.
+
+The harness now requires correlated stereo audio at the calibrated gain before
+installation and before custom-ID selection. After restoring the stock metadata,
+it records another stereo sweep and requires `AUDIO_RESTORED` before uninstalling.
+If that check fails, the runner stops with the binary still installed; inspect
+logs and storage safety before further actions. Finite ADC noise is insufficient
+for passing. Eleven offline safety tests include invalid/noisy baselines,
+catalogue changes, corrupted readbacks, and refusal to uninstall after metadata-only
+restoration. Saved-patch dumps alone do not prove that stock DSP is running.
+
+After the physical restart, verify identity/autosave, stock MIDI state **and real
+stereo loopback** before resuming the pending ports. Investigate the DubSiren
+transition separately before attempting to leave it installed. Keep the accepted
+capture artifacts; do not promote build-only ports to hardware-qualified status.
+
+## Delay memory and capacity
+
+Stock-code analysis and quiet **read-only descriptor telemetry** established
+`instance[3]` as `{base, exclusive_end, byte_count}` on this firmware. The observed
+standalone grant is **705600 bytes**. The shared compatibility layer checks
+alignment, range consistency and required size before dereferencing effect-owned
+memory, never changes descriptor fields, and initializes only its own arena.
+See [memory evidence and limits](MSPLUS-MEMORY-RESEARCH.md). Hydra and Stasis
+clear large buffers in bounded steps.
+
+The 34 ZD2/ZIC pairs total approximately **499 KB** against **1.21 MB free** in
+the verified baseline. File sizes suggest enough space to keep all 34 alongside all
+factory effects; actual allocated usage must be verified after installation. This is separate from simultaneous processing: the pedal has
+six effect slots, DSP loads are conservative placeholders, and multi-slot arena
+ownership/aggregate CPU capacity have not yet been hardware-qualified. Start
+manual testing with one custom effect at a time.
 
 ## Build with upstream tooling
 
@@ -39,7 +109,8 @@ cleanroom scaffold, ZD2/ZIC packaging, validation and guarded installer. Read it
 [SAFETY.md](https://github.com/thammer/stomphacks/blob/main/SAFETY.md),
 [DSP ABI](https://github.com/thammer/stomphacks/blob/main/docs/zd2-abi.md) and
 installation instructions before hardware work. `tools/msplus/upstream.lock.json`
-pins Stomphacks and zoom-zt2, including its directory-enumeration fix (PR 112).
+pins Stomphacks, zoom-zt2 (including its directory-enumeration fix, PR 112),
+and [Luca Matturro's Matujuice v1.5](https://github.com/matujuice/zoom-ms-zdl-effects-pack).
 Setup never opens MIDI and refuses to overwrite an existing dependency tree.
 
 ```sh
@@ -70,9 +141,10 @@ zeroed state at `instance[2]`. Thin source adapters include the original C with
 
 `src/msplus/common/compat.h` checks initialization and normalized parameter
 snapshots, sanitizes inputs, implements firmware bypass mixing and rejects
-non-finite/out-of-bounds outputs. No dynamic allocation or unknown memory is
-used. All six modified legacy kernels retain byte-identical legacy `.audio`
-sections when built with the same TI compiler.
+non-finite/out-of-bounds outputs. The shared arena adapter bounds every grant before use; no dynamic allocation
+or fixed DSP address is used. All 22 modified legacy kernels retain byte-identical legacy `.audio`
+sections when built with the same TI compiler. Sixteen buffered ports also
+match the original eight-frame C in native sample tests after initialization.
 
 Gain drops the old 8x compensation for an uninitialized legacy handler.
 Howl/Dustbox skip their legacy parameter-latch workaround. Corrupt's Plus
@@ -92,13 +164,15 @@ Declared DSP loads are conservative placeholders; they are not timing profiles.
 Only one process may use MIDI. Autosave must be OFF with a pedal ACK. Never save
 an experimental effect in a patch, overwrite/delete factory effects, flash
 firmware, or issue unknown SysEx. Recovery from storage corruption is unproven.
-Use private playground IDs `07001100` through `07001170` and filenames `XXZ*`
-only after upstream collision checks; these are not public ID allocations.
+Private playground IDs `07001100` through `07001280` cover the original ports
+and diagnostics; `07001300` through `070013b0` cover Matujuice. Filenames start
+with `XXZ`/`XXM`. Upstream collision checks remain mandatory; these are not public
+ID allocations.
 
 ```sh
 $PY "$SH/tools-pedal/safe_connect.py" build/msplus/session-YYYYMMDD
 $PY tools/msplus/backup.py build/msplus/backup-YYYYMMDD
-# Requires a one-slot, stock-only temporary scratch patch and discovered ports.
+# Requires a one-slot, bypassed stock-only scratch patch and healthy loopback.
 pw-jack $PY tools/msplus/run.py \
   --backup build/msplus/backup-YYYYMMDD --output build/msplus/campaign-01 \
   gain flower klang corrupt howl dustbox
@@ -163,7 +237,7 @@ invalidates that capture. Measured loop latency around 71 ms includes host
 buffering, both interfaces and the pedal; it is not intrinsic pedal latency.
 
 Final tests use return gains **0 dB**, sends -30 dBFS except Corrupt tracking
-at -20 dBFS. Earlier +12 dB return trials clipped on loud effects and were
+and the reviewed Rooms DIGIT/GATE profiles at -20 dBFS. Earlier +12 dB return trials clipped on loud effects and were
 rejected. A quiet bounded triangle diagnostic measured the return change as
 -12.001/-12.001 dB. Do not change return gains mid-campaign.
 
@@ -191,26 +265,31 @@ and firmware staging remain possible causes, not established diagnoses.
 No acceptance thresholds or effect math were changed to conceal this failure.
 Do not consider Scorch quantitatively qualified until this is resolved.
 
-## Storage, DSP and final pedal state
+## Final pedal state and architecture review
 
-The pedal reports 6,204,530 total bytes and **1,210,640 free** with its factory
-library. Seven experimental effect/icon pairs occupy about 98 KB allocated;
-extrapolating similar sizes to 22 suggests roughly 309 KB. Storage therefore
-looks sufficient for all 22 ports, but actual larger builds remain unmeasured.
-The [Zoom manual](https://zoomcorp.com/manuals/ms-70cdrplus-en/) specifies
-at most six simultaneous effect slots, and DSP limits can reduce that further. Installing 22 does not imply running 22 together.
+The latest full storage audit is
+`build/msplus/audit-after-dubsiren-02/VERIFIED.json`: autosave OFF, stock scratch,
+100 saved patches unchanged, factory effect list byte-identical and all 37
+experimental/diagnostic ZD2/ZIC pairs absent. Further documented stock selections
+also preserved all saved patches (`build/msplus/stock-reload-02/VERIFIED`).
+Factory files were never overwritten or deleted. The verified baseline backup is
+`build/msplus/backup-20261028` (306 files, including 300 ZD2/ZIC envelopes).
 
-The final audit confirms autosave OFF, a stock-only temporary patch, all 100
-saved patches unchanged, the original effect list byte-identical, and all eight
-experimental ZD2/ZIC pairs absent. Factory files were never overwritten or
-deleted. The verified backup is `build/msplus/backup-20261028`; final audit is
-`build/msplus/final-audit-0db`. The original backup validated 306 files, including
-300 factory effect/icon envelopes.
+`verify.py --installed <port names...>` can audit an exact retained set after
+qualification: it validates the catalogue with upstream's grammar, requires every
+factory entry unchanged plus exactly the named custom entries (including version,
+ID and installed flag), and reads every expected custom binary/icon back for
+byte equality. Diagnostics must be absent. It also rechecks all saved patches.
+This is read-only verification, not a bulk installer or permission to bypass tests.
 
-Architecture comparison against `pre-msplus` reduced duplication from 12.24%
-to about 11.8%, with average complexity 4.66→4.67 and max unchanged. It flags increased C
-entry-point complexity from necessary coefficient guards and mutually exclusive
-ABI branches, plus existing legacy arena/magic-shuttle clones in touched files.
-Those checks were retained. Its name-based call graph can conflate unrelated
-`record` methods; the Python imports remain acyclic. New infrastructure reuses
-upstream packaging/transfers and the existing C rather than copying algorithms.
+Architecture comparison against `pre-msplus` reduced duplication from 12.24% to
+11.21%, average complexity 4.66→4.80, maximum 122→136, and no additional dependency
+cycles. The maximum increase is the existing Oxide kernel with both mutually
+exclusive ABIs and necessary coefficient/arena/output guards; these checks remain.
+The shared Matujuice kernel and control helpers avoid duplicating DSP entry logic;
+the remaining adapter similarities are fixed parameter translations and original
+control glue. The analysis orchestrator now dispatches specific checks through a
+registry. New tooling reuses upstream packaging, validation and transfers rather
+than implementing another protocol. The remaining metric increases reflect the
+explicit safety branches, ABI coexistence and added validation, not an altered
+musical algorithm or deletion of necessary guards.

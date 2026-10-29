@@ -76,4 +76,7 @@ dry/half/wet and maximum-wow sweeps on both returns, with no clipping, non-finit
 output or xruns. All saved patches remained unchanged, stock scratch settings
 were restored, and GenLoss was removed. Captures: `build/msplus/genloss-hil-01/`.
 The read-only diagnostic and this bounded implementation advance the prior
-memory blocker; the remaining effects still require individual build and DSP tests.
+memory blocker. All 22 original effects and 12 Matujuice effects now build;
+individual hardware status and the subsequent bench-audio incident are tracked
+in [the development report](MSPLUS-DEVELOPMENT.md). A valid arena range alone
+does not establish that every kernel or transition is safe.
