@@ -51,12 +51,60 @@ long-duration endurance, every source feature or multi-effect chains.
 
 The [current evidence report](MSPLUS-HIL-34.json) records the latest per-port
 status as of October 29. Previous snapshots remain in Git history.
-**26 effects** pass selected standalone hardware checks. SyncEQ's steady-state
-checks also pass, but its return to stock fails and is not qualified. Scorch's
-numerical mismatch and DubSiren's transition failure remain unresolved. Five
-Matujuice effects still await hardware tests. Retention now additionally requires
-an actual verified stock-audio return for each port; only four campaigns currently
-have that evidence under the latest guard. Do not retain the full set yet.
+**31 effects** pass selected standalone hardware checks. SyncEQ and DubSiren now
+pass actual stock-audio restoration with protected control-state storage. All ten
+Matujuice ports tested in `matu-packed-campaign-01` passed and were removed safely.
+Scrub and GridDly have full-length, 15-bit history candidates awaiting hardware
+tests; see the precision note below. Scorch's numerical comparison remains
+unresolved, with high-level output compression now independently measured.
+Retention additionally requires current binary/source provenance and an actual
+verified stock-audio return for every port. The older original-effect campaigns
+are being repeated under that guard. Do not retain the full set yet.
+
+## Verified restoration fix and remaining history adapters
+
+After the USB-079 restart, a healthy stock preflight permitted removing the old
+SyncEQ artifact. The packed-state build then passed all configured audio checks,
+stock stereo restoration and guarded removal (`synceq-packed-hil-01`). It repeated
+successfully in `matu-packed-campaign-01`. DubSiren, Breather, all seven DirtBox
+models, all eight Sweep modes, WaveFold, DualShft, Choral, EuGate and S.GN_L also
+passed that campaign, with positive stock-audio recordings and unchanged saved
+patches after each effect. Their control headers use the same lossless helper;
+Choral packs four small regions around its audio arrays to avoid copying its
+large CANON history. The pristine dependency remains unchanged.
+
+The native arena inventory also found raw RNG words in GenLoss and Mangle that
+can represent NaN. Their Plus branches now retain those integers in a reserved
+small-state word and leave zero in the corresponding arena word between calls.
+Native comparison against the original eight-frame kernels still passes; their
+non-Plus `.audio` machine code is byte-identical (3,360/2,720 bytes), recorded in
+`build/msplus/rng-legacy-preservation-01/results.json`.
+
+Scrub and GridDly store two PCM samples per word; protecting only their headers
+would still leave many non-finite float patterns in their histories. Their new
+adapter preserves all 348,000 samples (7.9 seconds) using two signed 15-bit samples
+encoded as tiny finite floats below 1.1e-19. **History precision is 15 bits instead
+of the original 16**, with at most one original PCM count of error per write.
+The cores use Q14 scaling, so that is at most 1/16384 in DSP amplitude; feedback
+can accumulate quantization error. They are not bit-identical audio ports.
+No delay range or control is removed. The generator changes only two read sites
+and one write site in derived copies, refuses unexpected source layouts, and
+never modifies the pinned upstream source. Derived code and generator hashes
+are included in hardware provenance. Both generated effects pass upstream build
+validation. Exhaustive PCM values, clean-wet reference error, full-arena finiteness,
+canaries and all other native checks pass: **22 DSP tests and 17 tooling tests**.
+
+The output-linearity diagnostic was safely removed after its completed campaign.
+It measured less than 0.053 dB gain change through DSP peak 0.275, then
+1.48/1.12 dB compression at peak 0.55. Its strict 0.5 dB linearity check correctly
+fails. This supports investigating the output stage as the cause of Scorch's
+high-amplitude harmonic mismatch; it does not yet qualify Scorch or justify
+relaxing its DSP comparison tolerances.
+
+`audit-after-packed-matu-01/VERIFIED.json` verifies an empty experimental set,
+byte-identical factory effect list, all saved patches unchanged and autosave OFF
+after that campaign. The next serialized campaign covers the remaining original
+effects plus the two PCM-history ports. No firmware or recovery commands are used.
 
 ## October 29 continuation
 

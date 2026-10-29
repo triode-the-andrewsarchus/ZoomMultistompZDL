@@ -32,6 +32,26 @@ class BackupTests(unittest.TestCase):
             CheckedInput(port).receive()
 
 
+class PCMSourceTests(unittest.TestCase):
+    def test_derivation_preserves_dependency_and_refuses_source_layout_drift(self):
+        from pcm15 import derive
+        from upstream import ROOT
+        original = (ROOT / 'build/msplus/matujuice/src/custom/scrub/scrub.c').read_text()
+        target = 's->buf[s->wp] = (short)(int)v;'
+        with tempfile.TemporaryDirectory() as tmp:
+            source, output = Path(tmp) / 'source.c', Path(tmp) / 'derived.c'
+            source.write_text(original)
+            derive(source, output)
+            self.assertEqual(source.read_text(), original)
+            self.assertIn('mp_pcm15_write(s->buf, s->wp, (int)v);', output.read_text())
+            output.unlink()
+            for replacement in ('', target + target):
+                source.write_text(original.replace(target, replacement))
+                with self.assertRaises(RuntimeError):
+                    derive(source, output)
+                self.assertFalse(output.exists(), 'Refused source must not produce a derived kernel')
+
+
 class AudioTests(unittest.TestCase):
     def test_linearity_measurement_detects_a_saturated_output_stage(self):
         import soundfile as sf

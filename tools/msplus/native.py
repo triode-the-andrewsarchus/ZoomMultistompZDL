@@ -13,13 +13,15 @@ MATU_PORTS = ('wavefold', 'dualshft', 'formant', 'eugate', 'dubsiren', 'sgnl',
 
 
 class Kernel:
-    def __init__(self, name, arena_bytes=0):
+    def __init__(self, name, arena_bytes=0, raw_state=False):
         folder = ROOT / 'src/msplus' / name
         self.manifest = json.loads((folder / 'manifest.json').read_text())
         header = (folder / 'build/sh_params.h').read_text()
         symbol = re.search(r'#define SH_AUDIO_FN (\w+)', header)[1]
-        so = ROOT / 'build/msplus' / f'{name}-host.so'
+        variant = '-raw' if raw_state else ''
+        so = ROOT / 'build/msplus' / f'{name}{variant}-host.so'
         subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
+                        *(['-DMP_RAW_STATE_REFERENCE'] if raw_state else []),
                         '-I' + str(folder / 'build'), '-I' + str(ROOT / 'build/msplus/headers' / name), str(folder / self.manifest['kernel']),
                         '-o', str(so)], check=True)
         self.lib = ctypes.CDLL(str(so))
@@ -47,4 +49,3 @@ class Kernel:
         self.bus[:] = np.asarray(samples).T.reshape(32)
         self.fn(self.instance, self.ctx)
         return self.bus.reshape(2, 16).T.copy()
-

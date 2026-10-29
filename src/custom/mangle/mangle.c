@@ -201,6 +201,10 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
     MangleState *st = (MangleState *)base;
     float *buf  = (float *)bufBase;
     float *gbuf = buf + MG_BUF;
+#ifdef ZOOM_MSPLUS
+    /* Preserve RNG state outside memory that factory effects read as floats. */
+    st->fpd = ((uint32_t *)instance[2])[1];
+#endif
 
     if (st->magic != MG_MAGIC || st->version != MG_VERSION) {
         st->magic = MG_MAGIC;
@@ -225,6 +229,10 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= MG_TOTAL) st->initialized = 1u;
+#ifdef ZOOM_MSPLUS
+        ((uint32_t *)instance[2])[1] = st->fpd;
+        st->fpd = 0u;
+#endif
         MANGLE_EARLY_RETURN();
     }
 
@@ -330,4 +338,8 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
     st->shCnt = shCnt;
     st->lpZ = lpZ;
     st->fpd = fpd;
+#ifdef ZOOM_MSPLUS
+    ((uint32_t *)instance[2])[1] = st->fpd;
+    st->fpd = 0u;
+#endif
 }

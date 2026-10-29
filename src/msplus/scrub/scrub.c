@@ -1,6 +1,7 @@
 /* Matujuice v1.5 DSP by Luca Matturro, MIT; see ../MATUJUICE-LICENSE.
- * Pristine DSP core is included from the pinned dependency. Only the legacy
- * entry glue is adapted here. Two eight-sample calls preserve its timing.
+ * The pinned core is derived with only PCM read/write substitutions; see
+ * tools/msplus/pcm15.py. History is 15-bit; full ring length is preserved.
+ * The entry glue uses two eight-sample calls to preserve source timing.
  * The legacy dry-buffer tag transport has no Plus mapping: pass NULL to its
  * supported no-tag path. No firmware buffers beyond ctx[1] are accessed.
  */
@@ -15,7 +16,8 @@
 #define ZDL_GetLabel_7(...) static mj_unused_ZDL_GetLabel_7(__VA_ARGS__)
 
 #define SCRUB_HOST_TEST 1
-#include "../../../build/msplus/matujuice/src/custom/scrub/scrub.c"
+#include "../common/pcm15.h"
+#include "../../../build/msplus/derived/scrub.c"
 #include "scrub_params.h"
 
 #ifdef __TI_COMPILER_VERSION__
@@ -75,4 +77,5 @@ static inline void mp_raw_controls(float *params, const float *values)
 
 #define MJ_STATE_TYPE ScState
 #define MJ_PARAM_COUNT 8
+#define MJ_PACKED_HEADER_BYTES offsetof(ScState, buf)
 #include "../common/matujuice_kernel.h"

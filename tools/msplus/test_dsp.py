@@ -9,6 +9,25 @@ from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
+    def test_packed_matujuice_controls_match_raw_state_audio_exactly(self):
+        rng = np.random.default_rng(301)
+        source = rng.normal(0, .01, (16384, 2)).astype(np.float32)
+        for name in set(MATU_PORTS) - {'scrub', 'griddly'}:
+            with self.subTest(port=name):
+                packed = Kernel(name, arena_bytes=705600)
+                raw = Kernel(name, arena_bytes=705600, raw_state=True)
+                for setting in ('default', 'maximum', 'bypass'):
+                    if setting == 'maximum':
+                        packed.coeff[5:5+len(packed.manifest['params'])] = 1
+                        raw.coeff[:] = packed.coeff
+                    elif setting == 'bypass':
+                        packed.coeff[0] = raw.coeff[0] = 0
+                    for block in source.reshape(-1, 16, 2):
+                        np.testing.assert_array_equal(packed.block(block), raw.block(block))
+                    self.assertTrue(np.isfinite(packed.arena[2:-2].view(np.float32)).all())
+                np.testing.assert_array_equal(packed.arena[:2], [0xcafef00d]*2)
+                np.testing.assert_array_equal(packed.arena[-2:], [0xcafef00d]*2)
+
     def test_arena_header_roundtrip_preserves_every_bit_and_leaves_finite_storage(self):
         import ctypes
         import subprocess
@@ -18,8 +37,11 @@ class DSPTests(unittest.TestCase):
             source = Path(tmp) / 'header.c'
             library = Path(tmp) / 'header.so'
             source.write_text('#include <stdint.h>\n#include "' + str(ROOT / 'src/msplus/common/arena_state.h')
+                              + '"\n#include "' + str(ROOT / 'src/msplus/common/pcm15.h')
                               + '"\nvoid pack(uintptr_t a,uintptr_t b,unsigned n){mp_pack_header(a,b,n);}\n'
-                              'void unpack(uintptr_t a,uintptr_t b,unsigned n){mp_unpack_header(a,b,n);}\n')
+                              'void unpack(uintptr_t a,uintptr_t b,unsigned n){mp_unpack_header(a,b,n);}\n'
+                              'void put(short *p,int i,int v){mp_pcm15_write(p,i,v);}\n'
+                              'int get(const short *p,int i){return mp_pcm15_read(p,i);}\n')
             subprocess.run(['cc', '-shared', '-fPIC', '-O2', str(source), '-o', str(library)], check=True)
             lib = ctypes.CDLL(str(library))
             for fn in (lib.pack, lib.unpack):
@@ -38,6 +60,45 @@ class DSPTests(unittest.TestCase):
             np.testing.assert_array_equal(raw[1:-1], original)
             np.testing.assert_array_equal(raw[[0, -1]], [0xcafef00d]*2)
             np.testing.assert_array_equal(saved[[0, -1]], [0xcafef00d]*2)
+            lib.put.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+            lib.get.argtypes = [ctypes.c_void_p, ctypes.c_int]
+            pcm = np.zeros(32770, np.uint32)
+            pcm[[0, -1]] = 0xcafef00d
+            address = pcm.ctypes.data + 4
+            values = np.arange(-32767, 32768)
+            for index, value in enumerate(values):
+                lib.put(address, index, int(value))
+            decoded = np.array([lib.get(address, i) for i in range(len(values))])
+            self.assertLessEqual(np.max(abs(decoded-values)), 1)
+            self.assertEqual(lib.get(address, len(values)), 0, 'Writing must preserve the paired neighbour')
+            self.assertTrue(np.isfinite(pcm[1:-1].view(np.float32)).all())
+            self.assertLess(np.max(abs(pcm[1:-1].view(np.float32))), 1.1e-19)
+            np.testing.assert_array_equal(pcm[[0, -1]], [0xcafef00d]*2)
+
+    def test_pcm_history_ports_keep_full_buffers_and_bound_clean_wet_reference_error(self):
+        t = np.arange(65536)/44100
+        source = np.column_stack([np.zeros(len(t)), .1*np.sin(2*np.pi*997*t)])
+        for name in ('scrub', 'griddly'):
+            with self.subTest(port=name):
+                packed = Kernel(name, arena_bytes=705600)
+                raw = Kernel(name, arena_bytes=705600, raw_state=True)
+                edits = {'Mix': 100, 'Pos': 599, 'Glide': 0} if name == 'scrub' else {
+                    'Mix': 100, 'Time': 1, 'Fdbk': 0, 'Char': 0}
+                for i, param in enumerate(packed.manifest['params'], 5):
+                    if param['name'] in edits:
+                        packed.coeff[i] = raw.coeff[i] = edits[param['name']]/param['max']
+                for _ in range(4096):
+                    packed.block(np.zeros((16, 2)))
+                    raw.block(np.zeros((16, 2)))
+                actual = np.concatenate([packed.block(b) for b in source.reshape(-1, 16, 2)])
+                expected = np.concatenate([raw.block(b) for b in source.reshape(-1, 16, 2)])
+                self.assertGreater(np.max(abs(actual)), .01)
+                # Both legacy cores use Q14: one stored PCM count is 1/16384.
+                # Interpolation/windowing stays below two such counts here.
+                self.assertLess(np.max(abs(actual-expected)), 2/16384)
+                self.assertTrue(np.isfinite(packed.arena[2:-2].view(np.float32)).all())
+                np.testing.assert_array_equal(packed.arena[:2], [0xcafef00d]*2)
+                np.testing.assert_array_equal(packed.arena[-2:], [0xcafef00d]*2)
 
     def test_synceq_packed_state_survives_callbacks_and_instance_reinitialization(self):
         k = Kernel('synceq', arena_bytes=705600)
@@ -126,6 +187,16 @@ class DSPTests(unittest.TestCase):
             self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
             np.testing.assert_array_equal(k.arena, before)
 
+    def test_original_rng_state_never_remains_as_nonfinite_audio_memory(self):
+        for name in ('genloss', 'mangle'):
+            with self.subTest(port=name):
+                kernel = Kernel(name, arena_bytes=705600)
+                for _ in range(4096):
+                    output = kernel.block(np.full((16, 2), .01))
+                    self.assertTrue(np.isfinite(output).all())
+                    self.assertTrue(np.isfinite(kernel.arena[2:18].view(np.float32)).all())
+                self.assertNotEqual(kernel.state[1], 0, 'RNG sequence must remain live in small state')
+
     def test_buffered_ports_bounds_parameter_faults_and_extremes(self):
         rng = np.random.default_rng(84)
         ports = ['microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle',
@@ -167,6 +238,11 @@ class DSPTests(unittest.TestCase):
                 # Align initialized histories before excitation; lazy-clear time
                 # changes with callback geometry, while the sample math does not.
                 old.arena[:] = current.arena
+                # Logical state is equal although the Plus keeps these raw
+                # integers outside memory that a factory delay reads as audio.
+                if name in ('genloss', 'mangle'):
+                    offset = 9 if name == 'genloss' else 11
+                    old.arena[2 + offset] = current.state[1]
                 old.params[5:5+len(current.manifest['params'])] = current.coeff[5:5+len(current.manifest['params'])]
                 samples = rng.normal(0, 0.003, (16000, 2))
                 actual = np.concatenate([current.block(b) for b in samples.reshape(-1, 16, 2)])

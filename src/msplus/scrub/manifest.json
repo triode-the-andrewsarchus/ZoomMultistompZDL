@@ -5,10 +5,10 @@
   "version": "0.10",
   "display": "MJ SCRUB",
   "badge": "MJ",
-  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save. Full-length history uses 15-bit PCM for finite shared-memory reuse.",
   "dspload": 180,
   "kernel": "scrub.c",
-  "state_bytes": 4,
+  "state_bytes": 8,
   "scaffold": "cleanroom",
   "kernel_section": "text",
   "allow_stack": true,
@@ -68,5 +68,6 @@
       "default": 120,
       "explanation": "Tempo control; Matujuice v1.5 taper."
     }
-  ]
+  ],
+  "derived_source": "../../../build/msplus/derived/scrub.c"
 }

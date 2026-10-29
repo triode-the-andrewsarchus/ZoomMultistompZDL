@@ -3,11 +3,22 @@
  * mp_raw_controls. Two eight-frame calls preserve source clock cadence.
  * Bus B is the physical left input on this MS-70CDR+ rig.
  */
+#include <stddef.h>
+#ifdef MP_RAW_STATE_REFERENCE
+#ifdef __TI_COMPILER_VERSION__
+#error Raw arena state is only supported by the native reference host
+#endif
+#undef MJ_PACKED_HEADER_BYTES
+#endif
 #ifndef MJ_OWN_BYPASS
 #define MJ_OWN_BYPASS 0
 #endif
 #ifdef MJ_PACKED_HEADER_BYTES
 #include "arena_state.h"
+#ifndef MJ_HEADER_CODEC
+#define MJ_HEADER_CODEC(operation, base, packed) \
+    operation(base, packed, MJ_PACKED_HEADER_BYTES)
+#endif
 typedef char mp_header_fits[(MJ_PACKED_HEADER_BYTES <= sizeof(MJ_STATE_TYPE)
                             && MJ_PACKED_HEADER_BYTES % 4 == 0
                             && SH_STATE_GUARD_WORD >= 2) ? 1 : -1];
@@ -35,7 +46,7 @@ void SH_AUDIO_FN(void **instance, void **ctx)
 #ifdef MJ_PACKED_HEADER_BYTES
     uint32_t *small = (uint32_t *)instance[2];
     if (oldBase == (uint32_t)base && small[1] == 1u)
-        mp_unpack_header(base, base + packedOffset, MJ_PACKED_HEADER_BYTES);
+        MJ_HEADER_CODEC(mp_unpack_header, base, base + packedOffset);
 #endif
     float params[15];
     params[0] = fade;
@@ -57,7 +68,7 @@ void SH_AUDIO_FN(void **instance, void **ctx)
         }
     }
 #ifdef MJ_PACKED_HEADER_BYTES
-    mp_pack_header(base, base + packedOffset, MJ_PACKED_HEADER_BYTES);
+    MJ_HEADER_CODEC(mp_pack_header, base, base + packedOffset);
     small[1] = 1u;
 #endif
 }

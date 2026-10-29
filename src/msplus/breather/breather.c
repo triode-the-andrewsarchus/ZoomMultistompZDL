@@ -83,4 +83,5 @@ static inline void mp_raw_controls(float *params, const float *values)
 
 #define MJ_STATE_TYPE PuState
 #define MJ_PARAM_COUNT 9
+#define MJ_PACKED_HEADER_BYTES offsetof(PuState, rev)
 #include "../common/matujuice_kernel.h"

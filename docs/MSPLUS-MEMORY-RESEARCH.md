@@ -105,10 +105,22 @@ checks. Nineteen native tests pass, including arbitrary bit-pattern round trips
 reinitialization. Compared with the previous raw-state wrapper at `7aa8dee`,
 114,688 samples across neutral, boosted, filtered, bypassed and extreme controls
 are bit-identical (`build/msplus/synceq-packed-equivalence-01.json`). The candidate
-is **not yet hardware-qualified**. The installed file is still the old build;
-that exact old binary/icon pair is archived under
-`build/msplus/synceq-before-packed-state-build` for guarded removal after audio
-is restored. Never overwrite the installed filename with the new build.
+was initially pending hardware qualification. After USB restart 079, the old file
+was removed only after a healthy stock preflight, then the new file passed two
+hardware campaigns including actual stock audio restoration. The same protection
+also resolved DubSiren's restoration failure; ten protected Matujuice ports now
+have passing standalone hardware evidence. The exact old binary/icon pair remains
+archived under `build/msplus/synceq-before-packed-state-build`. Never overwrite an
+installed filename with a new build.
+
+Scrub/GridDly require protection of their PCM histories too. Their proposed
+full-length 15-bit encoding, precision cost and reference tests are documented in
+[the development report](MSPLUS-DEVELOPMENT.md#verified-restoration-fix-and-remaining-history-adapters).
+GenLoss and Mangle instead move their single RNG integer to small state; their
+original non-Plus machine code remains unchanged. The raw arena inventories are
+`matu-arena-reuse-inventory-01.json` and `original-arena-reuse-inventory-01.json`
+under ignored `build/msplus/`. Zero findings in the other measured configurations
+are not a proof for every control sequence.
 
 GenLoss is the first buffered proof of concept. Native canary tests cover
 undersized/inconsistent/oversized descriptor rejection before writes and an

@@ -8,7 +8,7 @@
   "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
   "dspload": 180,
   "kernel": "eugate.c",
-  "state_bytes": 4,
+  "state_bytes": 8,
   "scaffold": "cleanroom",
   "kernel_section": "text",
   "allow_stack": true,

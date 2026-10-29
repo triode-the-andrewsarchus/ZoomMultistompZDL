@@ -8,7 +8,7 @@
   "description": "Experimental GenLoss port using a validated bounded host ring. Never save.",
   "dspload": 60,
   "kernel": "genloss.c",
-  "state_bytes": 4,
+  "state_bytes": 8,
   "scaffold": "cleanroom",
   "kernel_section": "text",
   "allow_stack": true,

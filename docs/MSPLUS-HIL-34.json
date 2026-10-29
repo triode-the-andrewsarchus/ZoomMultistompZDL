@@ -3,8 +3,8 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 19,
-  "tool_fault_tests": 16,
+  "native_tests": 22,
+  "tool_fault_tests": 17,
   "return_gain_db": 0,
   "ports": [
     {
@@ -44,9 +44,36 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/breather/build/REPORT.md",
       "build_validated": true,
-      "status": "BUILD AND NATIVE ONLY: hardware test pending",
-      "current_build_sha256": "7cbee33ed56ddb50502050a7e9873b8da1a835858467c5b4c98e421cfbd093bb",
-      "ready_for_retention": false
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "ef93fd56a2931350e3d6be0d974671ab9cab2eb98534de1d469f07e67ab33484",
+      "ready_for_retention": true,
+      "evidence": "build/msplus/matu-packed-campaign-01/breather/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "rhythm_envelope_modulation",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 7,
+      "tested_binary_sha256": "ef93fd56a2931350e3d6be0d974671ab9cab2eb98534de1d469f07e67ab33484",
+      "source_fingerprints": {
+        "src/msplus/breather/manifest.json": "396c6295e432c9bf7f22ea243ce5c4e325dd19ee2d6b4aca6316af85d53bd1bc",
+        "src/msplus/breather/breather.c": "f61995c82644871796318537165aa17ad9622ce344fc6aa46b4bff5f6bff028a",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
+        "build/msplus/matujuice/src/custom/breather/manifest_pedal.json": "2466f5a885178912d735fd9c53b45e640ae60c0a758746e643a3c87f571ec50d",
+        "build/msplus/matujuice/src/custom/breather/breather.c": "2fa49935f2b6dc651711ec8e5dff1a025666686d93ac72c5b082220d2c4bf1b6",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true,
+      "audio_restoration_marker_present": true
     },
     {
       "port": "corrupt",
@@ -86,9 +113,35 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dirtbox/build/REPORT.md",
       "build_validated": true,
-      "status": "BUILD AND NATIVE ONLY: hardware test pending",
-      "current_build_sha256": "0dd24f08020eec3bdbb4c1a68932f43bc6ccb2a076f452019d58b85c0edac7a0",
-      "ready_for_retention": false
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
+      "ready_for_retention": true,
+      "evidence": "build/msplus/matu-packed-campaign-01/dirtbox/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 12,
+      "tested_binary_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
+      "source_fingerprints": {
+        "src/msplus/dirtbox/manifest.json": "1fd050bc78efbcf59a157d351bf466a61e9e7fabea44942342b62f30019017c2",
+        "src/msplus/dirtbox/dirtbox.c": "c8e6897a6ff012c9886e0056434a5ce8c60238805d5b247ab51b376c8f1b14b3",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
+        "build/msplus/matujuice/src/custom/dirtbox/manifest_pedal.json": "33f33b136f9b626d8cf72a67b0702098f697e833fac476f89646b0c9d5860037",
+        "build/msplus/matujuice/src/custom/dirtbox/dirtbox.c": "138c7babebe48ebf547c8c57d9f8d408b8de395e57285e2a88001a8ae27755f5",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true,
+      "audio_restoration_marker_present": true
     },
     {
       "port": "dissolve",
@@ -127,7 +180,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dualshft/build/REPORT.md",
       "build_validated": true,
-      "evidence": "build/msplus/matujuice-campaign-01/dualshft/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/dualshft/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -136,24 +189,27 @@
       ],
       "configured_passed": true,
       "additional_activity_errors": [],
-      "capture_count": 6,
-      "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "3f730afde4bf02fd71ed88b148448c9fb0b2f476e85daa5ea0097980784d004b",
-      "tested_binary_sha256": "3f730afde4bf02fd71ed88b148448c9fb0b2f476e85daa5ea0097980784d004b",
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "8ba2ce481db790950beb5fe3076c027af4491d7b030d902ef23d5269550b4414",
+      "tested_binary_sha256": "8ba2ce481db790950beb5fe3076c027af4491d7b030d902ef23d5269550b4414",
       "source_fingerprints": {
-        "src/msplus/dualshft/manifest.json": "9f3e4248fd359aa028da87cc438ba45abb8965a3b92830b93162cb90697544ee",
-        "src/msplus/dualshft/dualshft.c": "dded738c0998506a1b064dd9c534bb1df20071f965bc035edef7c9ade5797dd3",
+        "src/msplus/dualshft/manifest.json": "2a5696c68e8199f20a1e251d7aa3f04aceaf5713e54ca2f89c7c36120f0447bc",
+        "src/msplus/dualshft/dualshft.c": "e3a02b5ab97072472fba5b4d2c4c644ca82d3b4029637a38dc2113204e5d9367",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/dualshft/manifest_pedal.json": "48668d2e42ac265a74a5ee70c6e5c8ed6fc265455910c8e980ceda1a5477aa0d",
         "build/msplus/matujuice/src/custom/dualshft/dualshft.c": "d0b79ac32e0d377cb34046f156caade3fb0ac1800f2eb5c18be1759b1f4c5c17",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
       "stock_baseline_healthy": true,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     },
     {
       "port": "dubsiren",
@@ -162,35 +218,35 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dubsiren/build/REPORT.md",
       "build_validated": true,
-      "evidence": "build/msplus/matujuice-campaign-02/dubsiren/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/dubsiren/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
         "held_or_generated_audio",
         "zero_input_stability"
       ],
-      "configured_passed": false,
-      "additional_activity_errors": [
-        "prime: no reliable musical output above the noise floor: {'capture': 'prime', 'above_noise_db': [2.1240847331502377, 1.8094654179250549]}"
-      ],
-      "capture_count": 6,
-      "status": "NOT QUALIFIED: repeat run has invalid stock baseline; bench audio unavailable afterward; cause unresolved",
-      "current_build_sha256": "9a9cf75cc861edd6cc6017b9d93aae4bb95a82a55c2beb0987b17e0c3f9b2166",
-      "tested_binary_sha256": "9a9cf75cc861edd6cc6017b9d93aae4bb95a82a55c2beb0987b17e0c3f9b2166",
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 9,
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "1b2dca67f218c00318a9eb766eb6a29959a12952409d63b0fb7760d055bb7ed8",
+      "tested_binary_sha256": "1b2dca67f218c00318a9eb766eb6a29959a12952409d63b0fb7760d055bb7ed8",
       "source_fingerprints": {
-        "src/msplus/dubsiren/manifest.json": "38811b51474bbd860392cf08099b1bdeb7475afd77c402c97516237555c5e18a",
-        "src/msplus/dubsiren/dubsiren.c": "191f796ef4ad6d6e092fb0f0731f24a7a9488c299631bd4c1f15c73c52ebaf77",
+        "src/msplus/dubsiren/manifest.json": "88f8f24e02e9b052ee05a371768a36ed95aedf8bc6b17ec823fd72f3993c30eb",
+        "src/msplus/dubsiren/dubsiren.c": "89b4cbd32cb1b385dd281898de0c670e03bfc835774f520dea07d18bc621e24f",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/dubsiren/manifest_pedal.json": "d4ceac6fea421e357e97d88a653c21fb4fef67206c4e928b59327b058f96daf5",
         "build/msplus/matujuice/src/custom/dubsiren/dubsiren.c": "50e7bb8b94af0dad750531151fafb1f042f72f0506b7169a0b1a53ddf84ddbe7",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
-      "stock_baseline_healthy": false,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "stock_baseline_healthy": true,
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     },
     {
       "port": "dustbox",
@@ -228,7 +284,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/eugate/build/REPORT.md",
       "build_validated": true,
-      "evidence": "build/msplus/matujuice-campaign-01/eugate/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/eugate/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -238,24 +294,27 @@
       ],
       "configured_passed": true,
       "additional_activity_errors": [],
-      "capture_count": 6,
-      "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "7306300cab4493259645edcf13800f4dd659cb5709da10f8b289882412ce3517",
-      "tested_binary_sha256": "7306300cab4493259645edcf13800f4dd659cb5709da10f8b289882412ce3517",
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "c37506e1b2873da4e786e41a36cbf149ac60e9a19d426ab12a3d83976061800b",
+      "tested_binary_sha256": "c37506e1b2873da4e786e41a36cbf149ac60e9a19d426ab12a3d83976061800b",
       "source_fingerprints": {
-        "src/msplus/eugate/manifest.json": "fec540d4f705b2fbb61bd149b2da6dce56c948ad430635e23d5ee9452e067b70",
-        "src/msplus/eugate/eugate.c": "e57d787fd1857b74c0ca7f02981916bdf44fb9810de405ff1bd2f8e125cafa2f",
+        "src/msplus/eugate/manifest.json": "6aae1a6b37b6ff63869b70a7a83ada45681d24af857b249b42780e4e06f51244",
+        "src/msplus/eugate/eugate.c": "387290f32e5041559ce6b9d804812d2d40f4a1ea244b7b5cde050247218b4ed0",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/eugate/manifest_pedal.json": "a573aea29b9d8f72985422d070e92c46fa2d64be5143868c4926faadab6c42f4",
         "build/msplus/matujuice/src/custom/eugate/eugate.c": "a53619b2022d3092f8541c668fa548a60ffdab43ddc92521d0ffddd2cbbedec7",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
       "stock_baseline_healthy": true,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     },
     {
       "port": "flower",
@@ -294,7 +353,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/formant/build/REPORT.md",
       "build_validated": true,
-      "evidence": "build/msplus/matujuice-campaign-01/formant/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/formant/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -303,24 +362,27 @@
       ],
       "configured_passed": true,
       "additional_activity_errors": [],
-      "capture_count": 6,
-      "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "7c7bb6b915289cf86f17a3cccfb9a2954956bf659dc7d812a37fc162e6a924b0",
-      "tested_binary_sha256": "7c7bb6b915289cf86f17a3cccfb9a2954956bf659dc7d812a37fc162e6a924b0",
+      "capture_count": 7,
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "a8ffe626bc6591435968a7ab9097ad65a8e41dee91a28f4bf29f62f71c2c6e28",
+      "tested_binary_sha256": "a8ffe626bc6591435968a7ab9097ad65a8e41dee91a28f4bf29f62f71c2c6e28",
       "source_fingerprints": {
-        "src/msplus/formant/manifest.json": "0425e0085dd3ffb826370458960f7e909553faa2ff31e1227a871c971471f7fd",
-        "src/msplus/formant/formant.c": "79fded75aa811ca45d1f38699887e53bbaf042ddf86d70d62f3bdda49edb25ff",
+        "src/msplus/formant/manifest.json": "d8a36e759427c4a98a4ecef791a1b8f3942b2e8aa25c4ca5a67d01b572b80023",
+        "src/msplus/formant/formant.c": "e9147eff3d884c87dafe1f33241a779e7929858e013e76e8d0beb1bede8b7598",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/formant/manifest_pedal.json": "71b5ceefb586b58df37d901490f25a17750a424ef2e4d21bd28e23c5ef7f89c2",
         "build/msplus/matujuice/src/custom/formant/formant.c": "cdc2bfcd36f0edb825f97ea49981bdc12edbec9e63d7706fbb2162eb228ecfb3",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
       "stock_baseline_healthy": true,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     },
     {
       "port": "galactic",
@@ -374,7 +436,7 @@
       "additional_activity_errors": [],
       "capture_count": 7,
       "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "8640b792d2f697dcb88d0b449c1ec4552d8f47396b3e196551d9748fe3b9068f",
+      "current_build_sha256": "be23a59f485b60faa14ba6bb3a1a96b200ccb932fbc0b71b9052fb1dae231714",
       "tested_binary_sha256": "8640b792d2f697dcb88d0b449c1ec4552d8f47396b3e196551d9748fe3b9068f",
       "source_fingerprints": {
         "src/msplus/genloss/manifest.json": "e6967427d5769daa0320c0fb158f65f7ec473b0792bae74b25dce58f259e5d57",
@@ -394,8 +456,9 @@
       "build_report": "src/msplus/griddly/build/REPORT.md",
       "build_validated": true,
       "status": "BUILD AND NATIVE ONLY: hardware test pending",
-      "current_build_sha256": "dd2c9dce285ee9c9f345e76ea98f0694d47121920895cbefa12122a4a87936a2",
-      "ready_for_retention": false
+      "current_build_sha256": "90727db42a6cda7b88c3de864b0de2cb2b11411f9ba39658c106926b7fb60c30",
+      "ready_for_retention": false,
+      "audio_restoration_marker_present": false
     },
     {
       "port": "gyre",
@@ -537,7 +600,7 @@
       "additional_activity_errors": [],
       "capture_count": 6,
       "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "2b920b09a81bc836e48839f10b93c0040483c0af801872b16cc0c6e257ede5aa",
+      "current_build_sha256": "d052cf8a32579d689eeb249926a247f48850f00900b2087133cd2df0851b0087",
       "tested_binary_sha256": "2b920b09a81bc836e48839f10b93c0040483c0af801872b16cc0c6e257ede5aa",
       "source_fingerprints": {
         "src/msplus/mangle/manifest.json": "ca8da3c5a08cf677db6ffc5f9668b7f1259a71a2b4c1a642753e5dc58f2ffa1a",
@@ -645,7 +708,7 @@
       },
       "stock_baseline_healthy": true,
       "audio_restoration_marker_present": true,
-      "ready_for_retention": true
+      "ready_for_retention": false
     },
     {
       "port": "rooms",
@@ -679,7 +742,7 @@
       },
       "stock_baseline_healthy": true,
       "audio_restoration_marker_present": true,
-      "ready_for_retention": true
+      "ready_for_retention": false
     },
     {
       "port": "scorch",
@@ -798,8 +861,9 @@
       "build_report": "src/msplus/scrub/build/REPORT.md",
       "build_validated": true,
       "status": "BUILD AND NATIVE ONLY: hardware test pending",
-      "current_build_sha256": "de383c83efc574f668b1639825bbd283a9cd97bdecdb65919752c30a79a6469b",
-      "ready_for_retention": false
+      "current_build_sha256": "fadd7a95d0a8d05ed3213a46b6546c014a10ebd2bae8448eaf87fb8aa177ee85",
+      "ready_for_retention": false,
+      "audio_restoration_marker_present": false
     },
     {
       "port": "sgnl",
@@ -808,9 +872,9 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sgnl/build/REPORT.md",
       "build_validated": true,
-      "status": "PASS: selected standalone hardware checks and verified stock audio restoration",
-      "current_build_sha256": "6140ed2cc455ae4fa25687e3885fde5f68e3690a07a63a07d84c818d7f04b68e",
-      "evidence": "build/msplus/remaining-campaign-20261029-02/sgnl/hil/analysis.json",
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "4d92625a75e49a512bc698369bc820509a3a010b7a49d6726c42604e9d6fd70c",
+      "evidence": "build/msplus/matu-packed-campaign-01/sgnl/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -820,14 +884,16 @@
       "configured_passed": true,
       "additional_activity_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "6140ed2cc455ae4fa25687e3885fde5f68e3690a07a63a07d84c818d7f04b68e",
+      "tested_binary_sha256": "4d92625a75e49a512bc698369bc820509a3a010b7a49d6726c42604e9d6fd70c",
       "source_fingerprints": {
-        "src/msplus/sgnl/manifest.json": "13480aca94a204fd26eaec467ed96cedd71f9d90c6d4f205d5fff77f5de87959",
-        "src/msplus/sgnl/sgnl.c": "f8dd23b38326d773466383d32fbe73716d6177125644da864f79cf7ce6c53730",
+        "src/msplus/sgnl/manifest.json": "795424f739f7fd07b0ab51676343978f7813d79871f18a6310bd1db6d32e878f",
+        "src/msplus/sgnl/sgnl.c": "e5358800e33c95164455eb731f899c4ff6b902fb9806d8e48a8dc909ff19e013",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/sgnl/manifest_pedal.json": "27fede33c0a0029d3c75a1a1059aa491a0ad62bd269d700667792db68fc27d5f",
         "build/msplus/matujuice/src/custom/sgnl/sgnl.c": "aa15e6e030051f828e490ae0688898478b342aca332dee289a4699ac3e831590",
@@ -899,7 +965,7 @@
       },
       "stock_baseline_healthy": true,
       "audio_restoration_marker_present": true,
-      "ready_for_retention": true
+      "ready_for_retention": false
     },
     {
       "port": "spool",
@@ -976,9 +1042,36 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sweep/build/REPORT.md",
       "build_validated": true,
-      "status": "BUILD AND NATIVE ONLY: hardware test pending",
-      "current_build_sha256": "023bdeeca897e4bbeac07a9183849e72c3d1fb8509259aa83000330d3793844c",
-      "ready_for_retention": false
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
+      "ready_for_retention": true,
+      "evidence": "build/msplus/matu-packed-campaign-01/sweep/hil/analysis.json",
+      "configured_checks": [
+        "capture_integrity",
+        "signal_above_noise",
+        "dry_path_gain",
+        "zero_input_stability"
+      ],
+      "configured_passed": true,
+      "additional_activity_errors": [],
+      "capture_count": 13,
+      "tested_binary_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
+      "source_fingerprints": {
+        "src/msplus/sweep/manifest.json": "334e92b676e2898bbf49593b93b0f8948c63dd843320aa6b24df5a414e8440d5",
+        "src/msplus/sweep/sweep.c": "8485ea16b85dbbd8cc9c7ea78719856ced70681d506b3f9dfbefefb5a71dd00d",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
+        "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
+        "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
+        "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
+        "build/msplus/matujuice/src/custom/sweep/manifest_pedal.json": "f80c281329c5cb0662526e600850cd901274248bed3d31be225a82af615e918e",
+        "build/msplus/matujuice/src/custom/sweep/sweep.c": "3055ac9a55f45e75b872597e39a3bf2ab1cf000d76c180e85aa313094d474bc5",
+        "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "stock_baseline_healthy": true,
+      "audio_restoration_marker_present": true
     },
     {
       "port": "synceq",
@@ -987,33 +1080,34 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
-      "status": "NOT QUALIFIED: stock ID replacement stops audio. Candidate packed-state build validated natively but not yet tested on hardware.",
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
       "current_build_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
-      "evidence": "build/msplus/synceq-restoration-trace-01/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/synceq/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
         "zero_input_stability"
       ],
-      "configured_passed": false,
+      "configured_passed": true,
       "additional_activity_errors": [],
       "capture_count": 9,
-      "tested_binary_sha256": "0d9ebbf9acd0befe81c09f5a5c7cfd9d3164e2c0e3a39556f41bdf983ec8b8a5",
+      "tested_binary_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
       "source_fingerprints": {
-        "src/msplus/synceq/manifest.json": "35b8cb0dd1f09093e922b9bfeee4e294faae02c63e6563d814aaf24e4c4a9619",
-        "src/msplus/synceq/synceq.c": "1748557d19c6f36bc3be7c6e1c3a2c4aa2a182327735c96e76d42962fa117bdf",
+        "src/msplus/synceq/manifest.json": "e24bea1076a35e6c6b9628e1c209312a189cca3695c7b25ae639df72b1926609",
+        "src/msplus/synceq/synceq.c": "3866d6359aa099375a0784fb60600a46cc2611ebc962c810d78f3df1eca39abf",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/synceq/manifest_pedal.json": "30cc497e2aebff5ab72e282df1653ac640d124d7ef4f62ef263b405996b6eb3a",
         "build/msplus/matujuice/src/custom/synceq/synceq.c": "f2429c1c44e7555cd52d2e3a2b7c8b797052ee3be2b81245f11df802e69505ef",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
       "stock_baseline_healthy": true,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     },
     {
       "port": "taffy",
@@ -1052,7 +1146,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/wavefold/build/REPORT.md",
       "build_validated": true,
-      "evidence": "build/msplus/matujuice-campaign-01/wavefold/hil/analysis.json",
+      "evidence": "build/msplus/matu-packed-campaign-01/wavefold/hil/analysis.json",
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
@@ -1062,24 +1156,27 @@
       ],
       "configured_passed": true,
       "additional_activity_errors": [],
-      "capture_count": 7,
-      "status": "PASS: selected standalone hardware checks and additional activity checks",
-      "current_build_sha256": "ef9b99d0b678be8d2c0f2397c6da0653b446a3af42341a09b7c7a338bf8986a6",
-      "tested_binary_sha256": "ef9b99d0b678be8d2c0f2397c6da0653b446a3af42341a09b7c7a338bf8986a6",
+      "capture_count": 8,
+      "status": "PASS: selected standalone hardware checks, stock audio restored, saved bank unchanged",
+      "current_build_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
+      "tested_binary_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
       "source_fingerprints": {
-        "src/msplus/wavefold/manifest.json": "9fc087a14c68a281f38a8a20ed85fd399c04d92f2e97fdf3397a1f46cb6cebea",
-        "src/msplus/wavefold/wavefold.c": "9fa32b6c9cff2b68517b7c64cd643927e2539ad953276048a45869419ecfe1ef",
+        "src/msplus/wavefold/manifest.json": "6ff474d88cf7234e04edf62e63a33201597d68fc8c9eda2f0e77761bc592909c",
+        "src/msplus/wavefold/wavefold.c": "bbe91a9f0c0d42be5588554da7006a8b0d1ea393b9f83b268b805f571289d06c",
+        "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
-        "src/msplus/common/matujuice_kernel.h": "42d46d1ad6ef2cee49c49e862bf8b7cf4f8a78b3d78181f94bb8989ec9f0de87",
+        "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
+        "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
         "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
       },
       "stock_baseline_healthy": true,
-      "audio_restoration_marker_present": false,
-      "ready_for_retention": false
+      "audio_restoration_marker_present": true,
+      "ready_for_retention": true
     }
   ],
   "bench_blocker": "After confirmed power cycle, stock stereo loopback recovered. Spiral, Rewire, Rooms and SGNL passed. SyncEQ steady-state cases passed, but stock restoration lost audio before uninstall. Further installs stopped. Bypass-before-replacement change is offline-tested and awaits a fresh physical restart for its hardware test.",
@@ -1129,12 +1226,12 @@
     "quiet_calibrator_machine_code_preserved_bytes": 640
   },
   "current_blocker": {
-    "port": "synceq",
-    "audit": "build/msplus/audit-synceq-restoration-trace-01/VERIFIED.json",
-    "before_replacement_audio": "build/msplus/synceq-bypassed-transition-01/hil/before-restore/report.json",
-    "failed_stock_audio": "build/msplus/synceq-restoration-trace-01/hil/transition/stock-id/report.json",
-    "finding": "USB078 run: bypass stereo healthy; audio lost immediately upon stock ID replacement, before restoring any stock parameter. Candidate lossless packed-state storage removes NaN control words between callbacks; hardware test pending.",
-    "retained_set_installed": false,
-    "bypassed_audio": "build/msplus/synceq-restoration-trace-01/hil/transition/bypass/report.json"
+    "ports": [
+      "scorch",
+      "scrub",
+      "griddly"
+    ],
+    "finding": "Ten protected Matujuice ports passed actual stock-audio restoration. Scorch high-level comparison is confounded by measured output-stage compression; linear-range comparison pending. Scrub/GridDly full-length 15-bit history candidates pass native checks; hardware tests pending. Earlier original ports still need current restoration evidence.",
+    "retained_set_installed": false
   }
 }

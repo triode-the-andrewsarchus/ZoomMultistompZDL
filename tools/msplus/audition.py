@@ -349,6 +349,9 @@ def main():
         original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')
         if original_source.exists():
             sources.append(original_source)
+        if 'derived_source' in manifest:
+            sources.extend([(args.effect / manifest['derived_source']).resolve(),
+                            ROOT / 'tools/msplus/pcm15.py'])
         if 'legacy_manifest' in manifest:
             legacy = (args.effect / manifest['legacy_manifest']).resolve()
             sources.extend([legacy, legacy.parent / (legacy.parent.name + '.c')])

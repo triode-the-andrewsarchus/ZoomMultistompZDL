@@ -36,6 +36,10 @@ def main():
             if actual != pin:
                 raise RuntimeError('Matujuice dependency differs from pinned v1.5 source')
             subprocess.run(['git', '-C', str(dependency), 'diff', '--exit-code', 'HEAD', '--', 'src'], check=True)
+            if 'derived_source' in manifest:
+                from pcm15 import derive
+                derive(dependency / 'src/custom' / effect / (effect + '.c'),
+                       (folder / manifest['derived_source']).resolve())
         if 'legacy_manifest' in manifest:
             legacy = (folder / manifest['legacy_manifest']).resolve()
             headers = ROOT / 'build/msplus/headers' / effect

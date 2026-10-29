@@ -76,4 +76,20 @@ static inline void mp_raw_controls(float *params, const float *values)
 
 #define MJ_STATE_TYPE ChState
 #define MJ_PARAM_COUNT 9
+/* Control fields surround the tracker/CANON audio arrays. Pack only these
+ * four regions; copying the entire CANON history every callback is unnecessary.
+ * offsetof keeps the layout tied to the pristine core's actual C structure.
+ */
+#include <stddef.h>
+#define MJ_CA offsetof(ChState, ring)
+#define MJ_CB (offsetof(ChState, cc) - offsetof(ChState, cand))
+#define MJ_CC (offsetof(ChState, cnote) - offsetof(ChState, vw))
+#define MJ_CD (sizeof(ChState) - offsetof(ChState, rng))
+#define MJ_PACKED_HEADER_BYTES (MJ_CA + MJ_CB + MJ_CC + MJ_CD)
+#define MJ_HEADER_CODEC(operation, base, packed) do { \
+    operation((base), (packed), MJ_CA); \
+    operation((base) + offsetof(ChState, cand), (packed) + 2*MJ_CA, MJ_CB); \
+    operation((base) + offsetof(ChState, vw), (packed) + 2*(MJ_CA+MJ_CB), MJ_CC); \
+    operation((base) + offsetof(ChState, rng), (packed) + 2*(MJ_CA+MJ_CB+MJ_CC), MJ_CD); \
+} while (0)
 #include "../common/matujuice_kernel.h"

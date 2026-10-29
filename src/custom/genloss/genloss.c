@@ -164,6 +164,11 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
 
     GenLossState *st = (GenLossState *)base;
     float *buf = (float *)bufBase;
+#ifdef ZOOM_MSPLUS
+    /* RNG bits may encode NaN when a later factory effect reuses this arena.
+     * Keep the persistent integer in our reserved small-state word instead. */
+    st->rng = ((uint32_t *)instance[2])[1];
+#endif
 
     if (st->magic != GL_MAGIC || st->version != GL_VERSION || !st->initialized) {
         st->magic = GL_MAGIC;
@@ -242,4 +247,8 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
     st->hp = hp;
     st->lp = lp;
     st->rng = rng;
+#ifdef ZOOM_MSPLUS
+    ((uint32_t *)instance[2])[1] = st->rng;
+    st->rng = 0u;
+#endif
 }
