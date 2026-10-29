@@ -1,0 +1,42 @@
+{
+  "name": "ZDLGenLoss",
+  "filename": "XXZGENLS",
+  "id": "07001190",
+  "version": "0.10",
+  "display": "ZDL GENLOSS",
+  "badge": "ZD",
+  "description": "Experimental GenLoss port using a validated bounded host ring. Never save.",
+  "dspload": 60,
+  "kernel": "genloss.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Wow",
+      "max": 100,
+      "default": 72,
+      "explanation": "params[5]. Wow & flutter + pitch instability."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 52,
+      "explanation": "params[6]. Bandwidth / brightness (low-pass)."
+    },
+    {
+      "name": "Hiss",
+      "max": 100,
+      "default": 2,
+      "explanation": "params[7]. Tape hiss / noise-floor level."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Dry/wet crossfade. GenLoss previously had NO level or mix control at all -- its last knob was Hiss, a noise amount -- so it was the one effect you could not sit against the dry signal."
+    }
+  ]
+}

@@ -26,6 +26,10 @@ from pedal_common import assert_autosave_off, editor_off
 
 # Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
 CASES = {
+    'XXZGENLS': [(name, [(2, 0), (3, 100), (4, 0), (5, mix)], 'sweep')
+                 for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+                + [('wobble', [(2, 100)], 'sweep')],
+    'XXZMEM': [('disarmed', [(2, 0)], 'silence'), ('armed', [(2, 1)], 'silence')],
     'XXZCAL': [('peak50', [(2, 50)], 'silence'), ('peak10', [(2, 10)], 'silence'),
                ('volume10', [(2, 50), (0, 10, 0x64)], 'silence')],
     'XXZGAIN': [(name, [(2, level), (0, enabled)], 'sweep')

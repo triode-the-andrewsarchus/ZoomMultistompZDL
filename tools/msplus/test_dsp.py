@@ -10,7 +10,7 @@ from native import Kernel, ROOT
 
 class DSPTests(unittest.TestCase):
     def test_faults_fail_closed_and_stay_in_bounds(self):
-        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate']:
+        for name in ['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'calibrate', 'meminfo', 'genloss']:
             k = Kernel(name)
             canary = k.state[k.guard_word:].copy()
             k.state[k.guard_word] = 0
@@ -24,6 +24,58 @@ class DSPTests(unittest.TestCase):
             result = k.block(np.full((16, 2), np.inf))
             self.assertTrue(np.isfinite(result).all())
             np.testing.assert_array_equal(canary, k.state[k.guard_word:])
+
+    def test_memory_telemetry_is_disarmed_and_descriptor_read_only(self):
+        k = Kernel('meminfo')
+        k.instance[3] = 1  # Invalid pointer must never be accessed while disarmed.
+        self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
+        descriptor = np.array([0x12345678, 0x123c5678, 0x60000], np.uint32)
+        original = descriptor.copy()
+        k.instance[3] = descriptor.ctypes.data
+        k.coeff[5] = 1
+        audio = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(10000)])
+        np.testing.assert_array_equal(descriptor, original)
+        np.testing.assert_array_equal(k.state[1:4], original)
+        self.assertLessEqual(np.max(abs(audio)), 0.000201)
+        # First byte pair after the half-second preamble.
+        segment = audio[24255:39690]
+        freq = np.fft.rfftfreq(len(segment), 1 / 44100)
+        for ch, byte in enumerate([0x78, 0x56]):
+            measured = freq[np.argmax(abs(np.fft.rfft(segment[:, ch])))]
+            self.assertLess(abs(measured - (400 + byte * 20)), 4)
+
+    def test_genloss_bounded_ring_and_independent_delay_reference(self):
+        k = Kernel('genloss', arena_bytes=16384)
+        k.coeff[5:9] = [0, 1, 0, 1]
+        rng = np.random.default_rng(53)
+        samples = rng.normal(0, 0.01, (16000, 2))
+        output = np.concatenate([k.block(b) for b in samples.reshape(-1, 16, 2)])
+        x = samples.mean(axis=1) * 1.8
+        driven = 1.5*x - 0.5*x**3
+        delayed = np.zeros(len(x)); delayed[529:] = driven[:-529]
+        hp = signal.lfilter([0.012], [1, -0.988], delayed)
+        expected = signal.lfilter([0.53], [1, -0.47], delayed-hp) * 1.15
+        self.assertLess(np.sqrt(np.mean((output[:, 0]-expected)**2)), 1e-6)
+        np.testing.assert_allclose(output[:, 0], output[:, 1], atol=1e-8)
+        np.testing.assert_array_equal(k.arena[:2], [0xcafef00d]*2)
+        np.testing.assert_array_equal(k.arena[-2:], [0xcafef00d]*2)
+        k.coeff[8] = 0
+        np.testing.assert_allclose(k.block(samples[:16]), samples[:16].mean(axis=1)[:, None].repeat(2, axis=1), atol=1e-8)
+
+    def test_genloss_rejects_inconsistent_or_small_grants_before_writing(self):
+        for mode in ['small', 'mismatch', 'oversize']:
+            k = Kernel('genloss', arena_bytes=16384)
+            if mode == 'small':
+                k.descriptor[1] = k.descriptor[0] + 64
+                k.descriptor[2] = 64
+            elif mode == 'mismatch':
+                k.descriptor[2] += 4
+            else:
+                k.descriptor[1] = k.descriptor[0] + 705604
+                k.descriptor[2] = 705604
+            before = k.arena.copy()
+            self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
+            np.testing.assert_array_equal(k.arena, before)
 
     def test_gain_settling_bypass_and_channel_isolation(self):
         k = Kernel('gain')

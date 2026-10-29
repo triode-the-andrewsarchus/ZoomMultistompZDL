@@ -18,6 +18,16 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define GENLOSS_AUDIO_FUNC SH_AUDIO_FN
+#define GENLOSS_FRAMES SH_FRAMES
+#define GENLOSS_INPUT(x) mp_input(x)
+#define GENLOSS_OUTPUT(dry, wet) mp_output(dry, wet, fade)
+#else
+#define GENLOSS_FRAMES 8
+#define GENLOSS_INPUT(x) (x)
+#define GENLOSS_OUTPUT(dry, wet) (wet)
 #include "../../airwindows/common/zoom_params.h"
 #include "genloss_params.h"
 
@@ -30,6 +40,8 @@
 #define GENLOSS_CODE_SECTION(f) GENLOSS_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 GENLOSS_CODE_SECTION(GENLOSS_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -108,8 +120,27 @@ static inline float gl_read(const float *buf, uint32_t wp, float delay)
     return buf[idx] * (1.0f - fr) + buf[idxm] * fr;
 }
 
+#ifdef ZOOM_MSPLUS
+void GENLOSS_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float fade = coef[SH_COEFF_BYPASS];
+    float wow = coef[SH_PARAM_WOW], tone = coef[SH_PARAM_TONE];
+    float hiss = coef[SH_PARAM_HISS], mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, fade) || !mp_normalized(wow) || !mp_normalized(tone)
+        || !mp_normalized(hiss) || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(GenLossState) + 7u) & ~(uintptr_t)7u) + GL_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -125,6 +156,8 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
     uintptr_t end  = (uintptr_t)desc[1];
     if (base == 0u || end <= base) return;
     if ((base & 3u) != 0u) return;
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(GenLossState) + 7u) & ~(uintptr_t)7u;
     if (bufBase + (uintptr_t)GL_BUF * 4u > end) return;
@@ -144,14 +177,22 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     float wow  = zoom_param_norm01(params[GENLOSS_WOW_SLOT], GENLOSS_WOW_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tone = zoom_param_norm01(params[GENLOSS_TONE_SLOT], GENLOSS_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float hiss = zoom_param_norm01(params[GENLOSS_HISS_SLOT], GENLOSS_HISS_DEFAULT_NORM);
+#endif
     float lpCoef = 0.03f + tone * 0.5f;     /* one-pole cutoff ~210 Hz .. ~3.7 kHz */
     float hissLvl = hiss * 0.03f;           /* 0 .. ~0.03 noise floor */
     /* Dry/wet crossfade. Every other effect in the pack ends with one; GenLoss
      * shipped with none, so it could only ever be heard fully wet. */
+#ifndef ZOOM_MSPLUS
     float mix = zoom_param_norm01(params[GENLOSS_MIX_SLOT], GENLOSS_MIX_DEFAULT_NORM);
+#endif
     float wetLvl = mix;
     float dryLvl = 1.0f - mix;
 
@@ -161,9 +202,9 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
     uint32_t rng = st->rng;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float inL = fxBuf[i];
-        float inR = fxBuf[i + 8];
+    for (i = 0; i < GENLOSS_FRAMES; i++) {
+        float inL = GENLOSS_INPUT(fxBuf[i]);
+        float inR = GENLOSS_INPUT(fxBuf[i + GENLOSS_FRAMES]);
         float in = 0.5f * (inL + inR);
 
         float s = gl_soft(in * GL_DRIVE);
@@ -187,8 +228,8 @@ void GENLOSS_AUDIO_FUNC(unsigned int *ctx)
         float wet = lp + gl_rand(&rng) * hissLvl;
         float out = dryLvl * in + wetLvl * wet * GL_WET_TRIM;
 
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = GENLOSS_OUTPUT(inL, out);
+        fxBuf[i + GENLOSS_FRAMES] = GENLOSS_OUTPUT(inR, out);
 
         wp++;
         if (wp >= GL_BUF) wp = 0u;

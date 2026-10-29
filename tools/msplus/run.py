@@ -88,8 +88,8 @@ def main():
     args = ap.parse_args()
     available = {p.parent.name for p in (ROOT / 'src/msplus').glob('*/manifest.json')}
     unknown = set(args.effects) - available
-    if unknown or 'calibrate' in args.effects:
-        ap.error('Choose musical ports only: ' + ', '.join(sorted(available - {'calibrate'})))
+    if unknown or set(args.effects) & {'calibrate', 'meminfo'}:
+        ap.error('Choose musical ports only: ' + ', '.join(sorted(available - {'calibrate', 'meminfo'})))
     if args.calibration is not None:
         args.calibration = args.calibration.resolve()
         json.loads(args.calibration.read_text())

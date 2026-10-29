@@ -36,4 +36,24 @@ static inline float mp_output(float dry, float wet, float fade)
     if (!(out > -2.0f && out < 2.0f)) out = 0.0f;
     return out;
 }
+/* Stock DELAY_C descriptor semantics, corroborated by read-only telemetry on
+ * firmware 1.10: {base, exclusive_end, byte_count}. Only the observed grant
+ * range is accepted. Call AFTER mp_ready and coefficient checks. Never alter
+ * descriptor fields; reset only the effect-owned header on a fresh instance.
+ * Buffered manifests reserve one user word in instance[2] for the base stamp.
+ */
+static inline uintptr_t mp_arena_state(void **instance, uintptr_t required)
+{
+    const volatile uintptr_t *desc = (const volatile uintptr_t *)instance[3];
+    if (!desc || ((uintptr_t)desc & 3u)) return 0;
+    uintptr_t base = desc[0], end = desc[1], span = desc[2];
+    if (!base || (base & 7u) || end <= base || span != end - base
+        || span > 705600u || required > span) return 0;
+    uint32_t *stamp = (uint32_t *)instance[2];
+    if (*stamp != (uint32_t)base) {
+        *(uint32_t *)base = 0;  /* invalidate only our own legacy state magic */
+        *stamp = (uint32_t)base;
+    }
+    return base;
+}
 #endif

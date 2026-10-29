@@ -73,11 +73,53 @@ def compare_scorch(directory, calibration):
     return rows, errors
 
 
+def decode_memory(directory):
+    from scipy.signal import periodogram
+    report = json.loads((directory / 'armed/report.json').read_text())
+    if report['xruns'] or not report['finite'] or report['clipped']:
+        raise ValueError('Invalid memory diagnostic capture')
+    audio, rate = sf.read(directory / 'armed/return.wav', always_2d=True)
+    def frequencies(at):
+        segment = audio[int(at*rate):int((at+0.12)*rate)]
+        freq, power = periodogram(segment, fs=rate, window='hann', nfft=2**18, axis=0)
+        band = (freq > 150) & (freq < 5600)
+        return freq[band][np.argmax(power[band], axis=0)]
+    seen_preamble = False
+    first = None
+    for at in np.arange(0, 1, 0.05):
+        preamble = np.max(abs(frequencies(at) - [300, 200])) < 2
+        if preamble:
+            seen_preamble = True
+        elif seen_preamble:
+            first = at + 0.2
+            break
+    if first is None:
+        raise ValueError('No complete telemetry preamble')
+    payload, rows = [], []
+    for step in range(6):
+        pair = frequencies(first + step*0.5)[::-1]  # bus A then B
+        decoded = np.rint((pair - 400)/20).astype(int)
+        if np.any(decoded < 0) or np.any(decoded > 255) or np.max(abs(pair - (400+20*decoded))) > 2:
+            raise ValueError('Invalid telemetry byte frequencies')
+        payload.extend(decoded.tolist())
+        rows.append(pair.tolist())
+    data = bytes(payload)
+    base, end, count = [int.from_bytes(data[i:i+4], 'little') for i in (0, 4, 8)]
+    if not base or end <= base or count != end-base or (base | end | count) & 3:
+        raise ValueError('Descriptor is not a consistent aligned range')
+    result = dict(base=base, exclusive_end=end, byte_count=count, frequencies_hz=rows,
+                  arena_access='none; descriptor words read only')
+    (directory / 'memory.json').write_text(json.dumps(result, indent=2)+'\n')
+    return result
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('directory', type=Path, help='Completed calibration capture directory')
+    ap.add_argument('--memory', action='store_true', help='Decode read-only memory descriptor telemetry')
     args = ap.parse_args()
-    print(json.dumps(calibrate(args.directory), indent=2))
+    result = decode_memory(args.directory) if args.memory else calibrate(args.directory)
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == '__main__':

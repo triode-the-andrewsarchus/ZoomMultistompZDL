@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class Kernel:
-    def __init__(self, name):
+    def __init__(self, name, arena_bytes=0):
         folder = ROOT / 'src/msplus' / name
         self.manifest = json.loads((folder / 'manifest.json').read_text())
         header = (folder / 'build/sh_params.h').read_text()
@@ -32,8 +32,14 @@ class Kernel:
         self.guard = int(re.search(r'#define SH_STATE_GUARD\s+(0x[0-9A-Fa-f]+)', header)[1], 16)
         self.state[self.guard_word] = self.guard
         self.bus = np.zeros(32, np.float32)
-        self.instance = (ctypes.c_void_p * 3)(None, self.coeff.ctypes.data, self.state.ctypes.data)
+        self.instance = (ctypes.c_void_p * 4)(None, self.coeff.ctypes.data, self.state.ctypes.data, None)
         self.ctx = (ctypes.c_void_p * 2)(None, self.bus.ctypes.data)
+        if arena_bytes:
+            self.arena = np.full(arena_bytes // 4 + 4, 0xcafef00d, np.uint32)
+            base = self.arena.ctypes.data + 8
+            self.descriptor = np.array([base, base + arena_bytes, arena_bytes], np.uintp)
+            self.instance[3] = self.descriptor.ctypes.data
+
 
     def block(self, samples):
         self.bus[:] = np.asarray(samples).T.reshape(32)

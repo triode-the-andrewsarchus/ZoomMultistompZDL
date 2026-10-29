@@ -138,7 +138,7 @@ def validate_dry(directory, reference, effect):
     audio, rate = sf.read(directory / 'dry/return.wav', always_2d=True)
     if effect == 'klang':
         reference, _ = sf.read(directory / 'baseline-tone/return.wav', always_2d=True)
-    expected = -6.0206 if effect == 'scorch' else 0
+    expected = -6.0206 if effect in ('scorch', 'genloss') else 0
     return [f'{effect} dry gain mismatch: {row}' for row in compare(reference, audio, rate)
             if abs(row['gain_db'] - expected) > 0.5]
 
@@ -161,7 +161,7 @@ def main():
     ap.add_argument('directory', type=Path)
     ap.add_argument('--gain-check', action='store_true')
     ap.add_argument('--calibration', type=Path)
-    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox'])
+    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss'])
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
     results = load_captures(args.directory, reference, rate)
@@ -170,7 +170,7 @@ def main():
     if args.gain_check or args.effect == 'gain':
         errors = validate_gain(args.directory, reference, results)
         checks.append('gain_curve')
-    if args.effect in ('flower', 'klang', 'scorch', 'corrupt', 'howl'):
+    if args.effect in ('flower', 'klang', 'scorch', 'corrupt', 'howl', 'genloss'):
         errors.extend(validate_dry(args.directory, reference, args.effect))
         checks.append('dry_path_gain')
     if args.effect == 'scorch' and args.calibration:

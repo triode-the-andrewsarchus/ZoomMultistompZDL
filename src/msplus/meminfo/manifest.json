@@ -1,0 +1,9 @@
+{
+  "name": "ZDLMemory", "filename": "XXZMEM", "id": "07001180",
+  "version": "0.10", "display": "MEM INFO", "badge": "ZD",
+  "description": "Read-only ring descriptor diagnostic. No arena reads or writes. Arm only in initialized unsaved scratch patch. Remove after use.",
+  "dspload": 20, "kernel": "meminfo.c", "state_bytes": 24,
+  "scaffold": "cleanroom", "kernel_section": "text", "allow_stack": true, "opt_for_space": null,
+  "params": [{"name": "Arm", "max": 1, "default": 0,
+              "explanation": "0: silence without descriptor access; 1: quiet read-only telemetry."}]
+}
