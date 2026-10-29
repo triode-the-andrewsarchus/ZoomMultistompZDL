@@ -16,6 +16,17 @@
  */
 
 #include <stdint.h>
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define TAPEECHO4_AUDIO_FUNC SH_AUDIO_FN
+#define TAPEECHO4_FRAMES SH_FRAMES
+#define TAPEECHO4_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define TAPEECHO4_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define TAPEECHO4_FRAMES 8
+#define TAPEECHO4_OUTPUT(dry, wet) (wet)
+#define TAPEECHO4_EARLY_RETURN() return
+#endif
 
 #include "tapeecho4_params.h"
 #include "../common/zoom_params.h"
@@ -29,7 +40,11 @@
 #define TAPEECHO4_EXPAND_PRAGMA(x) TAPEECHO4_DO_PRAGMA(x)
 #define TAPEECHO4_CODE_SECTION(func) TAPEECHO4_EXPAND_PRAGMA(CODE_SECTION(func, ".audio"))
 #define TAPEECHO4_ALWAYS_INLINE(func) TAPEECHO4_EXPAND_PRAGMA(FUNC_ALWAYS_INLINE(func))
+
+#ifndef ZOOM_MSPLUS
 TAPEECHO4_CODE_SECTION(TAPEECHO4_AUDIO_FUNC)
+#endif
+
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -80,12 +95,18 @@ typedef struct TapeEcho4State {
 } TapeEcho4State;
 
 TAPEECHO4_ALWAYS_INLINE(align4)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(align4)
+#endif
 static inline uintptr_t align4(uintptr_t x)
 {
     return (x + 3u) & ~(uintptr_t)3u;
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_clampf)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_clampf)
+#endif
 static inline float te4_clampf(float x, float lo, float hi)
 {
     if (x < lo) return lo;
@@ -96,6 +117,9 @@ static inline float te4_clampf(float x, float lo, float hi)
 
 
 TAPEECHO4_ALWAYS_INLINE(recip_approx_pos)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(recip_approx_pos)
+#endif
 static inline float recip_approx_pos(float x)
 {
     union { float f; uint32_t u; } conv;
@@ -108,6 +132,9 @@ static inline float recip_approx_pos(float x)
 }
 
 TAPEECHO4_ALWAYS_INLINE(sin_approx)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(sin_approx)
+#endif
 static inline float sin_approx(float x)
 {
     x = x - TAPEECHO4_TWO_PI * (float)((int)(x * 0.15915494f));
@@ -130,6 +157,9 @@ static inline float sin_approx(float x)
 }
 
 TAPEECHO4_ALWAYS_INLINE(tape_saturate)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(tape_saturate)
+#endif
 static inline float tape_saturate(float x)
 {
     x = te4_clampf(x, -TAPEECHO4_CLIP_LIMIT, TAPEECHO4_CLIP_LIMIT);
@@ -149,6 +179,9 @@ static inline float tape_saturate(float x)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_reset_header)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_reset_header)
+#endif
 static inline void te4_reset_header(TapeEcho4State *st)
 {
     st->magic = TAPEECHO4_MAGIC;
@@ -158,6 +191,9 @@ static inline void te4_reset_header(TapeEcho4State *st)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_finish_init)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_finish_init)
+#endif
 static inline void te4_finish_init(TapeEcho4State *st)
 {
     st->writeIndex = 0u;
@@ -177,6 +213,9 @@ static inline void te4_finish_init(TapeEcho4State *st)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_clear_chunk)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_clear_chunk)
+#endif
 static inline void te4_clear_chunk(TapeEcho4State *st)
 {
     uint32_t *w = (uint32_t *)(void *)st;
@@ -196,6 +235,9 @@ static inline void te4_clear_chunk(TapeEcho4State *st)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_division)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_division)
+#endif
 static inline float te4_division(float divNorm)
 {
     if (divNorm < 0.16666667f) return 0.25f;
@@ -207,6 +249,9 @@ static inline float te4_division(float divNorm)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_read_delay)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_read_delay)
+#endif
 static inline float te4_read_delay(const float *delay, uint32_t writeIndex, float delaySamples)
 {
     int wholeInt = (int)delaySamples;
@@ -218,6 +263,9 @@ static inline float te4_read_delay(const float *delay, uint32_t writeIndex, floa
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_tape_filter)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_tape_filter)
+#endif
 static inline float te4_tape_filter(float x, float *hpState, float *lpState,
                                     float hpCoef, float lpCoef)
 {
@@ -228,6 +276,9 @@ static inline float te4_tape_filter(float x, float *hpState, float *lpState,
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_galaxy_filter)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_galaxy_filter)
+#endif
 static inline float te4_galaxy_filter(float x, float *history, uint32_t index)
 {
     float y;
@@ -259,6 +310,9 @@ static inline float te4_galaxy_filter(float x, float *history, uint32_t index)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_spring_tank)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_spring_tank)
+#endif
 static inline float te4_spring_tank(TapeEcho4State *st, float input)
 {
     uint32_t index = st->springIndex;
@@ -281,6 +335,9 @@ static inline float te4_spring_tank(TapeEcho4State *st, float input)
 }
 
 TAPEECHO4_ALWAYS_INLINE(te4_process_sample)
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(te4_process_sample)
+#endif
 static inline void te4_process_sample(TapeEcho4State *st, float *sampleL, float *sampleR,
                                       float baseDelay, float feedback, float flutter,
                                       float wow, float wear, float drive,
@@ -360,8 +417,39 @@ static inline void te4_process_sample(TapeEcho4State *st, float *sampleL, float 
     st->fpdR ^= st->fpdR << 5;
 }
 
+#ifdef ZOOM_MSPLUS
+void TAPEECHO4_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void TAPEECHO4_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float tempoNorm = coef[SH_PARAM_TEMPO];
+    float divNorm = coef[SH_PARAM_DIV];
+    float feedNorm = coef[SH_PARAM_FEED];
+    float flutter = coef[SH_PARAM_FLUTTER];
+    float wow = coef[SH_PARAM_WOW];
+    float wear = coef[SH_PARAM_WEAR];
+    float drive = coef[SH_PARAM_DRIVE];
+    float spring = coef[SH_PARAM_SPRING];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(tempoNorm)
+        || !mp_normalized(divNorm)
+        || !mp_normalized(feedNorm)
+        || !mp_normalized(flutter)
+        || !mp_normalized(wow)
+        || !mp_normalized(wear)
+        || !mp_normalized(drive)
+        || !mp_normalized(spring)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t stateBase = mp_arena_state(instance, sizeof(TapeEcho4State));
+    if (!stateBase) { mp_silence(fxBuf); return; }
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf = ZDL_PTR(float *, ctx[5]);
 
@@ -386,25 +474,45 @@ void TAPEECHO4_AUDIO_FUNC(unsigned int *ctx)
     if (bytes < sizeof(TapeEcho4State) || span < bytes) return;
     if (requiredEnd > end) return;
 
+#endif
+
     TapeEcho4State *st = (TapeEcho4State *)stateBase;
     if (st->magic != TAPEECHO4_MAGIC || st->version != TAPEECHO4_VERSION) {
         te4_reset_header(st);
-        return;
+        TAPEECHO4_EARLY_RETURN();
     }
     if (!st->initialized) {
         te4_clear_chunk(st);
-        return;
+        TAPEECHO4_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float tempoNorm = zoom_param_norm01(params[TAPEECHO4_TEMPO_SLOT], TAPEECHO4_TEMPO_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float divNorm = zoom_param_norm01(params[TAPEECHO4_DIV_SLOT], TAPEECHO4_DIV_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float feedNorm = zoom_param_norm01(params[TAPEECHO4_FEED_SLOT], TAPEECHO4_FEED_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float flutter = zoom_param_norm01(params[TAPEECHO4_FLUTTER_SLOT], TAPEECHO4_FLUTTER_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float wow = zoom_param_norm01(params[TAPEECHO4_WOW_SLOT], TAPEECHO4_WOW_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float wear = zoom_param_norm01(params[TAPEECHO4_WEAR_SLOT], TAPEECHO4_WEAR_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float drive = zoom_param_norm01(params[TAPEECHO4_DRIVE_SLOT], TAPEECHO4_DRIVE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float spring = zoom_param_norm01(params[TAPEECHO4_SPRING_SLOT], TAPEECHO4_SPRING_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix = zoom_param_norm01(params[TAPEECHO4_MIX_SLOT], TAPEECHO4_MIX_DEFAULT_NORM);
+#endif
 
     float bpm = 40.0f + tempoNorm * 160.0f;
     float beatSamples = 2646000.0f * recip_approx_pos(bpm);
@@ -413,11 +521,17 @@ void TAPEECHO4_AUDIO_FUNC(unsigned int *ctx)
     float feedback = spool_feedback(feedNorm);
 
     int i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < TAPEECHO4_FRAMES; i++) {
         float sL = fxBuf[i];
-        float sR = fxBuf[i + 8];
+#ifdef ZOOM_MSPLUS
+        sL = mp_input(sL);
+#endif
+        float sR = fxBuf[i + TAPEECHO4_FRAMES];
+#ifdef ZOOM_MSPLUS
+        sR = mp_input(sR);
+#endif
         te4_process_sample(st, &sL, &sR, baseDelay, feedback, flutter, wow, wear, drive, spring, mix);
-        fxBuf[i] = sL;
-        fxBuf[i + 8] = sR;
+        fxBuf[i] = TAPEECHO4_OUTPUT(fxBuf[i], sL);
+        fxBuf[i + TAPEECHO4_FRAMES] = TAPEECHO4_OUTPUT(fxBuf[i + TAPEECHO4_FRAMES], sR);
     }
 }

@@ -1,0 +1,77 @@
+{
+  "name": "ZDLOxide",
+  "filename": "XXZOXIDE",
+  "id": "07001280",
+  "version": "0.10",
+  "display": "ZDL OXIDE",
+  "badge": "ZD",
+  "description": "Experimental Oxide port with bounded host arena. Never save.",
+  "dspload": 180,
+  "kernel": "oxide.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../airwindows/totape9/manifest.json",
+  "legacy_prefix": "TOTAPE9",
+  "params": [
+    {
+      "name": "Input",
+      "max": 100,
+      "default": 50,
+      "explanation": "Input control; original pedal taper."
+    },
+    {
+      "name": "Tilt",
+      "max": 100,
+      "default": 50,
+      "explanation": "Tilt control; original pedal taper."
+    },
+    {
+      "name": "Shape",
+      "max": 100,
+      "default": 50,
+      "explanation": "Shape control; original pedal taper."
+    },
+    {
+      "name": "Flutter",
+      "max": 100,
+      "default": 30,
+      "explanation": "Flutter control; original pedal taper."
+    },
+    {
+      "name": "FlutSpd",
+      "max": 100,
+      "default": 50,
+      "explanation": "FlutSpd control; original pedal taper."
+    },
+    {
+      "name": "Bias",
+      "max": 100,
+      "default": 50,
+      "explanation": "Bias control; original pedal taper."
+    },
+    {
+      "name": "HeadBmp",
+      "max": 100,
+      "default": 25,
+      "explanation": "HeadBmp control; original pedal taper."
+    },
+    {
+      "name": "Output",
+      "max": 100,
+      "default": 50,
+      "explanation": "Output control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ],
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/oxide"
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "name": "ZDLGyre",
+  "filename": "XXZGYRE",
+  "id": "07001250",
+  "version": "0.10",
+  "display": "ZDL GYRE",
+  "badge": "ZD",
+  "description": "Experimental Gyre port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "gyre.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Size",
+      "max": 100,
+      "default": 45,
+      "explanation": "Size control; original pedal taper."
+    },
+    {
+      "name": "Feed",
+      "max": 100,
+      "default": 60,
+      "explanation": "Feed control; original pedal taper."
+    },
+    {
+      "name": "Decay",
+      "max": 100,
+      "default": 0,
+      "explanation": "Decay control; original pedal taper."
+    },
+    {
+      "name": "Rise",
+      "max": 100,
+      "default": 50,
+      "explanation": "Rise control; original pedal taper."
+    },
+    {
+      "name": "Glide",
+      "max": 100,
+      "default": 0,
+      "explanation": "Glide control; original pedal taper."
+    },
+    {
+      "name": "Span",
+      "max": 100,
+      "default": 50,
+      "explanation": "Span control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 55,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

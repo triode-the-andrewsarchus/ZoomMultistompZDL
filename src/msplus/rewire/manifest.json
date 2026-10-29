@@ -1,0 +1,66 @@
+{
+  "name": "ZDLRewire",
+  "filename": "XXZREWIR",
+  "id": "07001240",
+  "version": "0.10",
+  "display": "ZDL REWIRE",
+  "badge": "ZD",
+  "description": "Experimental Rewire port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "rewire.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Route",
+      "max": 100,
+      "default": 10,
+      "explanation": "Route control; original pedal taper."
+    },
+    {
+      "name": "Bits",
+      "max": 100,
+      "default": 55,
+      "explanation": "Bits control; original pedal taper."
+    },
+    {
+      "name": "Drive",
+      "max": 100,
+      "default": 35,
+      "explanation": "Drive control; original pedal taper."
+    },
+    {
+      "name": "Ring",
+      "max": 100,
+      "default": 20,
+      "explanation": "Ring control; original pedal taper."
+    },
+    {
+      "name": "Comb",
+      "max": 100,
+      "default": 25,
+      "explanation": "Comb control; original pedal taper."
+    },
+    {
+      "name": "Shift",
+      "max": 100,
+      "default": 50,
+      "explanation": "Shift control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 55,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 from scipy import signal
+from native import MATU_PORTS
 
 
 def align(reference, actual, rate):
@@ -42,11 +43,11 @@ def compare(reference, actual, rate):
     return results
 
 
-def tone_metrics(directory):
+def tone_metrics(directory, mono=False):
     audio, rate = sf.read(directory / 'return.wav', always_2d=True)
     metrics = []
     for ch in range(2):
-        start = int((0.8 + ch * 2.5) * rate)
+        start = int((0.8 if mono else 0.8 + ch * 2.5) * rate)
         segment = audio[start:start + int(0.8 * rate), ch]
         freq = np.fft.rfftfreq(len(segment), 1 / rate)
         power = np.abs(np.fft.rfft(segment * signal.windows.hann(len(segment)))) ** 2
@@ -59,7 +60,7 @@ def tone_metrics(directory):
     return metrics
 
 
-def load_captures(directory, reference, rate):
+def load_captures(directory, reference, rate, mono=False):
     results = {}
     for folder in sorted(directory.iterdir()):
         if folder.name == 'baseline' or not (folder / 'return.wav').is_file():
@@ -68,12 +69,17 @@ def load_captures(directory, reference, rate):
         if report['xruns'] or not report['finite'] or report['clipped']:
             raise SystemExit(f'Invalid capture: {folder}')
         if report['kind'] == 'tone':
-            results[folder.name] = tone_metrics(folder)
+            results[folder.name] = tone_metrics(folder, mono)
             continue
         audio, actual_rate = sf.read(folder / 'return.wav', always_2d=True)
         if actual_rate != rate:
             raise SystemExit('Capture rates differ')
-        results[folder.name] = compare(reference, audio, rate)
+        if report['kind'] == 'sweep':
+            ref = np.repeat(reference[:, :1], 2, axis=1) if mono else reference
+            results[folder.name] = compare(ref, audio, rate)
+        else:
+            results[folder.name] = dict(peak=np.max(abs(audio), axis=0).tolist(),
+                                        rms=np.sqrt(np.mean(audio**2, axis=0)).tolist())
     return results
 
 
@@ -138,9 +144,56 @@ def validate_dry(directory, reference, effect):
     audio, rate = sf.read(directory / 'dry/return.wav', always_2d=True)
     if effect == 'klang':
         reference, _ = sf.read(directory / 'baseline-tone/return.wav', always_2d=True)
-    expected = -6.0206 if effect in ('scorch', 'genloss') else 0
+    if effect in MATU_PORTS:
+        reference = np.repeat(reference[:, :1], 2, axis=1)
+    expected = -6.0206 if effect in ('scorch', 'genloss', 'hydra', 'spiral', 'rewire', 'gyre') else 0
     return [f'{effect} dry gain mismatch: {row}' for row in compare(reference, audio, rate)
             if abs(row['gain_db'] - expected) > 0.5]
+
+
+def validate_hold(directory, labels, tone=True, first=False):
+    baseline, rate = sf.read(directory / 'baseline/return.wav', always_2d=True)
+    noise = np.sqrt(np.mean(baseline[-rate:]**2, axis=0))
+    rows, errors = [], []
+    for label in labels:
+        audio, _ = sf.read(directory / label / 'return.wav', always_2d=True)
+        segment = audio[:rate] if first else audio[-rate:]
+        rms = np.sqrt(np.mean(segment**2, axis=0))
+        row = dict(capture=label, rms=rms.tolist(), above_noise_db=(20*np.log10(np.maximum(rms, 1e-12)/noise)).tolist())
+        rows.append(row)
+        if np.any(rms < noise*5):
+            errors.append(f'{label}: held/generated audio is too quiet: {row}')
+        if tone:
+            peaks = [r for ch in range(2) for r in tone_peaks(audio, rate, ch, [997])]
+            row['peaks'] = peaks
+            if any(abs(r['measured_hz']-997) > 3 for r in peaks):
+                errors.append(f'{label}: held tone frequency mismatch: {peaks}')
+    return rows, errors
+
+
+def validate_wavefold(directory):
+    audio, rate = sf.read(directory / 'symmetry/return.wav', always_2d=True)
+    rows = []
+    for ch in range(2):
+        segment = audio[int(.8*rate):int(1.8*rate), ch]
+        freq, power = signal.periodogram(segment, fs=rate, window='hann', nfft=2**19)
+        band = (freq > 900) & (freq < 2500)
+        peak = float(freq[band][np.argmax(power[band])])
+        rows.append(dict(channel=ch, expected_hz=1994, measured_hz=peak))
+    errors = [f'WaveFold knee should double the tone: {r}' for r in rows if abs(r['measured_hz']-1994)>2]
+    return rows, errors
+
+
+def validate_modulation(directory, label):
+    audio, rate = sf.read(directory / label / 'return.wav', always_2d=True)
+    start, end = int(.5*rate), int(5.5*rate)
+    size = int(.05*rate)
+    windows = audio[start:end].reshape(-1, size, 2)
+    rms = np.sqrt(np.mean(windows**2, axis=1))
+    lo, hi = np.percentile(rms, [10, 90], axis=0)
+    depth = 20*np.log10(np.maximum(hi, 1e-12)/np.maximum(lo, 1e-12))
+    row = dict(capture=label, envelope_depth_db=depth.tolist())
+    return row, [f'{label}: modulation depth too small: {row}'] if np.any(depth < 3) else []
 
 
 def check_silence(directory):
@@ -161,16 +214,16 @@ def main():
     ap.add_argument('directory', type=Path)
     ap.add_argument('--gain-check', action='store_true')
     ap.add_argument('--calibration', type=Path)
-    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss'])
+    ap.add_argument('--effect', choices=['gain', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
-    results = load_captures(args.directory, reference, rate)
+    results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS)
     errors = validate_gain(args.directory, reference, results) if args.gain_check else []
     checks = ['capture_integrity']
     if args.gain_check or args.effect == 'gain':
         errors = validate_gain(args.directory, reference, results)
         checks.append('gain_curve')
-    if args.effect in ('flower', 'klang', 'scorch', 'corrupt', 'howl', 'genloss'):
+    if (args.directory / 'dry/return.wav').is_file():
         errors.extend(validate_dry(args.directory, reference, args.effect))
         checks.append('dry_path_gain')
     if args.effect == 'scorch' and args.calibration:
@@ -189,6 +242,24 @@ def main():
         results['sidebands'] = rows
         errors.extend(problems)
         checks.append('ring_sideband_frequencies')
+    if args.effect in ('stasis', 'scrub', 'griddly', 'dubsiren'):
+        labels = {'stasis': ['hold', 'hold-off'], 'scrub': ['wet'],
+                  'griddly': ['tail'], 'dubsiren': ['siren']}[args.effect]
+        rows, problems = validate_hold(args.directory, labels, tone=args.effect == 'stasis',
+                                       first=args.effect in ('griddly', 'dubsiren'))
+        results['held_or_generated_audio'] = rows
+        errors.extend(problems)
+        checks.append('held_or_generated_audio')
+    if args.effect == 'wavefold':
+        rows, problems = validate_wavefold(args.directory)
+        results['folded_tone'] = rows
+        errors.extend(problems)
+        checks.append('fold_knee_frequency_doubling')
+    if args.effect in ('eugate', 'breather'):
+        rows, problems = validate_modulation(args.directory, 'wet' if args.effect == 'eugate' else 'pump')
+        results['modulation'] = rows
+        errors.extend(problems)
+        checks.append('rhythm_envelope_modulation')
     if (args.directory / 'silence/return.wav').exists():
         rows, problems = check_silence(args.directory)
         results['silence_stability'] = rows

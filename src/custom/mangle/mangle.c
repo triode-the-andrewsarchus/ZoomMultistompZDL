@@ -34,6 +34,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define MANGLE_AUDIO_FUNC SH_AUDIO_FN
+#define MANGLE_FRAMES SH_FRAMES
+#define MANGLE_INPUT(x) mp_input(x)
+#define MANGLE_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define MANGLE_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define MANGLE_FRAMES 8
+#define MANGLE_INPUT(x) (x)
+#define MANGLE_OUTPUT(dry, wet) (wet)
+#define MANGLE_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "mangle_params.h"
 
@@ -46,6 +58,8 @@
 #define MANGLE_CODE_SECTION(f) MANGLE_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 MANGLE_CODE_SECTION(MANGLE_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -134,8 +148,35 @@ static inline void mg_crush_scale(int bits, float *mul, float *inv)
     *inv = cvt.f;
 }
 
+#ifdef ZOOM_MSPLUS
+void MANGLE_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void MANGLE_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float time = coef[SH_PARAM_TIME];
+    float fbk = coef[SH_PARAM_FEEDBK];
+    float crush = coef[SH_PARAM_CRUSH];
+    float trmA = coef[SH_PARAM_TREMOLO];
+    float ptchA = coef[SH_PARAM_PITCH];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(time)
+        || !mp_normalized(fbk)
+        || !mp_normalized(crush)
+        || !mp_normalized(trmA)
+        || !mp_normalized(ptchA)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(MangleState) + 7u) & ~(uintptr_t)7u) + MG_TOTAL * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -143,17 +184,19 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) MANGLE_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) MANGLE_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) MANGLE_EARLY_RETURN();
+    if ((base & 3u) != 0u) MANGLE_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(MangleState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)MG_TOTAL * 4u > end) return;   /* delay ring + grain ring */
+    if (bufBase + (uintptr_t)MG_TOTAL * 4u > end) MANGLE_EARLY_RETURN();   /* delay ring + grain ring */
 
     MangleState *st = (MangleState *)base;
     float *buf  = (float *)bufBase;
@@ -182,15 +225,27 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= MG_TOTAL) st->initialized = 1u;
-        return;
+        MANGLE_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float time  = zoom_param_norm01(params[MANGLE_TIME_SLOT], MANGLE_TIME_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float fbk   = zoom_param_norm01(params[MANGLE_FEEDBK_SLOT], MANGLE_FEEDBK_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float crush = zoom_param_norm01(params[MANGLE_CRUSH_SLOT], MANGLE_CRUSH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float trmA  = zoom_param_norm01(params[MANGLE_TREMOLO_SLOT], MANGLE_TREMOLO_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float ptchA = zoom_param_norm01(params[MANGLE_PITCH_SLOT], MANGLE_PITCH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix   = zoom_param_norm01(params[MANGLE_MIX_SLOT], MANGLE_MIX_DEFAULT_NORM);
+#endif
 
     float delay = MG_DMIN + time * (MG_DMAX - MG_DMIN);
     float fb = fbk * MG_FB_MAX;
@@ -215,9 +270,11 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
     float gph = st->grainPhase, lfo = st->lfo, shReg = st->shReg, lpZ = st->lpZ;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < MANGLE_FRAMES; f++) {
+        fxBuf[f] = MANGLE_INPUT(fxBuf[f]);
+        fxBuf[f + MANGLE_FRAMES] = MANGLE_INPUT(fxBuf[f + MANGLE_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + MANGLE_FRAMES];
         float in = 0.5f * (inL + inR);
 
         /* delay tap: ONE fixed-distance read (the only pattern proven safe) */
@@ -259,8 +316,8 @@ void MANGLE_AUDIO_FUNC(unsigned int *ctx)
 
         float wetSig = proc + ptchA * (pitched - proc);      /* blend dry <-> pitched */
 
-        fxBuf[f]     = dry * inL + wet * wetSig;
-        fxBuf[f + 8] = dry * inR + wet * wetSig;
+        fxBuf[f]     = MANGLE_OUTPUT(fxBuf[f], dry * inL + wet * wetSig);
+        fxBuf[f + MANGLE_FRAMES] = MANGLE_OUTPUT(fxBuf[f + MANGLE_FRAMES], dry * inR + wet * wetSig);
 
         wp = (wp + 1u) & MG_MASK;
     }

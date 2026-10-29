@@ -17,6 +17,7 @@ import mido
 import zoomzt2
 from audio import AudioRig, run_capture, temporary_quantum
 from upstream import ROOT
+from native import MATU_PORTS
 from backup import CheckedInput, stock_patch
 from pedal_diy import check_envelope, check_zic
 from decode_preset import ZPTC
@@ -50,6 +51,66 @@ CASES = {
     'XXZHOWL': [(name, [(2, 35), (3, 50), (4, mix)], 'sweep') for name, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
                + [('extreme', [(2, 100), (3, 100)], 'sweep')],
 }
+
+
+BUFFERED_PORTS = {'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle',
+                  'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'}
+
+
+MATU_CASES = {
+    'wavefold': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
+                 ('drive', {'Drive': 100}, 'tone'), ('symmetry', {'Symm': 95, 'Tone': 100}, 'tone')],
+    'dualshft': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
+                 ('pitch', {'Ptch1': 66, 'Ptch2': 0}, 'tone')],
+    'formant': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
+                ('choir', {'Choir': 16, 'Size': 5}, 'tone')],
+    'eugate': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'sustain'),
+               ('pattern', {'Notes': 3, 'Steps': 7}, 'sustain')],
+    'dubsiren': [('siren', {'Vol': 25}, 'silence'), ('prime', {}, 'sustain'),
+                 ('tail', {'enabled': 0}, 'silence')],
+    'sgnl': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100, 'Codec': 0, 'Loss': 0}, 'sweep'),
+             ('damage', {'Loss': 70, 'Codec': 40}, 'tone')],
+    'scrub': [('dry', {'Mix': 0}, 'sweep'), ('prime', {}, 'sustain'),
+              ('wet', {'Mix': 100, 'Pos': 500}, 'silence'),
+              ('scan', {'Pos': 400}, 'silence')],
+    'griddly': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100, 'Time': 80}, 'sweep'),
+                ('prime', {}, 'sustain'), ('tail', {'enabled': 0}, 'silence')],
+    'synceq': [('default', {}, 'sweep'), ('low', {'Low': 24}, 'sweep'),
+               ('cut', {'HiCut': 10}, 'sweep')],
+    'breather': [('dry', {'Depth': 0, 'Verb': 0}, 'sweep'),
+                 ('pump', {'Depth': 80, 'Verb': 35}, 'sustain'),
+                 ('reverb', {'Depth': 0, 'Verb': 100}, 'sweep')],
+    'dirtbox': [('dry', {'Mix': 0, 'Level': 20}, 'sweep')]
+                + [(f'model{i}', {'Mix': 100, 'Model': i}, 'tone') for i in range(7)],
+    'sweep': [('dry', {'Mix': 0}, 'sweep')]
+              + [(f'engine{i}', {'Mix': 100, 'Type': i}, 'sweep') for i in range(8)],
+}
+
+
+def reviewed_cases(manifest):
+    if manifest['filename'] in CASES:
+        return CASES[manifest['filename']]
+    name = manifest['kernel'].removesuffix('.c')
+    if name in MATU_PORTS:
+        knobs = {p['name']: i+2 for i, p in enumerate(manifest['params'])}
+        knobs['enabled'] = 0
+        return [(label, [(knobs[key], value) for key, value in edits.items()], kind)
+                for label, edits, kind in MATU_CASES[name]]
+    if name not in BUFFERED_PORTS:
+        raise ValueError('No reviewed test cases for this effect')
+    knobs = {p['name']: i+2 for i, p in enumerate(manifest['params'])}
+    cases = [(label, [(knobs['Mix'], mix)], 'sweep')
+             for label, mix in [('dry', 0), ('half', 50), ('wet', 100)]]
+    if name == 'rooms':
+        cases.extend((f'mode{value}', [(knobs['Mode'], value)], 'sweep')
+                     for value in [20, 40, 60, 80, 100])
+    elif name == 'stasis':
+        cases = [('dry', [(knobs['Capture'], 1), (knobs['Mix'], 0)], 'sweep'),
+                 ('prime', [(knobs['Length'], 100), (knobs['Mix'], 100)], 'sustain'),
+                 ('hold', [(knobs['Capture'], 2)], 'silence'),
+                 ('hold-off', [(0, 0)], 'silence'),
+                 ('release', [(knobs['Capture'], 1)], 'sweep')]
+    return cases
 
 
 def verify_backup(folder):
@@ -235,8 +296,7 @@ def main():
     args = ap.parse_args()
     verify_backup(args.backup)
     manifest = json.loads((args.effect / 'manifest.json').read_text())
-    if manifest['filename'] not in CASES:
-        raise ValueError('No reviewed test cases for this effect')
+    cases = reviewed_cases(manifest)
     args.output.mkdir(parents=True, exist_ok=False)
     with temporary_quantum(1024), AudioRig(
             [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
@@ -244,10 +304,18 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         session = TempPatch(log, args.backup)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
-        sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'), ROOT / 'src/msplus/common/compat.h']
+        sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
         original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')
         if original_source.exists():
             sources.append(original_source)
+        if 'legacy_manifest' in manifest:
+            legacy = (args.effect / manifest['legacy_manifest']).resolve()
+            sources.extend([legacy, legacy.parent / (legacy.parent.name + '.c')])
+            if manifest.get('dependency') == 'matujuice-v1.5':
+                sources.append(ROOT / 'build/msplus/matujuice/src/custom/common/drytag.h')
+            else:
+                sources.extend([ROOT / 'src/airwindows/common/zoom_params.h',
+                                ROOT / 'src/airwindows/common/tape_controls.h'])
         (args.output / 'SOURCES.json').write_text(json.dumps({str(p.resolve().relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}, indent=2) + '\n')
         try:
             session.verify_saved()
@@ -259,7 +327,7 @@ def main():
                        'baseline-tone': capture_trial(args.output / 'baseline-tone', 'tone', -30, rig)}
             session.edit(1, int(manifest['id'], 16))
             session.edit(0, 1)
-            for label, edits, kind in CASES[manifest['filename']]:
+            for label, edits, kind in cases:
                 for edit in edits:
                     session.edit(*edit)
                 time.sleep(0.15)

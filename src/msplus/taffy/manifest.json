@@ -1,0 +1,48 @@
+{
+  "name": "ZDLTaffy",
+  "filename": "XXZTAFFY",
+  "id": "070011d0",
+  "version": "0.10",
+  "display": "ZDL TAFFY",
+  "badge": "ZD",
+  "description": "Experimental Taffy port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "taffy.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Speed",
+      "max": 100,
+      "default": 50,
+      "explanation": "Speed control; original pedal taper."
+    },
+    {
+      "name": "Chance",
+      "max": 100,
+      "default": 35,
+      "explanation": "Chance control; original pedal taper."
+    },
+    {
+      "name": "Depth",
+      "max": 100,
+      "default": 60,
+      "explanation": "Depth control; original pedal taper."
+    },
+    {
+      "name": "Glide",
+      "max": 100,
+      "default": 60,
+      "explanation": "Glide control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

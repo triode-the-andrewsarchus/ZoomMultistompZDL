@@ -7,6 +7,22 @@
  */
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define STASIS_AUDIO_FUNC SH_AUDIO_FN
+#define STASIS_FRAMES SH_FRAMES
+#define STASIS_ON hostFade
+#define STASIS_CAPTURE_VALUE (mp_capture * 2.0f)
+#define STASIS_INPUT(x) mp_input(x)
+#define STASIS_OUTPUT(dry, wet) mp_output(dry, wet, 1.0f) /* core owns capture/release ramps */
+#define STASIS_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define STASIS_FRAMES 8
+#define STASIS_ON params[0]
+#define STASIS_CAPTURE_VALUE (zoom_param_norm01(params[STASIS_CAPTURE_SLOT], 0.0f) * 100.0f)
+#define STASIS_INPUT(x) (x)
+#define STASIS_OUTPUT(dry, wet) (wet)
+#define STASIS_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "stasis_params.h"
 
@@ -19,6 +35,8 @@
 #define STASIS_CODE_SECTION(f) STASIS_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 STASIS_CODE_SECTION(STASIS_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -66,8 +84,35 @@ static inline float ss_read(const float *buf, float pos)
     return buf[a] * (1.0f - fr) + buf[b] * fr;
 }
 
+#ifdef ZOOM_MSPLUS
+void STASIS_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void STASIS_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float ln = coef[SH_PARAM_LENGTH];
+    float bl = coef[SH_PARAM_BLUR];
+    float dc = coef[SH_PARAM_DECAY];
+    float tn = coef[SH_PARAM_TONE];
+    float mix = coef[SH_PARAM_MIX];
+    float mp_capture = coef[SH_PARAM_CAPTURE];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(ln)
+        || !mp_normalized(bl)
+        || !mp_normalized(dc)
+        || !mp_normalized(tn)
+        || !mp_normalized(mix)
+        || !mp_normalized(mp_capture)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(StasisState) + 7u) & ~(uintptr_t)7u) + SS_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -80,14 +125,16 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
      * captures the past instead of the future. */
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) STASIS_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) STASIS_EARLY_RETURN();
+    if ((base & 3u) != 0u) STASIS_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(StasisState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)SS_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)SS_BUF * 4u > end) STASIS_EARLY_RETURN();
 
     StasisState *st = (StasisState *)base;
     float *buf = (float *)bufBase;
@@ -96,8 +143,8 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
         st->magic = SS_MAGIC;
         st->version = SS_VERSION;
         st->writePos = 0u;
-        st->prevOn = (params[0] >= 0.5f) ? 1u : 0u;   /* don't fire on load */
-        st->prevCapture = (uint32_t)(int32_t)(zoom_param_norm01(params[STASIS_CAPTURE_SLOT], 0.0f) * 100.0f + 0.5f);
+        st->prevOn = (STASIS_ON >= 0.5f) ? 1u : 0u;   /* don't fire on load */
+        st->prevCapture = (uint32_t)(int32_t)(STASIS_CAPTURE_VALUE + 0.5f);
         st->gate = 0.0f;
         st->frozen = 0u;
         st->capEnd = 0.0f;
@@ -115,13 +162,26 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
         if (lim > SS_BUF) lim = SS_BUF;
         for (; n < lim; n++) buf[n] = 0.0f;
         st->clearPos = n;
+#ifdef ZOOM_MSPLUS
+        STASIS_EARLY_RETURN();
+#endif
     }
 
+#ifndef ZOOM_MSPLUS
     float ln  = zoom_param_norm01(params[STASIS_LENGTH_SLOT], STASIS_LENGTH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float bl  = zoom_param_norm01(params[STASIS_BLUR_SLOT],   STASIS_BLUR_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float dc  = zoom_param_norm01(params[STASIS_DECAY_SLOT],  STASIS_DECAY_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tn  = zoom_param_norm01(params[STASIS_TONE_SLOT],   STASIS_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix = zoom_param_norm01(params[STASIS_MIX_SLOT],    STASIS_MIX_DEFAULT_NORM);
+#endif
 
     /* Loop length, live. */
     int32_t L = SS_CAP_MIN + (int32_t)(ln * ln * (float)SS_CAP_SPAN);
@@ -162,10 +222,10 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
     }
 
     float lpCoef = 0.02f + tn * 0.55f;
-    uint32_t nowOn = (params[0] >= 0.5f) ? 1u : 0u;
+    uint32_t nowOn = (STASIS_ON >= 0.5f) ? 1u : 0u;
 
     /* LineSel clones materialize UI integers in hundredths, even max=2. */
-    uint32_t capture = (uint32_t)(int32_t)(zoom_param_norm01(params[STASIS_CAPTURE_SLOT], 0.0f) * 100.0f + 0.5f);
+    uint32_t capture = (uint32_t)(int32_t)(STASIS_CAPTURE_VALUE + 0.5f);
     uint32_t fire = capture == 0u ? (nowOn && !st->prevOn) :
                     (capture == 2u && st->prevCapture != 2u);
     uint32_t release = capture == 0u ? (!nowOn && st->prevOn) : (capture == 1u);
@@ -195,8 +255,10 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
     float lp = st->lp, level = st->level;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float dry = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < STASIS_FRAMES; i++) {
+        fxBuf[i] = STASIS_INPUT(fxBuf[i]);
+        fxBuf[i + STASIS_FRAMES] = STASIS_INPUT(fxBuf[i + STASIS_FRAMES]);
+        float dry = 0.5f * (fxBuf[i] + fxBuf[i + STASIS_FRAMES]);
 
         /* Record only while NOT frozen: this is what stops the audio you play
          * over the hold from overwriting the hold itself. */
@@ -243,8 +305,8 @@ void STASIS_AUDIO_FUNC(unsigned int *ctx)
         /* No clipping, gain curve or mono sum on the dry path. A convex blend
          * is bounded for bounded input; Mix=100 contains only the held layer. */
         float blend = mix * st->gate;
-        fxBuf[i]     = fxBuf[i]     * (1.0f - blend) + wet * blend;
-        fxBuf[i + 8] = fxBuf[i + 8] * (1.0f - blend) + wet * blend;
+        fxBuf[i]     = STASIS_OUTPUT(fxBuf[i], fxBuf[i]     * (1.0f - blend) + wet * blend);
+        fxBuf[i + STASIS_FRAMES] = STASIS_OUTPUT(fxBuf[i + STASIS_FRAMES], fxBuf[i + STASIS_FRAMES] * (1.0f - blend) + wet * blend);
     }
 
     st->writePos = wp;

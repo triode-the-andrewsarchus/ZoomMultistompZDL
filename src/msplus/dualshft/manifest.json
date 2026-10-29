@@ -1,0 +1,78 @@
+{
+  "name": "MJDualShft",
+  "filename": "XXMDUALS",
+  "id": "07001310",
+  "version": "0.10",
+  "display": "MJ DUALSHFT",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "dualshft.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/dualshft/manifest_pedal.json",
+  "legacy_prefix": "DUALSHFT",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/dualshft"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Ptch1",
+      "max": 66,
+      "default": 49,
+      "explanation": "Ptch1 control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Ptch2",
+      "max": 66,
+      "default": 19,
+      "explanation": "Ptch2 control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Dly1",
+      "max": 112,
+      "default": 70,
+      "explanation": "Dly1 control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Dly2",
+      "max": 112,
+      "default": 50,
+      "explanation": "Dly2 control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Div",
+      "max": 16,
+      "default": 8,
+      "explanation": "Div control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Depth",
+      "max": 80,
+      "default": 29,
+      "explanation": "Depth control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Shape",
+      "max": 6,
+      "default": 0,
+      "explanation": "Shape control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

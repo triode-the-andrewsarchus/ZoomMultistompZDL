@@ -1,0 +1,78 @@
+{
+  "name": "MJDirtBox",
+  "filename": "XXMDIRTB",
+  "id": "070013a0",
+  "version": "0.10",
+  "display": "MJ DIRTBOX",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "dirtbox.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/dirtbox/manifest_pedal.json",
+  "legacy_prefix": "DIRTBOX",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/dirtbox"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Model",
+      "max": 6,
+      "default": 3,
+      "explanation": "Model control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Drive",
+      "max": 100,
+      "default": 50,
+      "explanation": "Drive control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 80,
+      "explanation": "Tone control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Low",
+      "max": 24,
+      "default": 12,
+      "explanation": "Low control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mid",
+      "max": 24,
+      "default": 12,
+      "explanation": "Mid control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "High",
+      "max": 24,
+      "default": 12,
+      "explanation": "High control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "ZNR",
+      "max": 100,
+      "default": 50,
+      "explanation": "ZNR control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Level",
+      "max": 100,
+      "default": 50,
+      "explanation": "Level control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

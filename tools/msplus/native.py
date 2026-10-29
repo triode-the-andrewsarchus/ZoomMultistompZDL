@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
+MATU_PORTS = ('wavefold', 'dualshft', 'formant', 'eugate', 'dubsiren', 'sgnl',
+              'scrub', 'griddly', 'synceq', 'breather', 'dirtbox', 'sweep')
 
 
 class Kernel:
@@ -18,7 +20,7 @@ class Kernel:
         symbol = re.search(r'#define SH_AUDIO_FN (\w+)', header)[1]
         so = ROOT / 'build/msplus' / f'{name}-host.so'
         subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
-                        '-I' + str(folder / 'build'), str(folder / self.manifest['kernel']),
+                        '-I' + str(folder / 'build'), '-I' + str(ROOT / 'build/msplus/headers' / name), str(folder / self.manifest['kernel']),
                         '-o', str(so)], check=True)
         self.lib = ctypes.CDLL(str(so))
         self.fn = getattr(self.lib, symbol)

@@ -52,6 +52,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define SPIRAL_AUDIO_FUNC SH_AUDIO_FN
+#define SPIRAL_FRAMES SH_FRAMES
+#define SPIRAL_INPUT(x) mp_input(x)
+#define SPIRAL_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define SPIRAL_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define SPIRAL_FRAMES 8
+#define SPIRAL_INPUT(x) (x)
+#define SPIRAL_OUTPUT(dry, wet) (wet)
+#define SPIRAL_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "spiral_params.h"
 
@@ -64,6 +76,8 @@
 #define SPIRAL_CODE_SECTION(f) SPIRAL_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 SPIRAL_CODE_SECTION(SPIRAL_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -160,8 +174,39 @@ static inline float sp_wrap(float pos)
     return pos;
 }
 
+#ifdef ZOOM_MSPLUS
+void SPIRAL_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void SPIRAL_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float dv = coef[SH_PARAM_DIV];
+    float tp = coef[SH_PARAM_TEMPO];
+    float fn = coef[SH_PARAM_FEEDBK];
+    float rn = coef[SH_PARAM_RISE];
+    float gn = coef[SH_PARAM_GLIDE];
+    float sn = coef[SH_PARAM_SPAN];
+    float on = coef[SH_PARAM_TONE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(dv)
+        || !mp_normalized(tp)
+        || !mp_normalized(fn)
+        || !mp_normalized(rn)
+        || !mp_normalized(gn)
+        || !mp_normalized(sn)
+        || !mp_normalized(on)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(SpiralState) + 7u) & ~(uintptr_t)7u) + SP_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -169,17 +214,19 @@ void SPIRAL_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) SPIRAL_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) SPIRAL_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) SPIRAL_EARLY_RETURN();
+    if ((base & 3u) != 0u) SPIRAL_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(SpiralState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)SP_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)SP_BUF * 4u > end) SPIRAL_EARLY_RETURN();
 
     SpiralState *st = (SpiralState *)base;
     float *buf = (float *)bufBase;
@@ -201,14 +248,30 @@ void SPIRAL_AUDIO_FUNC(unsigned int *ctx)
         st->initialized = 1u;
     }
 
+#ifndef ZOOM_MSPLUS
     float dv = zoom_param_norm01(params[SPIRAL_DIV_SLOT],    SPIRAL_DIV_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tp = zoom_param_norm01(params[SPIRAL_TEMPO_SLOT],  SPIRAL_TEMPO_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float fn = zoom_param_norm01(params[SPIRAL_FEEDBK_SLOT], SPIRAL_FEEDBK_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float rn = zoom_param_norm01(params[SPIRAL_RISE_SLOT],   SPIRAL_RISE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float gn = zoom_param_norm01(params[SPIRAL_GLIDE_SLOT],  SPIRAL_GLIDE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float sn = zoom_param_norm01(params[SPIRAL_SPAN_SLOT],   SPIRAL_SPAN_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float on = zoom_param_norm01(params[SPIRAL_TONE_SLOT],   SPIRAL_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix = zoom_param_norm01(params[SPIRAL_MIX_SLOT],   SPIRAL_MIX_DEFAULT_NORM);
+#endif
 
     /* Tempo knob reads straight as BPM so the pedal's own number is the tempo. */
     float bpm = tp * SP_BPM_MAX;
@@ -273,8 +336,10 @@ void SPIRAL_AUDIO_FUNC(unsigned int *ctx)
     int32_t cool = st->cool;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float dry = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < SPIRAL_FRAMES; i++) {
+        fxBuf[i] = SPIRAL_INPUT(fxBuf[i]);
+        fxBuf[i + SPIRAL_FRAMES] = SPIRAL_INPUT(fxBuf[i + SPIRAL_FRAMES]);
+        float dry = 0.5f * (fxBuf[i] + fxBuf[i + SPIRAL_FRAMES]);
 
         float ax = sp_abs(dry);
         envF += SP_ENV_FAST * (ax - envF);
@@ -317,8 +382,8 @@ void SPIRAL_AUDIO_FUNC(unsigned int *ctx)
         wp++;
 
         float out = dry + (sp_soft(dry + lp) - dry) * mix;
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = SPIRAL_OUTPUT(fxBuf[i], out);
+        fxBuf[i + SPIRAL_FRAMES] = SPIRAL_OUTPUT(fxBuf[i + SPIRAL_FRAMES], out);
     }
 
     st->writePos = wp;

@@ -1,0 +1,78 @@
+{
+  "name": "MJSGNL",
+  "filename": "XXMSGNL",
+  "id": "07001350",
+  "version": "0.10",
+  "display": "MJ SGNL",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "sgnl.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/sgnl/manifest_pedal.json",
+  "legacy_prefix": "SGNL",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/sgnl"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Loss",
+      "max": 100,
+      "default": 30,
+      "explanation": "Loss control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Size",
+      "max": 100,
+      "default": 40,
+      "explanation": "Size control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Codec",
+      "max": 100,
+      "default": 30,
+      "explanation": "Codec control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Fill",
+      "max": 7,
+      "default": 1,
+      "explanation": "Fill control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Burst",
+      "max": 100,
+      "default": 30,
+      "explanation": "Burst control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Jump",
+      "max": 100,
+      "default": 20,
+      "explanation": "Jump control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Line",
+      "max": 3,
+      "default": 0,
+      "explanation": "Line control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Edge",
+      "max": 100,
+      "default": 30,
+      "explanation": "Edge control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

@@ -70,6 +70,20 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define REWIRE_DO_PRAGMA(x) _Pragma(#x)
+#define REWIRE_EXPAND_PRAGMA(x) REWIRE_DO_PRAGMA(x)
+#define REWIRE_AUDIO_FUNC SH_AUDIO_FN
+#define REWIRE_FRAMES SH_FRAMES
+#define REWIRE_INPUT(x) mp_input(x)
+#define REWIRE_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define REWIRE_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define REWIRE_FRAMES 8
+#define REWIRE_INPUT(x) (x)
+#define REWIRE_OUTPUT(dry, wet) (wet)
+#define REWIRE_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "rewire_params.h"
 
@@ -82,6 +96,8 @@
 #define REWIRE_CODE_SECTION(f) REWIRE_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 REWIRE_CODE_SECTION(REWIRE_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -236,8 +252,39 @@ static inline float rw_comb(float x, float depth, float *buf, uint32_t wp,
     return y;
 }
 
+#ifdef ZOOM_MSPLUS
+void REWIRE_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void REWIRE_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float rt = coef[SH_PARAM_ROUTE];
+    float bi = coef[SH_PARAM_BITS];
+    float dr = coef[SH_PARAM_DRIVE];
+    float rg = coef[SH_PARAM_RING];
+    float cb = coef[SH_PARAM_COMB];
+    float sh = coef[SH_PARAM_SHIFT];
+    float tn = coef[SH_PARAM_TONE];
+    float mx = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(rt)
+        || !mp_normalized(bi)
+        || !mp_normalized(dr)
+        || !mp_normalized(rg)
+        || !mp_normalized(cb)
+        || !mp_normalized(sh)
+        || !mp_normalized(tn)
+        || !mp_normalized(mx)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(RewireState) + 7u) & ~(uintptr_t)7u) + RW_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -245,17 +292,19 @@ void REWIRE_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) REWIRE_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) REWIRE_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) REWIRE_EARLY_RETURN();
+    if ((base & 3u) != 0u) REWIRE_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(RewireState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)RW_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)RW_BUF * 4u > end) REWIRE_EARLY_RETURN();
 
     RewireState *st = (RewireState *)base;
     float *buf = (float *)bufBase;
@@ -286,14 +335,30 @@ void REWIRE_AUDIO_FUNC(unsigned int *ctx)
         st->clearPos = n;
     }
 
+#ifndef ZOOM_MSPLUS
     float rt = zoom_param_norm01(params[REWIRE_ROUTE_SLOT], REWIRE_ROUTE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float bi = zoom_param_norm01(params[REWIRE_BITS_SLOT],  REWIRE_BITS_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float dr = zoom_param_norm01(params[REWIRE_DRIVE_SLOT], REWIRE_DRIVE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float rg = zoom_param_norm01(params[REWIRE_RING_SLOT],  REWIRE_RING_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float cb = zoom_param_norm01(params[REWIRE_COMB_SLOT],  REWIRE_COMB_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float sh = zoom_param_norm01(params[REWIRE_SHIFT_SLOT], REWIRE_SHIFT_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tn = zoom_param_norm01(params[REWIRE_TONE_SLOT],  REWIRE_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mx = zoom_param_norm01(params[REWIRE_MIX_SLOT],   REWIRE_MIX_DEFAULT_NORM);
+#endif
 
     /* Bits: word length from a literal ladder so 1/step is a literal too, and
      * decimation hold rising with the same knob. */
@@ -340,8 +405,10 @@ void REWIRE_AUDIO_FUNC(unsigned int *ctx)
     float lp = st->lp;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float dry = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < REWIRE_FRAMES; i++) {
+        fxBuf[i] = REWIRE_INPUT(fxBuf[i]);
+        fxBuf[i + REWIRE_FRAMES] = REWIRE_INPUT(fxBuf[i + REWIRE_FRAMES]);
+        float dry = 0.5f * (fxBuf[i] + fxBuf[i + REWIRE_FRAMES]);
 
         ph += oscInc;
         if (ph > RW_TWO_PI) ph -= RW_TWO_PI;
@@ -381,8 +448,8 @@ void REWIRE_AUDIO_FUNC(unsigned int *ctx)
         float wet = lp;
 
         float out = dry * (1.0f - mx) + rw_soft(wet) * mx;
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = REWIRE_OUTPUT(fxBuf[i], out);
+        fxBuf[i + REWIRE_FRAMES] = REWIRE_OUTPUT(fxBuf[i + REWIRE_FRAMES], out);
     }
 
     st->writePos = wp;

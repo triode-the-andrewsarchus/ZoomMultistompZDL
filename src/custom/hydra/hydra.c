@@ -44,6 +44,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define HYDRA_AUDIO_FUNC SH_AUDIO_FN
+#define HYDRA_FRAMES SH_FRAMES
+#define HYDRA_INPUT(x) mp_input(x)
+#define HYDRA_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define HYDRA_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define HYDRA_FRAMES 8
+#define HYDRA_INPUT(x) (x)
+#define HYDRA_OUTPUT(dry, wet) (wet)
+#define HYDRA_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "hydra_params.h"
 
@@ -56,6 +68,8 @@
 #define HYDRA_CODE_SECTION(f) HYDRA_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 HYDRA_CODE_SECTION(HYDRA_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -119,8 +133,35 @@ static inline float hy_wrap(float pos)
     return pos;
 }
 
+#ifdef ZOOM_MSPLUS
+void HYDRA_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void HYDRA_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float dv = coef[SH_PARAM_DIV];
+    float tp = coef[SH_PARAM_TEMPO];
+    float fast = coef[SH_PARAM_FAST];
+    float slow = coef[SH_PARAM_SLOW];
+    float tone = coef[SH_PARAM_TONE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(dv)
+        || !mp_normalized(tp)
+        || !mp_normalized(fast)
+        || !mp_normalized(slow)
+        || !mp_normalized(tone)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(HydraState) + 7u) & ~(uintptr_t)7u) + HY_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -128,22 +169,28 @@ void HYDRA_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) HYDRA_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) HYDRA_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) HYDRA_EARLY_RETURN();
+    if ((base & 3u) != 0u) HYDRA_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(HydraState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)HY_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)HY_BUF * 4u > end) HYDRA_EARLY_RETURN();
 
     HydraState *st = (HydraState *)base;
     float *buf = (float *)bufBase;
 
-    if (st->magic != HY_MAGIC || st->version != HY_VERSION || !st->initialized) {
+    if (st->magic != HY_MAGIC || st->version != HY_VERSION
+#ifndef ZOOM_MSPLUS
+        || !st->initialized
+#endif
+        ) {
         st->magic = HY_MAGIC;
         st->version = HY_VERSION;
         st->writePos = 0u;
@@ -151,17 +198,44 @@ void HYDRA_AUDIO_FUNC(unsigned int *ctx)
         st->slowPos = 0.0f;
         st->grainT = 0;
         st->lp = 0.0f;
+#ifdef ZOOM_MSPLUS
+        st->initialized = 0u;
+#else
         uint32_t i;
         for (i = 0u; i < HY_BUF; i++) buf[i] = 0.0f;
         st->initialized = 1u;
+#endif
     }
 
+#ifdef ZOOM_MSPLUS
+    if (!st->initialized) {
+        uint32_t n = (uint32_t)st->grainT, lim = n + 512u;
+        if (lim > HY_BUF) lim = HY_BUF;
+        for (; n < lim; ++n) buf[n] = 0;
+        st->grainT = (int32_t)lim;
+        if (lim == HY_BUF) { st->initialized = 1; st->grainT = 0; }
+        HYDRA_EARLY_RETURN();
+    }
+#endif
+
+#ifndef ZOOM_MSPLUS
     float dv   = zoom_param_norm01(params[HYDRA_DIV_SLOT],   HYDRA_DIV_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tp   = zoom_param_norm01(params[HYDRA_TEMPO_SLOT], HYDRA_TEMPO_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float fast = zoom_param_norm01(params[HYDRA_FAST_SLOT],   HYDRA_FAST_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float slow = zoom_param_norm01(params[HYDRA_SLOW_SLOT],   HYDRA_SLOW_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tone = zoom_param_norm01(params[HYDRA_TONE_SLOT],   HYDRA_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix  = zoom_param_norm01(params[HYDRA_MIX_SLOT],    HYDRA_MIX_DEFAULT_NORM);
+#endif
 
     /* Window used to be a free cubic sweep over 5.8ms..743ms, which is why it
      * "never got dialled in to tempo": the re-trigger rate IS the rhythm of the
@@ -208,9 +282,11 @@ void HYDRA_AUDIO_FUNC(unsigned int *ctx)
     float lp      = st->lp;
 
     int i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < HYDRA_FRAMES; i++) {
+        fxBuf[i] = HYDRA_INPUT(fxBuf[i]);
+        fxBuf[i + HYDRA_FRAMES] = HYDRA_INPUT(fxBuf[i + HYDRA_FRAMES]);
         float inL = fxBuf[i];
-        float inR = fxBuf[i + 8];
+        float inR = fxBuf[i + HYDRA_FRAMES];
         float dry = 0.5f * (inL + inR);
 
         buf[wp & HY_MASK] = dry;
@@ -248,8 +324,8 @@ void HYDRA_AUDIO_FUNC(unsigned int *ctx)
         float wet = hy_soft(dry + lp);
         float out = dry + (wet - dry) * mix;
 
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = HYDRA_OUTPUT(fxBuf[i], out);
+        fxBuf[i + HYDRA_FRAMES] = HYDRA_OUTPUT(fxBuf[i + HYDRA_FRAMES], out);
     }
 
     st->writePos = wp;

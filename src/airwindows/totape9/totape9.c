@@ -49,6 +49,17 @@
 
 /* #include <math.h>  -- replaced with inline implementations below */
 #include <stdint.h>
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define TOTAPE9_AUDIO_FUNC SH_AUDIO_FN
+#define TOTAPE9_FRAMES SH_FRAMES
+#define TOTAPE9_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define TOTAPE9_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define TOTAPE9_FRAMES 8
+#define TOTAPE9_OUTPUT(dry, wet) (wet)
+#define TOTAPE9_EARLY_RETURN() return
+#endif
 
 #include "../common/zoom_params.h"
 #include "../common/tape_controls.h"
@@ -81,6 +92,9 @@
  * special-case handling for NaN/Inf/denormals.
  * ====================================================================== */
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(recip_approx_pos)
+#endif
 static inline float recip_approx_pos(float x)
 {
     union { float f; uint32_t u; } conv;
@@ -93,6 +107,9 @@ static inline float recip_approx_pos(float x)
 }
 
 /* --- sinf: no-divide polynomial approximation ------------------------ */
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(zoom_sinf)
+#endif
 static inline float zoom_sinf(float x)
 {
     const float TWO_PI  = 6.2831853f;
@@ -116,6 +133,9 @@ static inline float zoom_sinf(float x)
 }
 
 /* --- logf: bit-hack + polynomial correction -------------------------- */
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(zoom_logf)
+#endif
 static inline float zoom_logf(float x)
 {
     /* Fast log2 via IEEE 754 float bit layout + correction polynomial.
@@ -135,6 +155,9 @@ static inline float zoom_logf(float x)
 }
 
 /* --- tanf: small-angle polynomial for ToTape9 head-bump frequencies --- */
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(zoom_tanf)
+#endif
 static inline float zoom_tanf(float x)
 {
     float x2 = x * x;
@@ -150,7 +173,11 @@ static inline float zoom_tanf(float x)
 #define TOTAPE9_DO_PRAGMA(x) _Pragma(#x)
 #define TOTAPE9_EXPAND_PRAGMA(x) TOTAPE9_DO_PRAGMA(x)
 #define TOTAPE9_CODE_SECTION(func) TOTAPE9_EXPAND_PRAGMA(CODE_SECTION(func, ".audio"))
+
+#ifndef ZOOM_MSPLUS
 TOTAPE9_CODE_SECTION(TOTAPE9_AUDIO_FUNC)
+#endif
+
 
 /*
  * On the TI C674x (32-bit target) sizeof(unsigned int) == sizeof(void*) == 4,
@@ -251,6 +278,9 @@ typedef struct ToTape9State {
     uint32_t fpdR;
 } ToTape9State;
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(align4)
+#endif
 static inline uintptr_t align4(uintptr_t x)
 {
     return (x + 3u) & ~(uintptr_t)3u;
@@ -259,6 +289,9 @@ static inline uintptr_t align4(uintptr_t x)
 #define TOTAPE9_PARAM_MISSING(raw) (!((raw) >= 0.0f && (raw) <= 100.0f))
 #define TOTAPE9_PARAM_NORM(raw, fallback_norm) zoom_param_norm01((raw), (fallback_norm))
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(start_lazy_init)
+#endif
 static inline void start_lazy_init(ToTape9State *st)
 {
     /* Stamp the header so future callbacks see "init in progress". The full
@@ -276,6 +309,9 @@ static inline void start_lazy_init(ToTape9State *st)
     st->cachedOutput = TOTAPE9_MIX_DEFAULT_NORM;
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(clear_state_chunk)
+#endif
 static inline void clear_state_chunk(ToTape9State *st)
 {
     /* Word-aligned stores. clearIndex starts after the header/cache words and advances by
@@ -360,6 +396,9 @@ static inline void clear_state_chunk(ToTape9State *st)
  * ====================================================================== */
 
 #if TOTAPE9_FULL_DSP
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(computeHDB)
+#endif
 static inline void computeHDB(float *hdb, float normalizedFreq, float reso)
 {
     hdb[HDB_FREQ] = normalizedFreq;
@@ -388,7 +427,11 @@ static inline void computeHDB(float *hdb, float normalizedFreq, float reso)
  *   ctx[12] – magic source      (read once per loop iteration)
  * ====================================================================== */
 
+#ifdef ZOOM_MSPLUS
+void TOTAPE9_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
 #if !TOTAPE9_FULL_DSP
     float *params = ZDL_PTR(float *, ctx[1]);
@@ -533,6 +576,33 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
 #endif
 
     /* --- Decode context structure --- */
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float rawInput = coef[SH_PARAM_INPUT];
+    float rawTilt = coef[SH_PARAM_TILT];
+    float rawShape = coef[SH_PARAM_SHAPE];
+    float rawFlutter = coef[SH_PARAM_FLUTTER];
+    float rawFlutSpd = coef[SH_PARAM_FLUTSPD];
+    float rawBias = coef[SH_PARAM_BIAS];
+    float rawHeadBmp = coef[SH_PARAM_HEADBMP];
+    float rawOutput = coef[SH_PARAM_OUTPUT];
+    float rawMix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(rawInput)
+        || !mp_normalized(rawTilt)
+        || !mp_normalized(rawShape)
+        || !mp_normalized(rawFlutter)
+        || !mp_normalized(rawFlutSpd)
+        || !mp_normalized(rawBias)
+        || !mp_normalized(rawHeadBmp)
+        || !mp_normalized(rawOutput)
+        || !mp_normalized(rawMix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t stateBase = mp_arena_state(instance, sizeof(ToTape9State));
+    if (!stateBase) { mp_silence(fxBuf); return; }
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf = ZDL_PTR(float *, ctx[5]);  /* L:[0..7] R:[8..15] */
 
@@ -556,14 +626,16 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
     if (bytes < sizeof(ToTape9State) || span < bytes) return;
     if (requiredEnd > end) return;
 
+#endif
+
     ToTape9State *st = (ToTape9State *)stateBase;
     if (st->magic != TOTAPE9_MAGIC || st->version != TOTAPE9_VERSION) {
 #ifdef TOTAPE9_SKIP_STATE_INIT
         /* Diagnostic build: bail out without running any state init. */
-        return;
+        TOTAPE9_EARLY_RETURN();
 #else
         start_lazy_init(st);
-        return;
+        TOTAPE9_EARLY_RETURN();
 #endif
     }
     if (!st->initialized) {
@@ -571,10 +643,10 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
         /* Diagnostic build: header write happened in start_lazy_init, but
          * never advance the chunked clear. Isolates the 16-byte header
          * write from the 512-byte chunk loop on hardware. */
-        return;
+        TOTAPE9_EARLY_RETURN();
 #else
         clear_state_chunk(st);
-        return;
+        TOTAPE9_EARLY_RETURN();
 #endif
     }
 #ifdef TOTAPE9_INIT_ONLY
@@ -582,16 +654,30 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
      * DSP body is skipped. Isolates "lazy init runs to completion" from
      * "DSP body executes". If T9InitOnly loads while T9NoHand freezes,
      * the freeze is in the DSP body, not the lazy clear. */
-    return;
+    TOTAPE9_EARLY_RETURN();
 #endif
 
+#ifndef ZOOM_MSPLUS
     float rawInput = params[TOTAPE9_INPUT_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawTilt = params[TOTAPE9_TILT_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawShape = params[TOTAPE9_SHAPE_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawFlutter = params[TOTAPE9_FLUTTER_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawFlutSpd = params[TOTAPE9_FLUTSPD_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawBias = params[TOTAPE9_BIAS_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawHeadBmp = params[TOTAPE9_HEADBMP_SLOT];
+#endif
     /* Knob 8 is labelled OUTPUT and knob 9 MIX, and until now this block read them
      * as HeadFrq and Output -- everything from knob 8 on was shifted by one. So
      * "Output" moved a 25-200 Hz filter corner instead of the level, which is
@@ -606,8 +692,12 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
      * control on the pedal and the pack has no room for it; the bump now sits at
      * a fixed 62 Hz, near the middle of its old travel and where a tape machine's
      * head bump actually lives. */
+#ifndef ZOOM_MSPLUS
     float rawOutput = params[TOTAPE9_OUTPUT_SLOT];
+#endif
+#ifndef ZOOM_MSPLUS
     float rawMix    = params[TOTAPE9_MIX_SLOT];
+#endif
 
     /* Bypass = clean dry passthrough, same off-gate as every other effect.
      * (An earlier build kept processing while "off" whenever the param block
@@ -615,7 +705,9 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
      * BYPASSED effect's params as all-zero too, so that made a switched-OFF
      * Oxide keep running its up-to-2x output gain: louder when off. Reload
      * materialization is handled at the editor / knob-latch level instead.) */
-    if (params[0] < 0.5f) return;
+#ifndef ZOOM_MSPLUS
+    if (params[0] < 0.5f) TOTAPE9_EARLY_RETURN();
+#endif
     float pInput = TOTAPE9_PARAM_NORM(rawInput, TOTAPE9_INPUT_DEFAULT_NORM);
     float pTilt = TOTAPE9_PARAM_NORM(rawTilt, TOTAPE9_TILT_DEFAULT_NORM);
     float pShape = TOTAPE9_PARAM_NORM(rawShape, TOTAPE9_SHAPE_DEFAULT_NORM);
@@ -699,17 +791,23 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
      * including dubly encode/decode, flutter, biquads, Taylor sat,
      * ClipOnly3. If T9DspNoLoop freezes, the freeze is in computeHDB or
      * derived params. If it loads, the for-loop body is the killer. */
-    return;
+    TOTAPE9_EARLY_RETURN();
 #endif
 
     /* --- Process 8 stereo sample-pairs --- */
     float *fxL = fxBuf;       /* samples 0-7  */
-    float *fxR = fxBuf + 8;   /* samples 8-15 */
+    float *fxR = fxBuf + TOTAPE9_FRAMES;   /* samples 8-15 */
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < TOTAPE9_FRAMES; i++)
     {
         float sL = fxL[i];
+#ifdef ZOOM_MSPLUS
+        sL = mp_input(sL);
+#endif
         float sR = fxR[i];
+#ifdef ZOOM_MSPLUS
+        sR = mp_input(sR);
+#endif
         /* Held for the Mix crossfade: this effect had no dry path at all, so it
          * could only ever be heard at full wet however its last knob was set. */
         const float cleanL = sL, cleanR = sR;
@@ -1040,8 +1138,8 @@ void TOTAPE9_AUDIO_FUNC(unsigned int *ctx)
          * ============================================================= */
         /* Output is a level on the finished signal, and Mix sits it against the
          * dry -- the order every other effect in the pack uses. */
-        fxL[i] = cleanL * (1.0f - pMixFull) + sL * pMixFull;
-        fxR[i] = cleanR * (1.0f - pMixFull) + sR * pMixFull;
+        fxL[i] = TOTAPE9_OUTPUT(cleanL, cleanL * (1.0f - pMixFull) + sL * pMixFull);
+        fxR[i] = TOTAPE9_OUTPUT(cleanR, cleanR * (1.0f - pMixFull) + sR * pMixFull);
     }
     /* (no return value; jump to B3 handled by compiler epilogue) */
 #endif

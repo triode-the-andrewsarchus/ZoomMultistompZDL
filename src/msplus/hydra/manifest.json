@@ -1,0 +1,54 @@
+{
+  "name": "ZDLHydra",
+  "filename": "XXZHYDRA",
+  "id": "07001210",
+  "version": "0.10",
+  "display": "ZDL HYDRA",
+  "badge": "ZD",
+  "description": "Experimental Hydra port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "hydra.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Div",
+      "max": 100,
+      "default": 42,
+      "explanation": "Div control; original pedal taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 240,
+      "default": 120,
+      "explanation": "Tempo control; original pedal taper."
+    },
+    {
+      "name": "Fast",
+      "max": 100,
+      "default": 70,
+      "explanation": "Fast control; original pedal taper."
+    },
+    {
+      "name": "Slow",
+      "max": 100,
+      "default": 55,
+      "explanation": "Slow control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 45,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

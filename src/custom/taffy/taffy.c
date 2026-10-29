@@ -25,6 +25,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define TAFFY_AUDIO_FUNC SH_AUDIO_FN
+#define TAFFY_FRAMES SH_FRAMES
+#define TAFFY_INPUT(x) mp_input(x)
+#define TAFFY_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define TAFFY_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define TAFFY_FRAMES 8
+#define TAFFY_INPUT(x) (x)
+#define TAFFY_OUTPUT(dry, wet) (wet)
+#define TAFFY_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "taffy_params.h"
 
@@ -37,6 +49,8 @@
 #define TAFFY_CODE_SECTION(f) TAFFY_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 TAFFY_CODE_SECTION(TAFFY_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -90,8 +104,33 @@ static inline uint32_t tf_rng(uint32_t r)
 /* top 24 bits -> [0, 1) */
 #define TF_RAND01(r) ((float)((r) >> 8) * 5.9604645e-8f)
 
+#ifdef ZOOM_MSPLUS
+void TAFFY_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void TAFFY_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float speedK = coef[SH_PARAM_SPEED];
+    float chance = coef[SH_PARAM_CHANCE];
+    float depth = coef[SH_PARAM_DEPTH];
+    float glide = coef[SH_PARAM_GLIDE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(speedK)
+        || !mp_normalized(chance)
+        || !mp_normalized(depth)
+        || !mp_normalized(glide)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(TaffyState) + 7u) & ~(uintptr_t)7u) + TF_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -99,17 +138,19 @@ void TAFFY_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) TAFFY_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) TAFFY_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) TAFFY_EARLY_RETURN();
+    if ((base & 3u) != 0u) TAFFY_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(TaffyState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)TF_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)TF_BUF * 4u > end) TAFFY_EARLY_RETURN();
 
     TaffyState *st = (TaffyState *)base;
     float *buf = (float *)bufBase;
@@ -136,14 +177,24 @@ void TAFFY_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= TF_BUF) st->initialized = 1u;
-        return;
+        TAFFY_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float speedK = zoom_param_norm01(params[TAFFY_SPEED_SLOT], TAFFY_SPEED_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float chance = zoom_param_norm01(params[TAFFY_CHANCE_SLOT], TAFFY_CHANCE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float depth  = zoom_param_norm01(params[TAFFY_DEPTH_SLOT], TAFFY_DEPTH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float glide  = zoom_param_norm01(params[TAFFY_GLIDE_SLOT], TAFFY_GLIDE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix    = zoom_param_norm01(params[TAFFY_MIX_SLOT], TAFFY_MIX_DEFAULT_NORM);
+#endif
 
     /* knob -> speed: -1x .. stop .. +1x (noon) .. +2x */
     float knobSpeed;
@@ -165,9 +216,11 @@ void TAFFY_AUDIO_FUNC(unsigned int *ctx)
     if (chance <= 0.001f) tgt = knobSpeed;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < TAFFY_FRAMES; f++) {
+        fxBuf[f] = TAFFY_INPUT(fxBuf[f]);
+        fxBuf[f + TAFFY_FRAMES] = TAFFY_INPUT(fxBuf[f + TAFFY_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + TAFFY_FRAMES];
         buf[wp] = 0.5f * (inL + inR);
 
         /* random slips: every TF_EVT samples, maybe re-decide. Slips are now
@@ -236,8 +289,8 @@ void TAFFY_AUDIO_FUNC(unsigned int *ctx)
             warp = tf_read(buf, wp, dA);
         }
 
-        fxBuf[f]     = dry * inL + wet * warp;
-        fxBuf[f + 8] = dry * inR + wet * warp;
+        fxBuf[f]     = TAFFY_OUTPUT(fxBuf[f], dry * inL + wet * warp);
+        fxBuf[f + TAFFY_FRAMES] = TAFFY_OUTPUT(fxBuf[f + TAFFY_FRAMES], dry * inR + wet * warp);
 
         wp = (wp + 1u) & TF_MASK;
     }

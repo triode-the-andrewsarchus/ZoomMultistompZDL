@@ -1,0 +1,30 @@
+{
+  "name": "ZDLShatter",
+  "filename": "XXZSHATT",
+  "id": "070011b0",
+  "version": "0.10",
+  "display": "ZDL SHATTER",
+  "badge": "ZD",
+  "description": "Experimental Shatter port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "shatter.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Chance",
+      "max": 100,
+      "default": 55,
+      "explanation": "Chance control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

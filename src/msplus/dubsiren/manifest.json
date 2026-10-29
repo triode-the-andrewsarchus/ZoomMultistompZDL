@@ -1,0 +1,78 @@
+{
+  "name": "MJDubSiren",
+  "filename": "XXMDUBSI",
+  "id": "07001340",
+  "version": "0.10",
+  "display": "MJ DUBSIREN",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "dubsiren.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/dubsiren/manifest_pedal.json",
+  "legacy_prefix": "DUBSIREN",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/dubsiren"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Trig",
+      "max": 3,
+      "default": 1,
+      "explanation": "Trig control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mode",
+      "max": 3,
+      "default": 1,
+      "explanation": "Mode control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Pitch",
+      "max": 100,
+      "default": 48,
+      "explanation": "Pitch control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Rate",
+      "max": 112,
+      "default": 67,
+      "explanation": "Rate control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Depth",
+      "max": 100,
+      "default": 34,
+      "explanation": "Depth control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Vol",
+      "max": 100,
+      "default": 50,
+      "explanation": "Vol control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Time",
+      "max": 100,
+      "default": 40,
+      "explanation": "Time control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Fdbk",
+      "max": 125,
+      "default": 70,
+      "explanation": "Fdbk control; Matujuice v1.5 taper."
+    }
+  ]
+}

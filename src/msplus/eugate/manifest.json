@@ -1,0 +1,78 @@
+{
+  "name": "MJEuGate",
+  "filename": "XXMEUGAT",
+  "id": "07001330",
+  "version": "0.10",
+  "display": "MJ EUGATE",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "eugate.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/eugate/manifest_pedal.json",
+  "legacy_prefix": "EUGATE",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/eugate"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Notes",
+      "max": 63,
+      "default": 4,
+      "explanation": "Notes control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Steps",
+      "max": 63,
+      "default": 15,
+      "explanation": "Steps control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Shift",
+      "max": 63,
+      "default": 0,
+      "explanation": "Shift control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Swing",
+      "max": 100,
+      "default": 0,
+      "explanation": "Swing control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Reset",
+      "max": 3,
+      "default": 0,
+      "explanation": "Reset control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Gap",
+      "max": 50,
+      "default": 15,
+      "explanation": "Gap control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Soft",
+      "max": 100,
+      "default": 35,
+      "explanation": "Soft control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

@@ -18,6 +18,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define MICROLOOM_AUDIO_FUNC SH_AUDIO_FN
+#define MICROLOOM_FRAMES SH_FRAMES
+#define MICROLOOM_INPUT(x) mp_input(x)
+#define MICROLOOM_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define MICROLOOM_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define MICROLOOM_FRAMES 8
+#define MICROLOOM_INPUT(x) (x)
+#define MICROLOOM_OUTPUT(dry, wet) (wet)
+#define MICROLOOM_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "microloom_params.h"
 
@@ -30,6 +42,8 @@
 #define MICROLOOM_CODE_SECTION(f) MICROLOOM_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 MICROLOOM_CODE_SECTION(MICROLOOM_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -78,8 +92,31 @@ static inline float ml_read(const float *buf, uint32_t wp, float delay)
     return buf[idx] * (1.0f - fr) + buf[idxm] * fr;
 }
 
+#ifdef ZOOM_MSPLUS
+void MICROLOOM_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void MICROLOOM_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float pitch = coef[SH_PARAM_PITCH];
+    float regen = coef[SH_PARAM_REGEN];
+    float tone = coef[SH_PARAM_TONE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(pitch)
+        || !mp_normalized(regen)
+        || !mp_normalized(tone)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(MicroloomState) + 7u) & ~(uintptr_t)7u) + ML_REGION * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -87,17 +124,19 @@ void MICROLOOM_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) MICROLOOM_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) MICROLOOM_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) MICROLOOM_EARLY_RETURN();
+    if ((base & 3u) != 0u) MICROLOOM_EARLY_RETURN();
+
+#endif
 
     uintptr_t regionBase = (base + sizeof(MicroloomState) + 7u) & ~(uintptr_t)7u;
-    if (regionBase + (uintptr_t)ML_REGION * 4u > end) return;
+    if (regionBase + (uintptr_t)ML_REGION * 4u > end) MICROLOOM_EARLY_RETURN();
 
     MicroloomState *st = (MicroloomState *)base;
     float *buf  = (float *)regionBase;
@@ -125,13 +164,21 @@ void MICROLOOM_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= ML_REGION) st->initialized = 1u;
-        return;
+        MICROLOOM_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float pitch = zoom_param_norm01(params[MICROLOOM_PITCH_SLOT], MICROLOOM_PITCH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float regen = zoom_param_norm01(params[MICROLOOM_REGEN_SLOT], MICROLOOM_REGEN_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float tone  = zoom_param_norm01(params[MICROLOOM_TONE_SLOT], MICROLOOM_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix   = zoom_param_norm01(params[MICROLOOM_MIX_SLOT], MICROLOOM_MIX_DEFAULT_NORM);
+#endif
     float ratio = 0.5f + pitch * 1.5f;       /* 0.5 (oct down) .. 2.0 (oct up) */
     float tcoef = 0.05f + tone * 0.7f;       /* output low-pass: dark .. bright */
     float regenGain = regen * 0.85f;
@@ -148,9 +195,11 @@ void MICROLOOM_AUDIO_FUNC(unsigned int *ctx)
     uint32_t a0 = st->ap0i, a1 = st->ap1i, a2 = st->ap2i;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < MICROLOOM_FRAMES; f++) {
+        fxBuf[f] = MICROLOOM_INPUT(fxBuf[f]);
+        fxBuf[f + MICROLOOM_FRAMES] = MICROLOOM_INPUT(fxBuf[f + MICROLOOM_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + MICROLOOM_FRAMES];
         float in = 0.5f * (inL + inR);
         buf[wp] = in + feed;
 
@@ -180,8 +229,8 @@ void MICROLOOM_AUDIO_FUNC(unsigned int *ctx)
         else if (feed < -ML_CLAMP) feed = -ML_CLAMP;
 
         olp += tcoef * (feed - olp);         /* Tone: output low-pass */
-        fxBuf[f]     = dry * inL + wet * olp;
-        fxBuf[f + 8] = dry * inR + wet * olp;
+        fxBuf[f]     = MICROLOOM_OUTPUT(fxBuf[f], dry * inL + wet * olp);
+        fxBuf[f + MICROLOOM_FRAMES] = MICROLOOM_OUTPUT(fxBuf[f + MICROLOOM_FRAMES], dry * inR + wet * olp);
 
         wp++;
         if (wp >= ML_MB) wp = 0u;

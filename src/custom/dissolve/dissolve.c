@@ -21,6 +21,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define DISSOLVE_AUDIO_FUNC SH_AUDIO_FN
+#define DISSOLVE_FRAMES SH_FRAMES
+#define DISSOLVE_INPUT(x) mp_input(x)
+#define DISSOLVE_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define DISSOLVE_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define DISSOLVE_FRAMES 8
+#define DISSOLVE_INPUT(x) (x)
+#define DISSOLVE_OUTPUT(dry, wet) (wet)
+#define DISSOLVE_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "dissolve_params.h"
 
@@ -33,6 +45,8 @@
 #define DISSOLVE_CODE_SECTION(f) DISSOLVE_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 DISSOLVE_CODE_SECTION(DISSOLVE_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -101,8 +115,31 @@ static inline float ds_read(const float *line, uint32_t wp, float d)
     return line[idx0] * (1.0f - fr) + line[idx1] * fr;
 }
 
+#ifdef ZOOM_MSPLUS
+void DISSOLVE_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void DISSOLVE_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float chance = coef[SH_PARAM_CHANCE];
+    float smear = coef[SH_PARAM_SMEAR];
+    float glitch = coef[SH_PARAM_GLITCH];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(chance)
+        || !mp_normalized(smear)
+        || !mp_normalized(glitch)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = sizeof(DissolveState);
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -110,15 +147,17 @@ void DISSOLVE_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) DISSOLVE_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) DISSOLVE_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
-    if (end - base < (uintptr_t)sizeof(DissolveState)) return;
+    if (base == 0u || end <= base) DISSOLVE_EARLY_RETURN();
+    if ((base & 3u) != 0u) DISSOLVE_EARLY_RETURN();
+    if (end - base < (uintptr_t)sizeof(DissolveState)) DISSOLVE_EARLY_RETURN();
+
+#endif
 
     DissolveState *st = (DissolveState *)base;
 
@@ -151,13 +190,21 @@ void DISSOLVE_AUDIO_FUNC(unsigned int *ctx)
             st->rng = 0x89ABCDFu;
             st->initialized = 1u;
         }
-        return;
+        DISSOLVE_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float chance = zoom_param_norm01(params[DISSOLVE_CHANCE_SLOT], DISSOLVE_CHANCE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float smear  = zoom_param_norm01(params[DISSOLVE_SMEAR_SLOT], DISSOLVE_SMEAR_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float glitch = zoom_param_norm01(params[DISSOLVE_GLITCH_SLOT], DISSOLVE_GLITCH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix    = zoom_param_norm01(params[DISSOLVE_MIX_SLOT], DISSOLVE_MIX_DEFAULT_NORM);
+#endif
 
     float fb = DS_FB_MIN + smear * DS_FB_SPAN;
     float apg = 0.20f + smear * 0.45f;         /* diffusion strength */
@@ -170,9 +217,11 @@ void DISSOLVE_AUDIO_FUNC(unsigned int *ctx)
     uint32_t a1 = st->ai1, a2 = st->ai2, rng = st->rng;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < DISSOLVE_FRAMES; f++) {
+        fxBuf[f] = DISSOLVE_INPUT(fxBuf[f]);
+        fxBuf[f + DISSOLVE_FRAMES] = DISSOLVE_INPUT(fxBuf[f + DISSOLVE_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + DISSOLVE_FRAMES];
         float in = 0.5f * (inL + inR);
 
         /* per-chunk decisions: input gate + read mode */
@@ -224,8 +273,8 @@ void DISSOLVE_AUDIO_FUNC(unsigned int *ctx)
 
         st->line[wp] = ds_soft((gate ? in : 0.0f) + y2 * fb);
 
-        fxBuf[f]     = dry * inL + wet * outL;
-        fxBuf[f + 8] = dry * inR + wet * outR;
+        fxBuf[f]     = DISSOLVE_OUTPUT(fxBuf[f], dry * inL + wet * outL);
+        fxBuf[f + DISSOLVE_FRAMES] = DISSOLVE_OUTPUT(fxBuf[f + DISSOLVE_FRAMES], dry * inR + wet * outR);
 
         wp = (wp + 1u) & DS_MASK;
         cp++;

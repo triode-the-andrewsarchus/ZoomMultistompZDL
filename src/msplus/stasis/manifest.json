@@ -1,0 +1,54 @@
+{
+  "name": "ZDLStasis",
+  "filename": "XXZSTASI",
+  "id": "07001230",
+  "version": "0.10",
+  "display": "ZDL STASIS",
+  "badge": "ZD",
+  "description": "Experimental Stasis port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "stasis.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Length",
+      "max": 100,
+      "default": 35,
+      "explanation": "Length control; original pedal taper."
+    },
+    {
+      "name": "Blur",
+      "max": 100,
+      "default": 50,
+      "explanation": "Blur control; original pedal taper."
+    },
+    {
+      "name": "Decay",
+      "max": 100,
+      "default": 100,
+      "explanation": "Decay control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 55,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    },
+    {
+      "name": "Capture",
+      "max": 2,
+      "default": 0,
+      "explanation": "Capture control; original pedal taper."
+    }
+  ]
+}

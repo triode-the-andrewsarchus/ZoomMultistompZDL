@@ -47,6 +47,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define GYRE_AUDIO_FUNC SH_AUDIO_FN
+#define GYRE_FRAMES SH_FRAMES
+#define GYRE_INPUT(x) mp_input(x)
+#define GYRE_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define GYRE_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define GYRE_FRAMES 8
+#define GYRE_INPUT(x) (x)
+#define GYRE_OUTPUT(dry, wet) (wet)
+#define GYRE_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "gyre_params.h"
 
@@ -59,6 +71,8 @@
 #define GY_CODE_SECTION(f) GY_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 GY_CODE_SECTION(GYRE_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -142,8 +156,39 @@ static inline float gy_wrap(float pos)
     return pos;
 }
 
+#ifdef ZOOM_MSPLUS
+void GYRE_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void GYRE_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float sz = coef[SH_PARAM_SIZE];
+    float fd = coef[SH_PARAM_FEED];
+    float dc = coef[SH_PARAM_DECAY];
+    float rn = coef[SH_PARAM_RISE];
+    float gn = coef[SH_PARAM_GLIDE];
+    float sn = coef[SH_PARAM_SPAN];
+    float on = coef[SH_PARAM_TONE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(sz)
+        || !mp_normalized(fd)
+        || !mp_normalized(dc)
+        || !mp_normalized(rn)
+        || !mp_normalized(gn)
+        || !mp_normalized(sn)
+        || !mp_normalized(on)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(GyreState) + 7u) & ~(uintptr_t)7u) + GY_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -151,17 +196,19 @@ void GYRE_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) GYRE_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) GYRE_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) GYRE_EARLY_RETURN();
+    if ((base & 3u) != 0u) GYRE_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(GyreState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)GY_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)GY_BUF * 4u > end) GYRE_EARLY_RETURN();
 
     GyreState *st = (GyreState *)base;
     float *buf = (float *)bufBase;
@@ -191,14 +238,30 @@ void GYRE_AUDIO_FUNC(unsigned int *ctx)
         st->clearPos = n;
     }
 
+#ifndef ZOOM_MSPLUS
     float sz  = zoom_param_norm01(params[GYRE_SIZE_SLOT],  GYRE_SIZE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float fd  = zoom_param_norm01(params[GYRE_FEED_SLOT],  GYRE_FEED_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float dc  = zoom_param_norm01(params[GYRE_DECAY_SLOT], GYRE_DECAY_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float rn  = zoom_param_norm01(params[GYRE_RISE_SLOT],  GYRE_RISE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float gn  = zoom_param_norm01(params[GYRE_GLIDE_SLOT], GYRE_GLIDE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float sn  = zoom_param_norm01(params[GYRE_SPAN_SLOT],  GYRE_SPAN_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float on  = zoom_param_norm01(params[GYRE_TONE_SLOT],  GYRE_TONE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix = zoom_param_norm01(params[GYRE_MIX_SLOT],   GYRE_MIX_DEFAULT_NORM);
+#endif
 
     /* Size: squared so the short end, where the loop reads as a stutter rather
      * than a phrase, gets most of the travel. */
@@ -242,8 +305,10 @@ void GYRE_AUDIO_FUNC(unsigned int *ctx)
     int32_t cool = st->cool;
 
     int i;
-    for (i = 0; i < 8; i++) {
-        float dry = 0.5f * (fxBuf[i] + fxBuf[i + 8]);
+    for (i = 0; i < GYRE_FRAMES; i++) {
+        fxBuf[i] = GYRE_INPUT(fxBuf[i]);
+        fxBuf[i + GYRE_FRAMES] = GYRE_INPUT(fxBuf[i + GYRE_FRAMES]);
+        float dry = 0.5f * (fxBuf[i] + fxBuf[i + GYRE_FRAMES]);
 
         float ax = gy_abs(dry);
         envF += GY_ENV_FAST * (ax - envF);
@@ -288,8 +353,8 @@ void GYRE_AUDIO_FUNC(unsigned int *ctx)
         wp++;
 
         float out = dry * (1.0f - mix) + gy_clip1(lp) * mix;
-        fxBuf[i]     = out;
-        fxBuf[i + 8] = out;
+        fxBuf[i]     = GYRE_OUTPUT(fxBuf[i], out);
+        fxBuf[i + GYRE_FRAMES] = GYRE_OUTPUT(fxBuf[i + GYRE_FRAMES], out);
     }
 
     st->writePos = wp;

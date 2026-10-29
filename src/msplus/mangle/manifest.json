@@ -1,0 +1,54 @@
+{
+  "name": "ZDLMangle",
+  "filename": "XXZMANGL",
+  "id": "070011f0",
+  "version": "0.10",
+  "display": "ZDL MANGLE",
+  "badge": "ZD",
+  "description": "Experimental Mangle port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "mangle.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Time",
+      "max": 100,
+      "default": 40,
+      "explanation": "Time control; original pedal taper."
+    },
+    {
+      "name": "Feedbk",
+      "max": 100,
+      "default": 45,
+      "explanation": "Feedbk control; original pedal taper."
+    },
+    {
+      "name": "Crush",
+      "max": 100,
+      "default": 0,
+      "explanation": "Crush control; original pedal taper."
+    },
+    {
+      "name": "Tremolo",
+      "max": 100,
+      "default": 0,
+      "explanation": "Tremolo control; original pedal taper."
+    },
+    {
+      "name": "Pitch",
+      "max": 100,
+      "default": 0,
+      "explanation": "Pitch control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

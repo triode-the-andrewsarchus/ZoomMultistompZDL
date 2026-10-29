@@ -50,6 +50,10 @@ def stimulus(rate, level_db, kind):
     result = np.zeros((n, 2), np.float32)
     if kind == 'silence':
         return result
+    if kind == 'sustain':
+        wave = amplitude * np.sin(2 * np.pi * 997 * np.arange(n) / rate)
+        result[:] = wave[:, None]
+        return result
     rng = np.random.default_rng(70)
     for ch in range(2):
         start = int((0.5 + ch * 2.5) * rate)
@@ -204,7 +208,7 @@ def main():
     ap.add_argument('--send', nargs=2, required=True, help='Exact physical JACK port names')
     ap.add_argument('--return-ports', nargs='+', help='Exact physical capture ports; default: all AudioFuse ports')
     ap.add_argument('--level-db', type=float, default=-50)
-    ap.add_argument('--kind', choices=['probe', 'tone', 'sweep', 'silence'], default='probe')
+    ap.add_argument('--kind', choices=['probe', 'tone', 'sweep', 'silence', 'sustain'], default='probe')
     args = ap.parse_args()
     result = run_capture(args.directory, args.send, args.return_ports, args.kind, args.level_db)
     for path in result['paths']:

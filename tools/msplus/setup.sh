@@ -7,6 +7,7 @@ python3 - <<'PY'
 import json, pathlib, subprocess
 lock = json.loads(pathlib.Path('tools/msplus/upstream.lock.json').read_text())
 for name, url, dest in [
+    ('matujuice-v1.5', 'https://github.com/matujuice/zoom-ms-zdl-effects-pack.git', 'build/msplus/matujuice'),
     ('stomphacks', 'https://github.com/thammer/stomphacks.git', 'build/msplus/stomphacks'),
     ('zoom-zt2', 'https://github.com/mungewell/zoom-zt2.git', 'build/msplus/stomphacks/zoom-zt2'),
 ]:

@@ -1,0 +1,72 @@
+{
+  "name": "MJScrub",
+  "filename": "XXMSCRUB",
+  "id": "07001360",
+  "version": "0.10",
+  "display": "MJ SCRUB",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "scrub.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/scrub/manifest_pedal.json",
+  "legacy_prefix": "SCRUB",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/scrub"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Pos",
+      "max": 600,
+      "default": 600,
+      "explanation": "Pos control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Grain",
+      "max": 112,
+      "default": 50,
+      "explanation": "Grain control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Rec",
+      "max": 2,
+      "default": 0,
+      "explanation": "Rec control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Glide",
+      "max": 100,
+      "default": 40,
+      "explanation": "Glide control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Dir",
+      "max": 3,
+      "default": 0,
+      "explanation": "Dir control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Spray",
+      "max": 100,
+      "default": 0,
+      "explanation": "Spray control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    }
+  ]
+}

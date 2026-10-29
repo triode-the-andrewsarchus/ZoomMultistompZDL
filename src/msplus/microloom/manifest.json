@@ -1,0 +1,42 @@
+{
+  "name": "ZDLMicrolm",
+  "filename": "XXZMICRO",
+  "id": "070011a0",
+  "version": "0.10",
+  "display": "ZDL MICROLM",
+  "badge": "ZD",
+  "description": "Experimental Microlm port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "microloom.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Pitch",
+      "max": 100,
+      "default": 100,
+      "explanation": "Pitch control; original pedal taper."
+    },
+    {
+      "name": "Regen",
+      "max": 100,
+      "default": 72,
+      "explanation": "Regen control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 55,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

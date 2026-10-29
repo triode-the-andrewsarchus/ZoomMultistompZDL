@@ -1,0 +1,42 @@
+{
+  "name": "ZDLDissolv",
+  "filename": "XXZDISSO",
+  "id": "070011e0",
+  "version": "0.10",
+  "display": "ZDL DISSOLVE",
+  "badge": "ZD",
+  "description": "Experimental Dissolve port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "dissolve.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Chance",
+      "max": 100,
+      "default": 40,
+      "explanation": "Chance control; original pedal taper."
+    },
+    {
+      "name": "Smear",
+      "max": 100,
+      "default": 55,
+      "explanation": "Smear control; original pedal taper."
+    },
+    {
+      "name": "Glitch",
+      "max": 100,
+      "default": 35,
+      "explanation": "Glitch control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "name": "MJBreather",
+  "filename": "XXMBREAT",
+  "id": "07001390",
+  "version": "0.10",
+  "display": "MJ BREATHER",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "breather.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/breather/manifest_pedal.json",
+  "legacy_prefix": "BREATHER",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/breather"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Targt",
+      "max": 3,
+      "default": 2,
+      "explanation": "Targt control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Shape",
+      "max": 2,
+      "default": 0,
+      "explanation": "Shape control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Depth",
+      "max": 100,
+      "default": 80,
+      "explanation": "Depth control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Div",
+      "max": 4,
+      "default": 2,
+      "explanation": "Div control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Shift",
+      "max": 100,
+      "default": 0,
+      "explanation": "Shift control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Curve",
+      "max": 100,
+      "default": 50,
+      "explanation": "Curve control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Verb",
+      "max": 100,
+      "default": 35,
+      "explanation": "Verb control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 160,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Size",
+      "max": 100,
+      "default": 50,
+      "explanation": "Size control; Matujuice v1.5 taper."
+    }
+  ]
+}

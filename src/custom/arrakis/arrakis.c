@@ -18,6 +18,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define ARRAKIS_AUDIO_FUNC SH_AUDIO_FN
+#define ARRAKIS_FRAMES SH_FRAMES
+#define ARRAKIS_INPUT(x) mp_input(x)
+#define ARRAKIS_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define ARRAKIS_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define ARRAKIS_FRAMES 8
+#define ARRAKIS_INPUT(x) (x)
+#define ARRAKIS_OUTPUT(dry, wet) (wet)
+#define ARRAKIS_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "arrakis_params.h"
 
@@ -30,6 +42,8 @@
 #define ARRAKIS_CODE_SECTION(f) ARRAKIS_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 ARRAKIS_CODE_SECTION(ARRAKIS_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -92,8 +106,27 @@ static inline float ar_read(const float *buf, uint32_t wp, float d)
     return buf[idx] * (1.0f - fr) + buf[idxm] * fr;
 }
 
+#ifdef ZOOM_MSPLUS
+void ARRAKIS_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void ARRAKIS_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float detune = coef[SH_PARAM_DETUNE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(detune)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(ArrakisState) + 7u) & ~(uintptr_t)7u) + AR_BUF * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -101,17 +134,19 @@ void ARRAKIS_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) ARRAKIS_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) ARRAKIS_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) ARRAKIS_EARLY_RETURN();
+    if ((base & 3u) != 0u) ARRAKIS_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(ArrakisState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)AR_BUF * 4u > end) return;
+    if (bufBase + (uintptr_t)AR_BUF * 4u > end) ARRAKIS_EARLY_RETURN();
 
     ArrakisState *st = (ArrakisState *)base;
     float *buf = (float *)bufBase;
@@ -135,11 +170,15 @@ void ARRAKIS_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= AR_BUF) st->initialized = 1u;
-        return;
+        ARRAKIS_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float detune = zoom_param_norm01(params[ARRAKIS_DETUNE_SLOT], ARRAKIS_DETUNE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix    = zoom_param_norm01(params[ARRAKIS_MIX_SLOT], ARRAKIS_MIX_DEFAULT_NORM);
+#endif
     float dAmp = detune * AR_CENTS_MAX * AR_LN2_1200;   /* detune ratio swing */
     float wet = mix;
     float dry = 1.0f - mix;
@@ -148,9 +187,11 @@ void ARRAKIS_AUDIO_FUNC(unsigned int *ctx)
     float pa = st->pa, pb = st->pb, lfo = st->lfo, lpA = st->lpA, lpB = st->lpB;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < ARRAKIS_FRAMES; f++) {
+        fxBuf[f] = ARRAKIS_INPUT(fxBuf[f]);
+        fxBuf[f + ARRAKIS_FRAMES] = ARRAKIS_INPUT(fxBuf[f + ARRAKIS_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + ARRAKIS_FRAMES];
         buf[wp] = 0.5f * (inL + inR);
 
         lfo += AR_LFO_INC;
@@ -186,8 +227,8 @@ void ARRAKIS_AUDIO_FUNC(unsigned int *ctx)
         lpA = (1.0f - AR_LP_A) * wA + AR_LP_A * lpA;
         lpB = (1.0f - AR_LP_A) * wB + AR_LP_A * lpB;
 
-        fxBuf[f]     = dry * inL + wet * lpA;
-        fxBuf[f + 8] = dry * inR + wet * lpB;
+        fxBuf[f]     = ARRAKIS_OUTPUT(fxBuf[f], dry * inL + wet * lpA);
+        fxBuf[f + ARRAKIS_FRAMES] = ARRAKIS_OUTPUT(fxBuf[f + ARRAKIS_FRAMES], dry * inR + wet * lpB);
 
         wp++;
         if (wp >= AR_BUF) wp = 0u;

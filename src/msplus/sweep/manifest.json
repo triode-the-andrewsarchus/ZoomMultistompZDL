@@ -1,0 +1,78 @@
+{
+  "name": "MJSweep",
+  "filename": "XXMSWEEP",
+  "id": "070013b0",
+  "version": "0.10",
+  "display": "MJ SWEEP",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "sweep.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/sweep/manifest_pedal.json",
+  "legacy_prefix": "SWEEP",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/sweep"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Type",
+      "max": 7,
+      "default": 0,
+      "explanation": "Type control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Rate",
+      "max": 115,
+      "default": 109,
+      "explanation": "Rate control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Depth",
+      "max": 100,
+      "default": 70,
+      "explanation": "Depth control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Cntr",
+      "max": 100,
+      "default": 50,
+      "explanation": "Cntr control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Reso",
+      "max": 100,
+      "default": 40,
+      "explanation": "Reso control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Shape",
+      "max": 5,
+      "default": 0,
+      "explanation": "Shape control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 50,
+      "explanation": "Tone control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

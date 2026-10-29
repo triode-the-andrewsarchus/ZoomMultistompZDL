@@ -1,0 +1,48 @@
+{
+  "name": "ZDLRooms",
+  "filename": "XXZROOMS",
+  "id": "07001200",
+  "version": "0.10",
+  "display": "ZDL ROOMS",
+  "badge": "ZD",
+  "description": "Experimental Rooms port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "rooms.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Mode",
+      "max": 100,
+      "default": 0,
+      "explanation": "Mode control; original pedal taper."
+    },
+    {
+      "name": "Time",
+      "max": 100,
+      "default": 55,
+      "explanation": "Time control; original pedal taper."
+    },
+    {
+      "name": "Freq",
+      "max": 100,
+      "default": 45,
+      "explanation": "Freq control; original pedal taper."
+    },
+    {
+      "name": "Depth",
+      "max": 100,
+      "default": 45,
+      "explanation": "Depth control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

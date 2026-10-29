@@ -1,0 +1,54 @@
+{
+  "name": "MJWaveFold",
+  "filename": "XXMWAVEF",
+  "id": "07001300",
+  "version": "0.10",
+  "display": "MJ WAVEFOLD",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "wavefold.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json",
+  "legacy_prefix": "WAVEFOLD",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/wavefold"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Drive",
+      "max": 100,
+      "default": 40,
+      "explanation": "Drive control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Symm",
+      "max": 100,
+      "default": 50,
+      "explanation": "Symm control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 60,
+      "explanation": "Tone control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Level",
+      "max": 100,
+      "default": 50,
+      "explanation": "Level control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ]
+}

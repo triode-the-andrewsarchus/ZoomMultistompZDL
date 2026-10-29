@@ -1,0 +1,78 @@
+{
+  "name": "MJGridDly",
+  "filename": "XXMGRIDD",
+  "id": "07001370",
+  "version": "0.10",
+  "display": "MJ GRIDDLY",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "griddly.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/griddly/manifest_pedal.json",
+  "legacy_prefix": "GRIDDLY",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/griddly"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Type",
+      "max": 5,
+      "default": 0,
+      "explanation": "Type control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Time",
+      "max": 113,
+      "default": 108,
+      "explanation": "Time control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Fdbk",
+      "max": 120,
+      "default": 45,
+      "explanation": "Fdbk control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 60,
+      "explanation": "Tone control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Char",
+      "max": 100,
+      "default": 30,
+      "explanation": "Char control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Duck",
+      "max": 100,
+      "default": 0,
+      "explanation": "Duck control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tail",
+      "max": 1,
+      "default": 1,
+      "explanation": "Tail control; Matujuice v1.5 taper."
+    }
+  ]
+}

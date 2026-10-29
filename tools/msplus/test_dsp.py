@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from scipy import signal
 
-from native import Kernel, ROOT
+from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
@@ -76,6 +76,118 @@ class DSPTests(unittest.TestCase):
             before = k.arena.copy()
             self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
             np.testing.assert_array_equal(k.arena, before)
+
+    def test_buffered_ports_bounds_parameter_faults_and_extremes(self):
+        rng = np.random.default_rng(84)
+        ports = ['microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle',
+                 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide']
+        for name in ports:
+            with self.subTest(port=name):
+                k = Kernel(name, arena_bytes=705600)
+                for _ in range(1024):
+                    k.block(np.zeros((16, 2)))
+                for slot in [0] + list(range(5, 5+len(k.manifest['params']))):
+                    old = k.coeff[slot]; k.coeff[slot] = np.nan
+                    before = k.arena.copy()
+                    self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
+                    np.testing.assert_array_equal(k.arena, before)
+                    k.coeff[slot] = old
+                samples = rng.normal(0, 0.01, (44160, 2))
+                output = np.concatenate([k.block(b) for b in samples.reshape(-1, 16, 2)])
+                self.assertTrue(np.isfinite(output).all())
+                self.assertGreater(np.max(abs(output)), 1e-5)
+                k.coeff[5:5+len(k.manifest['params'])] = 1
+                for _ in range(2048):
+                    self.assertTrue(np.isfinite(k.block(np.zeros((16, 2)))).all())
+                np.testing.assert_array_equal(k.arena[:2], [0xcafef00d]*2)
+                np.testing.assert_array_equal(k.arena[-2:], [0xcafef00d]*2)
+                self.assertTrue(np.isfinite(k.block(np.full((16, 2), np.inf))).all())
+
+    def test_buffered_math_matches_original_eight_frame_sources(self):
+        from legacy import LegacyKernel
+        rng = np.random.default_rng(71)
+        names = ['genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve',
+                 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre',
+                 'galactic', 'spool', 'oxide']
+        for name in names:
+            with self.subTest(port=name):
+                current = Kernel(name, arena_bytes=705600)
+                old = LegacyKernel(name)
+                for _ in range(4096):
+                    current.block(np.zeros((16, 2)))
+                # Align initialized histories before excitation; lazy-clear time
+                # changes with callback geometry, while the sample math does not.
+                old.arena[:] = current.arena
+                old.params[5:5+len(current.manifest['params'])] = current.coeff[5:5+len(current.manifest['params'])]
+                samples = rng.normal(0, 0.003, (16000, 2))
+                actual = np.concatenate([current.block(b) for b in samples.reshape(-1, 16, 2)])
+                expected = np.concatenate([old.block(b) for b in samples.reshape(-1, 8, 2)])
+                error = np.sqrt(np.mean((actual-expected)**2))
+                self.assertLess(error, 2e-6, f'{name}: RMS error {error}')
+
+    def test_stasis_capture_remains_audible_while_bypassed(self):
+        k = Kernel('stasis', arena_bytes=705600)
+        k.coeff[0] = 0
+        k.coeff[5] = 1
+        k.coeff[9] = 1
+        k.coeff[10] = 0.5  # Capture=1: release/live, even while bypassed.
+        t = np.arange(88208)/44100
+        source = np.column_stack([np.sin(2*np.pi*997*t)]*2)*0.01
+        for b in source.reshape(-1, 16, 2):
+            k.block(b)
+        k.coeff[10] = 1  # Capture=2: hold independently of the bypass switch.
+        held = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(4096)])
+        self.assertGreater(np.sqrt(np.mean(held[-16000:]**2)), 0.001)
+        k.coeff[10] = 0.5
+        released = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(4096)])
+        self.assertLess(np.sqrt(np.mean(released[-16000:]**2)), 1e-7)
+
+    def test_matujuice_guards_canaries_and_active_dsp(self):
+        t = np.arange(88208)/44100
+        sample = np.column_stack([np.sin(2*np.pi*1499*t), np.sin(2*np.pi*997*t)])*0.01
+        for name in MATU_PORTS:
+            with self.subTest(port=name):
+                k = Kernel(name, arena_bytes=705600)
+                for _ in range(2048):
+                    k.block(np.zeros((16, 2)))
+                for slot in [0] + list(range(5, 5+len(k.manifest['params']))):
+                    before = k.arena.copy(); value = k.coeff[slot]
+                    k.coeff[slot] = np.nan
+                    self.assertTrue((k.block(np.ones((16, 2))) == 0).all())
+                    np.testing.assert_array_equal(k.arena, before)
+                    k.coeff[slot] = value
+                out = np.concatenate([k.block(b) for b in sample.reshape(-1, 16, 2)])
+                self.assertTrue(np.isfinite(out).all())
+                self.assertGreater(np.max(abs(out)), 1e-6)
+                k.coeff[5:5+len(k.manifest['params'])] = 1
+                for _ in range(512):
+                    self.assertTrue(np.isfinite(k.block(np.zeros((16, 2)))).all())
+                np.testing.assert_array_equal(k.arena[:2], [0xcafef00d]*2)
+                np.testing.assert_array_equal(k.arena[-2:], [0xcafef00d]*2)
+                self.assertTrue(np.isfinite(k.block(np.full((16, 2), np.inf))).all())
+
+    def test_matujuice_left_input_and_grid_delay_bypass_tail(self):
+        k = Kernel('wavefold', arena_bytes=705600)
+        k.coeff[9] = 0  # Mix=0 still follows the original mono-left input.
+        source = np.tile([0.02, 0.01], (16, 1))
+        np.testing.assert_allclose(k.block(source), 0.01, atol=1e-8)
+        k.coeff[0] = 0
+        np.testing.assert_allclose(k.block(source), source, atol=1e-8)
+        k = Kernel('griddly', arena_bytes=705600)
+        k.coeff[6] = 80/113
+        k.coeff[11] = 1
+        for _ in range(1024):
+            k.block(np.zeros((16, 2)))
+        t = np.arange(88208)/44100
+        source = np.column_stack([np.zeros(len(t)), np.sin(2*np.pi*997*t)])*0.01
+        for b in source.reshape(-1, 16, 2):
+            k.block(b)
+        k.coeff[0] = 0
+        tail = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(2048)])
+        self.assertGreater(np.sqrt(np.mean(tail**2)), 1e-4)
+        k.coeff[13] = 0  # Tail OFF must then mute the delayed layer.
+        muted = np.concatenate([k.block(np.zeros((16, 2))) for _ in range(2048)])
+        self.assertLess(np.sqrt(np.mean(muted[-16000:]**2)), 1e-7)
 
     def test_gain_settling_bypass_and_channel_isolation(self):
         k = Kernel('gain')

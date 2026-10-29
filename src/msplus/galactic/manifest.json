@@ -1,0 +1,53 @@
+{
+  "name": "ZDLGalacti",
+  "filename": "XXZGALAC",
+  "id": "07001260",
+  "version": "0.10",
+  "display": "ZDL GALACTIC",
+  "badge": "ZD",
+  "description": "Experimental Galactic port with bounded host arena. Never save.",
+  "dspload": 180,
+  "kernel": "galactic.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../airwindows/galactic/manifest.json",
+  "legacy_prefix": "GALACTIC",
+  "params": [
+    {
+      "name": "Replace",
+      "max": 100,
+      "default": 50,
+      "explanation": "Replace control; original pedal taper."
+    },
+    {
+      "name": "Bright",
+      "max": 100,
+      "default": 50,
+      "explanation": "Bright control; original pedal taper."
+    },
+    {
+      "name": "Detune",
+      "max": 100,
+      "default": 50,
+      "explanation": "Detune control; original pedal taper."
+    },
+    {
+      "name": "Bigness",
+      "max": 100,
+      "default": 100,
+      "explanation": "Bigness control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ],
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/galactic"
+  ]
+}

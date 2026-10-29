@@ -1,0 +1,66 @@
+{
+  "name": "ZDLSpiral",
+  "filename": "XXZSPIRA",
+  "id": "07001220",
+  "version": "0.10",
+  "display": "ZDL SPIRAL",
+  "badge": "ZD",
+  "description": "Experimental Spiral port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "spiral.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Div",
+      "max": 100,
+      "default": 30,
+      "explanation": "Div control; original pedal taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 240,
+      "default": 120,
+      "explanation": "Tempo control; original pedal taper."
+    },
+    {
+      "name": "Feedbk",
+      "max": 100,
+      "default": 60,
+      "explanation": "Feedbk control; original pedal taper."
+    },
+    {
+      "name": "Rise",
+      "max": 100,
+      "default": 62,
+      "explanation": "Rise control; original pedal taper."
+    },
+    {
+      "name": "Glide",
+      "max": 100,
+      "default": 45,
+      "explanation": "Glide control; original pedal taper."
+    },
+    {
+      "name": "Span",
+      "max": 100,
+      "default": 45,
+      "explanation": "Span control; original pedal taper."
+    },
+    {
+      "name": "Tone",
+      "max": 100,
+      "default": 50,
+      "explanation": "Tone control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

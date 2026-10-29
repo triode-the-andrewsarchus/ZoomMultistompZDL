@@ -1,0 +1,78 @@
+{
+  "name": "MJSyncEQ",
+  "filename": "XXMSYNCE",
+  "id": "07001380",
+  "version": "0.10",
+  "display": "MJ SYNCEQ",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "synceq.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/synceq/manifest_pedal.json",
+  "legacy_prefix": "SYNCEQ",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/synceq"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "LoCut",
+      "max": 50,
+      "default": 0,
+      "explanation": "LoCut control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Low",
+      "max": 24,
+      "default": 12,
+      "explanation": "Low control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mid",
+      "max": 24,
+      "default": 12,
+      "explanation": "Mid control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "MidF",
+      "max": 50,
+      "default": 25,
+      "explanation": "MidF control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "High",
+      "max": 24,
+      "default": 12,
+      "explanation": "High control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "HiCut",
+      "max": 50,
+      "default": 50,
+      "explanation": "HiCut control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Drive",
+      "max": 100,
+      "default": 0,
+      "explanation": "Drive control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Level",
+      "max": 24,
+      "default": 12,
+      "explanation": "Level control; Matujuice v1.5 taper."
+    }
+  ]
+}

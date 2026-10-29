@@ -32,6 +32,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define ROOMS_AUDIO_FUNC SH_AUDIO_FN
+#define ROOMS_FRAMES SH_FRAMES
+#define ROOMS_INPUT(x) mp_input(x)
+#define ROOMS_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define ROOMS_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define ROOMS_FRAMES 8
+#define ROOMS_INPUT(x) (x)
+#define ROOMS_OUTPUT(dry, wet) (wet)
+#define ROOMS_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "rooms_params.h"
 
@@ -44,6 +56,8 @@
 #define ROOMS_CODE_SECTION(f) ROOMS_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 ROOMS_CODE_SECTION(ROOMS_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -129,8 +143,33 @@ static inline void rm_crush_scale(int bits, float *mul, float *inv)
     *inv = cvt.f;
 }
 
+#ifdef ZOOM_MSPLUS
+void ROOMS_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void ROOMS_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float modeN = coef[SH_PARAM_MODE];
+    float timeN = coef[SH_PARAM_TIME];
+    float freq = coef[SH_PARAM_FREQ];
+    float depth = coef[SH_PARAM_DEPTH];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(modeN)
+        || !mp_normalized(timeN)
+        || !mp_normalized(freq)
+        || !mp_normalized(depth)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(RoomsState) + 7u) & ~(uintptr_t)7u) + RM_TOTAL * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -138,17 +177,19 @@ void ROOMS_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) ROOMS_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) ROOMS_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) ROOMS_EARLY_RETURN();
+    if ((base & 3u) != 0u) ROOMS_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(RoomsState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)RM_TOTAL * 4u > end) return;
+    if (bufBase + (uintptr_t)RM_TOTAL * 4u > end) ROOMS_EARLY_RETURN();
 
     RoomsState *st = (RoomsState *)base;
     float *buf = (float *)bufBase;
@@ -177,14 +218,24 @@ void ROOMS_AUDIO_FUNC(unsigned int *ctx)
         for (uint32_t i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= RM_TOTAL) st->initialized = 1u;
-        return;
+        ROOMS_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float modeN = zoom_param_norm01(params[ROOMS_MODE_SLOT],  ROOMS_MODE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float timeN = zoom_param_norm01(params[ROOMS_TIME_SLOT],  ROOMS_TIME_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float freq  = zoom_param_norm01(params[ROOMS_FREQ_SLOT],  ROOMS_FREQ_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float depth = zoom_param_norm01(params[ROOMS_DEPTH_SLOT], ROOMS_DEPTH_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix   = zoom_param_norm01(params[ROOMS_MIX_SLOT],   ROOMS_MIX_DEFAULT_NORM);
+#endif
 
 #ifdef ROOMS_DISCRETE_MODE
     /* Separate Rooms6 patch ID: shared edit handler stores raw UI / 100. */
@@ -271,9 +322,11 @@ void ROOMS_AUDIO_FUNC(unsigned int *ctx)
     uint32_t fpd = st->fpd;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < ROOMS_FRAMES; f++) {
+        fxBuf[f] = ROOMS_INPUT(fxBuf[f]);
+        fxBuf[f + ROOMS_FRAMES] = ROOMS_INPUT(fxBuf[f + ROOMS_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + ROOMS_FRAMES];
         float in = 0.5f * (inL + inR);
 
         /* bipolar sub-audible dither keeps the reverb tail above denormals */
@@ -369,8 +422,8 @@ void ROOMS_AUDIO_FUNC(unsigned int *ctx)
 
         /* one soft-clip on the wet output bounds the self-oscillating modes */
         float wc = rm_soft(character);
-        fxBuf[f]     = dry * inL + wetMix * wc;
-        fxBuf[f + 8] = dry * inR + wetMix * wc;
+        fxBuf[f]     = ROOMS_OUTPUT(fxBuf[f], dry * inL + wetMix * wc);
+        fxBuf[f + ROOMS_FRAMES] = ROOMS_OUTPUT(fxBuf[f + ROOMS_FRAMES], dry * inR + wetMix * wc);
     }
 
     st->fpd = fpd;

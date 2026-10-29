@@ -15,6 +15,18 @@
 
 #include <stdint.h>
 
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define SHATTER_AUDIO_FUNC SH_AUDIO_FN
+#define SHATTER_FRAMES SH_FRAMES
+#define SHATTER_INPUT(x) mp_input(x)
+#define SHATTER_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define SHATTER_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define SHATTER_FRAMES 8
+#define SHATTER_INPUT(x) (x)
+#define SHATTER_OUTPUT(dry, wet) (wet)
+#define SHATTER_EARLY_RETURN() return
 #include "../../airwindows/common/zoom_params.h"
 #include "shatter_params.h"
 
@@ -27,6 +39,8 @@
 #define SHATTER_CODE_SECTION(f) SHATTER_EXPAND_PRAGMA(CODE_SECTION(f, ".audio"))
 
 SHATTER_CODE_SECTION(SHATTER_AUDIO_FUNC)
+
+#endif
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -66,8 +80,27 @@ static inline uint32_t sh_xs(uint32_t *s)
     return x;
 }
 
+#ifdef ZOOM_MSPLUS
+void SHATTER_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void SHATTER_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float chance = coef[SH_PARAM_CHANCE];
+    float mix = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(chance)
+        || !mp_normalized(mix)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t required = ((sizeof(ShatterState) + 7u) & ~(uintptr_t)7u) + SH_TOTAL_FLOATS * 4u;
+    uintptr_t base = mp_arena_state(instance, required);
+    if (!base) { mp_silence(fxBuf); return; }
+    uintptr_t end = base + required;
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf  = ZDL_PTR(float *, ctx[5]);
 
@@ -75,17 +108,19 @@ void SHATTER_AUDIO_FUNC(unsigned int *ctx)
     unsigned int *magicDst = ZDL_PTR(unsigned int *, *(unsigned int *)ZDL_PTR(unsigned int *, ctx[11]));
     *magicDst = *magicSrc;
 
-    if (params[0] < 0.5f) return;
+    if (params[0] < 0.5f) SHATTER_EARLY_RETURN();
 
     volatile unsigned int *desc = ZDL_PTR(volatile unsigned int *, ctx[3]);
-    if (!desc) return;
+    if (!desc) SHATTER_EARLY_RETURN();
     uintptr_t base = (uintptr_t)desc[0];
     uintptr_t end  = (uintptr_t)desc[1];
-    if (base == 0u || end <= base) return;
-    if ((base & 3u) != 0u) return;
+    if (base == 0u || end <= base) SHATTER_EARLY_RETURN();
+    if ((base & 3u) != 0u) SHATTER_EARLY_RETURN();
+
+#endif
 
     uintptr_t bufBase = (base + sizeof(ShatterState) + 7u) & ~(uintptr_t)7u;
-    if (bufBase + (uintptr_t)SH_TOTAL_FLOATS * 4u > end) return;
+    if (bufBase + (uintptr_t)SH_TOTAL_FLOATS * 4u > end) SHATTER_EARLY_RETURN();
 
     ShatterState *st = (ShatterState *)base;
     float *buf = (float *)bufBase;
@@ -111,11 +146,15 @@ void SHATTER_AUDIO_FUNC(unsigned int *ctx)
         for (i = st->clearIndex; i < e; i++) buf[i] = 0.0f;
         st->clearIndex = e;
         if (e >= SH_TOTAL_FLOATS) st->initialized = 1u;
-        return;                       /* pass dry while clearing */
+        SHATTER_EARLY_RETURN();                       /* pass dry while clearing */
     }
 
+#ifndef ZOOM_MSPLUS
     float chance = zoom_param_norm01(params[SHATTER_CHANCE_SLOT], SHATTER_CHANCE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float mix    = zoom_param_norm01(params[SHATTER_MIX_SLOT], SHATTER_MIX_DEFAULT_NORM);
+#endif
     int chanceThr = (int)(chance * 65536.0f);
     float wet = mix;
     float dry = 1.0f - mix;
@@ -129,9 +168,11 @@ void SHATTER_AUDIO_FUNC(unsigned int *ctx)
     uint32_t rng = st->rng;
 
     int f;
-    for (f = 0; f < 8; f++) {
+    for (f = 0; f < SHATTER_FRAMES; f++) {
+        fxBuf[f] = SHATTER_INPUT(fxBuf[f]);
+        fxBuf[f + SHATTER_FRAMES] = SHATTER_INPUT(fxBuf[f + SHATTER_FRAMES]);
         float inL = fxBuf[f];
-        float inR = fxBuf[f + 8];
+        float inR = fxBuf[f + SHATTER_FRAMES];
         buf[2u * wp] = inL;
         buf[2u * wp + 1u] = inR;
 
@@ -169,8 +210,8 @@ void SHATTER_AUDIO_FUNC(unsigned int *ctx)
             oR = inR;
         }
 
-        fxBuf[f]     = dry * inL + wet * oL;
-        fxBuf[f + 8] = dry * inR + wet * oR;
+        fxBuf[f]     = SHATTER_OUTPUT(fxBuf[f], dry * inL + wet * oL);
+        fxBuf[f + SHATTER_FRAMES] = SHATTER_OUTPUT(fxBuf[f + SHATTER_FRAMES], dry * inR + wet * oR);
 
         wp++;
         if (wp >= SH_BUFLEN) wp = 0u;

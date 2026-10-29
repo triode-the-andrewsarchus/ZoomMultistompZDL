@@ -1,0 +1,30 @@
+{
+  "name": "ZDLArrakis",
+  "filename": "XXZARRAK",
+  "id": "070011c0",
+  "version": "0.10",
+  "display": "ZDL ARRAKIS",
+  "badge": "ZD",
+  "description": "Experimental Arrakis port with bounded host arena. Never save.",
+  "dspload": 80,
+  "kernel": "arrakis.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Detune",
+      "max": 100,
+      "default": 63,
+      "explanation": "Detune control; original pedal taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 50,
+      "explanation": "Mix control; original pedal taper."
+    }
+  ]
+}

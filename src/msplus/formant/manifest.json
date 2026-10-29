@@ -1,0 +1,79 @@
+{
+  "name": "MJChoral",
+  "filename": "XXMFORMA",
+  "id": "07001320",
+  "version": "0.10",
+  "display": "MJ CHORAL",
+  "badge": "MJ",
+  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "dspload": 180,
+  "kernel": "formant.c",
+  "state_bytes": 4,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "legacy_manifest": "../../../build/msplus/matujuice/src/custom/formant/manifest_pedal.json",
+  "legacy_prefix": "FORMANT",
+  "kernel_cflags": [
+    "--include_path=../../../../build/msplus/headers/formant"
+  ],
+  "dependency": "matujuice-v1.5",
+  "params": [
+    {
+      "name": "Choir",
+      "max": 16,
+      "default": 4,
+      "explanation": "Choir control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Size",
+      "max": 5,
+      "default": 2,
+      "explanation": "Size control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Chord",
+      "max": 24,
+      "default": 0,
+      "explanation": "Chord control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Sing",
+      "max": 11,
+      "default": 6,
+      "explanation": "Sing control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Pace",
+      "max": 16,
+      "default": 4,
+      "explanation": "Pace control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Feel",
+      "max": 100,
+      "default": 40,
+      "explanation": "Feel control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Glide",
+      "max": 100,
+      "default": 20,
+      "explanation": "Glide control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Tempo",
+      "max": 441,
+      "default": 120,
+      "explanation": "Tempo control; Matujuice v1.5 taper."
+    },
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 70,
+      "explanation": "Mix control; Matujuice v1.5 taper."
+    }
+  ],
+  "opt_level": 1
+}

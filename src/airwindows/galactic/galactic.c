@@ -13,6 +13,17 @@
  */
 
 #include <stdint.h>
+#ifdef ZOOM_MSPLUS
+#include "../../msplus/common/compat.h"
+#define GALACTIC_AUDIO_FUNC SH_AUDIO_FN
+#define GALACTIC_FRAMES SH_FRAMES
+#define GALACTIC_OUTPUT(dry, wet) mp_output(dry, wet, hostFade)
+#define GALACTIC_EARLY_RETURN() do { mp_silence(fxBuf); return; } while (0)
+#else
+#define GALACTIC_FRAMES 8
+#define GALACTIC_OUTPUT(dry, wet) (wet)
+#define GALACTIC_EARLY_RETURN() return
+#endif
 
 #include "../common/zoom_params.h"
 #include "galactic_params.h"
@@ -24,7 +35,11 @@
 #define GALACTIC_DO_PRAGMA(x) _Pragma(#x)
 #define GALACTIC_EXPAND_PRAGMA(x) GALACTIC_DO_PRAGMA(x)
 #define GALACTIC_CODE_SECTION(func) GALACTIC_EXPAND_PRAGMA(CODE_SECTION(func, ".audio"))
+
+#ifndef ZOOM_MSPLUS
 GALACTIC_CODE_SECTION(GALACTIC_AUDIO_FUNC)
+#endif
+
 
 #define ZDL_PTR(type, word) ((type)(uintptr_t)(word))
 
@@ -127,11 +142,17 @@ typedef struct GalacticState {
     uint32_t fpdR;
 } GalacticState;
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(align4)
+#endif
 static inline uintptr_t align4(uintptr_t x)
 {
     return (x + 3u) & ~(uintptr_t)3u;
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(sin_approx)
+#endif
 static inline float sin_approx(float x)
 {
     const float twoPi = 6.28318530718f;
@@ -155,6 +176,9 @@ static inline float sin_approx(float x)
     return y * sign;
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(gal_reset_header)
+#endif
 static inline void gal_reset_header(GalacticState *st)
 {
     st->magic = GALACTIC_MAGIC;
@@ -163,6 +187,9 @@ static inline void gal_reset_header(GalacticState *st)
     st->clearIndex = 16u;
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(gal_finish_init)
+#endif
 static inline void gal_finish_init(GalacticState *st)
 {
     int i;
@@ -189,6 +216,9 @@ static inline void gal_finish_init(GalacticState *st)
     st->initialized = 1u;
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(gal_clear_chunk)
+#endif
 static inline void gal_clear_chunk(GalacticState *st)
 {
     uint32_t *w = (uint32_t *)(void *)st;
@@ -207,6 +237,9 @@ static inline void gal_clear_chunk(GalacticState *st)
     }
 }
 
+#ifdef ZOOM_MSPLUS
+ZOOM_ALWAYS_INLINE(gal_process_sample)
+#endif
 static inline void gal_process_sample(GalacticState *st, float *sampleL, float *sampleR,
                                       float regen, float attenuate, float lowpass,
                                       float drift, float wet,
@@ -368,8 +401,31 @@ static inline void gal_process_sample(GalacticState *st, float *sampleL, float *
     *sampleR = inputSampleR;
 }
 
+#ifdef ZOOM_MSPLUS
+void GALACTIC_AUDIO_FUNC(void **instance, void **ctx)
+#else
 void GALACTIC_AUDIO_FUNC(unsigned int *ctx)
+#endif
 {
+#ifdef ZOOM_MSPLUS
+    const float *coef = (const float *)instance[1];
+    float *fxBuf = (float *)ctx[1];
+    float hostFade = coef[SH_COEFF_BYPASS];
+    float A = coef[SH_PARAM_REPLACE];
+    float B = coef[SH_PARAM_BRIGHT];
+    float C = coef[SH_PARAM_DETUNE];
+    float D = coef[SH_PARAM_BIGNESS];
+    float E = coef[SH_PARAM_MIX];
+    if (!mp_ready(instance, hostFade) || !mp_normalized(A)
+        || !mp_normalized(B)
+        || !mp_normalized(C)
+        || !mp_normalized(D)
+        || !mp_normalized(E)) {
+        mp_silence(fxBuf); return;
+    }
+    uintptr_t stateBase = mp_arena_state(instance, sizeof(GalacticState));
+    if (!stateBase) { mp_silence(fxBuf); return; }
+#else
     float *params = ZDL_PTR(float *, ctx[1]);
     float *fxBuf = ZDL_PTR(float *, ctx[5]);
 
@@ -394,21 +450,33 @@ void GALACTIC_AUDIO_FUNC(unsigned int *ctx)
     if (bytes < sizeof(GalacticState) || span < bytes) return;
     if (requiredEnd > end) return;
 
+#endif
+
     GalacticState *st = (GalacticState *)stateBase;
     if (st->magic != GALACTIC_MAGIC || st->version != GALACTIC_VERSION) {
         gal_reset_header(st);
-        return;
+        GALACTIC_EARLY_RETURN();
     }
     if (!st->initialized) {
         gal_clear_chunk(st);
-        return;
+        GALACTIC_EARLY_RETURN();
     }
 
+#ifndef ZOOM_MSPLUS
     float A = GAL_PARAM_NORM(params[GALACTIC_REPLACE_SLOT], GALACTIC_REPLACE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float B = GAL_PARAM_NORM(params[GALACTIC_BRIGHT_SLOT], GALACTIC_BRIGHT_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float C = GAL_PARAM_NORM(params[GALACTIC_DETUNE_SLOT], GALACTIC_DETUNE_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float D = GAL_PARAM_NORM(params[GALACTIC_BIGNESS_SLOT], GALACTIC_BIGNESS_DEFAULT_NORM);
+#endif
+#ifndef ZOOM_MSPLUS
     float E = GAL_PARAM_NORM(params[GALACTIC_MIX_SLOT], GALACTIC_MIX_DEFAULT_NORM);
+#endif
 
     float regen = 0.125f - (A * 0.0625f);
     float attenuate = A * 0.6665f;
@@ -433,14 +501,20 @@ void GALACTIC_AUDIO_FUNC(unsigned int *ctx)
     int delayH = (int)(1597.0f * size);
 
     int i;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < GALACTIC_FRAMES; i++) {
         float sL = fxBuf[i];
-        float sR = fxBuf[i + 8];
+#ifdef ZOOM_MSPLUS
+        sL = mp_input(sL);
+#endif
+        float sR = fxBuf[i + GALACTIC_FRAMES];
+#ifdef ZOOM_MSPLUS
+        sR = mp_input(sR);
+#endif
         gal_process_sample(st, &sL, &sR, regen, attenuate, lowpass, drift, wet,
                            delayI, delayJ, delayK, delayL,
                            delayA, delayB, delayC, delayD,
                            delayE, delayF, delayG, delayH);
-        fxBuf[i] = sL;
-        fxBuf[i + 8] = sR;
+        fxBuf[i] = GALACTIC_OUTPUT(fxBuf[i], sL);
+        fxBuf[i + GALACTIC_FRAMES] = GALACTIC_OUTPUT(fxBuf[i + GALACTIC_FRAMES], sR);
     }
 }
