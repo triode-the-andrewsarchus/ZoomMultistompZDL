@@ -43,7 +43,8 @@ Zoom Effect Manager installs the effects. See the [installation guide](docs/INST
 * **Experimental MS-70CDR+ source ports:** all 22 release effects plus the
   12 Matujuice v1.5 effects build using Stomphacks. All 34 pass selected standalone
   hardware tests and are installed on
-  the test pedal, with saved patches preserved and autosave off. Scrub/GridDly use
+  the test pedal with adapted original artwork, saved patches preserved and
+  autosave off. [Preview the Plus artwork](docs/images/msplus-artwork.png). Scrub/GridDly use
   15-bit histories; cross-effect FOLLOW sync remains unsupported. See
   [development, limitations and hardware results](docs/MSPLUS-DEVELOPMENT.md).
 * **Untested/unsupported:** MS-50G+, MS-60B+ and the Four series. These require

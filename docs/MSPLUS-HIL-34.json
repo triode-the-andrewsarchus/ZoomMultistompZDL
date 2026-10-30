@@ -1507,7 +1507,7 @@
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/matu-packed-campaign-01/wavefold/hil/analysis.json",
+      "evidence": "build/msplus/artwork-smoke-01/wavefold/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1519,7 +1519,7 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 8,
-      "tested_binary_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
+      "tested_binary_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
       "source_fingerprints": {
         "src/msplus/wavefold/manifest.json": "6ff474d88cf7234e04edf62e63a33201597d68fc8c9eda2f0e77761bc592909c",
         "src/msplus/wavefold/wavefold.c": "bbe91a9f0c0d42be5588554da7006a8b0d1ea393b9f83b268b805f571289d06c",
@@ -1533,14 +1533,6 @@
         "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
         "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
-        "artwork_binary_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
-        "dsp_sha256": "1de2a26193db445f8194b9236779f7879477b3fdb26f3627023cb55d827e82bd",
-        "source_sha256": "a4f24b62af6ad51a96a236a8a0e8cdc86b16a111f9461fa853d74d9bd6f83ddd",
-        "icon_sha256": "48719e93290cbc10a8d7c8c03210c5b03673e6303c3631aa777b1b368ae8fcfb",
-        "dsp_byte_identical": true
       }
     }
   ],

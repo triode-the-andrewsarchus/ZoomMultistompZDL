@@ -3,10 +3,11 @@
 Experimental ports on branch `feat/ms70cdr-plus`, tested on an actual MS-70CDR+
 firmware **1.10**. All **22 original musical effects** and **12 Matujuice v1.5
 effects** now build as ZD2 and pass selected standalone hardware checks. All 34
-are installed with their icons for manual audition. The retained-set audit read
+are installed with adapted original artwork for manual audition. The retained-set audit read
 back all 68 files, confirmed all 100 saved patches unchanged, preserved factory
 catalogue entries and verified stock stereo audio with autosave OFF. The exact
-installation evidence is `build/msplus/retained-34-20261029-01/`. A fresh full
+artwork installation evidence is `build/msplus/artwork-final-20261029-01/COMPLETE.json`.
+The earlier DSP retention audit is `build/msplus/retained-34-20261029-01/`. A fresh full
 readback verified all 305 original files except the deliberately updated effect
 list byte-for-byte, including all 302 factory effect/icon/IR files. The final
 post-readback stereo audio check also passed. See
@@ -100,6 +101,27 @@ hardware-tested binary, allowing only ICON/CRC changes and requiring the ZIC
 to match the current source artwork. It retains the original hardware evidence
 and records the artwork variant separately; it does not claim that these
 new containers were the binaries used in the earlier DSP captures.
+
+All 34 artwork pairs are now installed. A fresh pre-update backup verified 374
+files and 100 stock-only saved patches; all 305 original non-catalogue files
+matched the original backup. The guarded replacement campaign used upstream
+dry runs, uninstall-before-install and readback verification. Stasis uses its
+bottom artwork panel because its original knobs sit above the illustration;
+an additional crop test checks all 34 sources against the original live value
+box positions and their recorded source hashes.
+
+The final audit read back all 68 current files byte-for-byte, preserved the
+factory catalogue and all 100 saved patches, and independently verified that
+every new ZD2 differs from its backed-up predecessor only in ICON and CRC.
+WaveFold also passed its selected hardware cases with the updated container
+and verified stock-audio restoration (`build/msplus/artwork-smoke-01/`). After
+the complete-set readback closed its file sessions, both stereo loopback paths
+passed again (correlations 0.952/0.951, gain -20.13/-20.07 dB). Autosave is OFF,
+the temporary patch is stock-only, PipeWire quantum is restored to 128, and
+580,780 bytes remain free. The final proof binds the catalogue/file audit,
+audio recording, source-to-container equivalence and accepted hardware report:
+`build/msplus/artwork-final-20261029-01/COMPLETE.json`.
+See the [34-effect artwork preview](images/msplus-artwork.png).
 
 ### WaveFold input sensitivity
 
