@@ -48,6 +48,22 @@ def check_sources(folder, manifest, evidence):
             raise RuntimeError(f'{folder.name}: hardware-tested source has changed: {source}')
 
 
+def check_binary(folder, evidence, expected_hash):
+    manifest = json.loads((folder / 'manifest.json').read_text())
+    artifact = folder / 'build' / (manifest['filename'] + '.ZD2')
+    original = (evidence.parent / 'BUILT.ZD2').read_bytes()
+    if hashlib.sha256(original).hexdigest() != expected_hash:
+        raise RuntimeError(f'{folder.name}: recorded hardware-tested binary hash differs')
+    if artifact.read_bytes() == original:
+        return None
+    from artwork import check_variant
+    try:
+        return check_variant(original, artifact.read_bytes(), artifact.with_suffix('.ZIC').read_bytes(),
+                             ROOT / 'src/msplus/artwork' / (folder.name + '.png'))
+    except (ValueError, FileNotFoundError) as error:
+        raise RuntimeError(f'{folder.name}: current build differs from the hardware-tested binary: {error}') from error
+
+
 def qualified_artifacts(report):
     folders = {p.parent.name: p.parent for p in (ROOT / 'src/msplus').glob('*/manifest.json')
                if p.parent.name not in {'gain', 'calibrate', 'meminfo', 'linearity'}}
@@ -64,10 +80,7 @@ def qualified_artifacts(report):
         if not evidence.is_relative_to(ROOT):
             raise RuntimeError('Evidence must be inside the working repository')
         check_measurements(name, evidence)
-        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
-        tested = hashlib.sha256((evidence.parent / 'BUILT.ZD2').read_bytes()).hexdigest()
-        if digest != tested or digest != row['tested_binary_sha256']:
-            raise RuntimeError(f'{name}: current build differs from the hardware-tested binary')
+        check_binary(folder, evidence, row['tested_binary_sha256'])
         check_sources(folder, manifest, evidence)
         if not (folder / 'build/REPORT.md').is_file():
             raise RuntimeError(f'{name}: upstream build validation report missing')

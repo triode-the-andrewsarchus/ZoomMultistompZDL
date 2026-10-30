@@ -49,6 +49,9 @@ def main():
                                manifest['legacy_prefix'])
         subprocess.run([sys.executable, str(STOMPHACKS / 'tools/zd2_make_effect.py'),
                         str(ports / effect / 'manifest.json')], check=True, env=env)
+        if (ports / 'artwork' / (effect + '.png')).is_file():
+            from artwork import apply
+            apply(folder)
 
 
 if __name__ == '__main__':

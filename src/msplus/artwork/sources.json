@@ -1,0 +1,444 @@
+{
+  "arrakis": {
+    "name": "Arrakis",
+    "source": "dist/Arrakis.ZDL",
+    "source_sha256": "45dcf1e5177c6aa3507219245b05e636742ec2366ac653f990b4511a79dd8c89",
+    "symbol": "picEffectType_Arrakis",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "ff89d3d947e239b33389d35799710efac9f0ec6a91455add31d99c00e556beec"
+  },
+  "breather": {
+    "name": "Breather",
+    "source": "dist/Breather.ZDL",
+    "source_sha256": "4fded786b226833208b010a3dc810308b7ff348e25e0ad89689cd0d2b3c0629f",
+    "symbol": "picEffectType_Breather",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "4dfbf4bcc11ae5c3c9ef7c217e180c453aeb9c09d656a68cbb8f1c10c2cf9f66"
+  },
+  "corrupt": {
+    "name": "Corrupt",
+    "source": "dist/Corrupt.ZDL",
+    "source_sha256": "8ee58e03d0d5863cf0ac0671ca8749f545eca023b7851c086f873fc3665ed324",
+    "symbol": "picEffectType_Corrupt",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "b09d58a5a4d5a98392a5887a88729e960e74696362742770e26288300ef999be"
+  },
+  "dirtbox": {
+    "name": "DirtBox",
+    "source": "dist/DirtBox.ZDL",
+    "source_sha256": "7e4ffd72524bce62d5dad1a24daa71958767c835c0833deaf044a97e3b49732a",
+    "symbol": "picEffectType_DirtBox",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "bace1a0e78379c703b685fec363939e9068cfe031f060f4176ceb447c121c42d"
+  },
+  "dissolve": {
+    "name": "Dissolve",
+    "source": "dist/Dissolve.ZDL",
+    "source_sha256": "53be6d443b17550761bb3beababf96565270e259475751fb8e715190d889cce9",
+    "symbol": "picEffectType_Dissolve",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "fca2d7aa3db45f2b60cc020aabf5cdd8343d453af9ded81941dbd4ec7e3d5b98"
+  },
+  "dualshft": {
+    "name": "DualShft",
+    "source": "dist/DualShft.ZDL",
+    "source_sha256": "4a6bd07eaad1f8e02bfc696691bfdc805e2c808ee6c551075860ff7b3144759f",
+    "symbol": "picEffectType_DualShft",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "7df794f675c79414744e533209d355e24da7c08d79573a659aafeb2b4528ec11"
+  },
+  "dubsiren": {
+    "name": "DubSiren",
+    "source": "dist/DubSiren.ZDL",
+    "source_sha256": "45130dfa4b4c255a9a6a62a654f59d5a418c03ad90c149c7f7032c0eb5c18e89",
+    "symbol": "picEffectType_DubSiren",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "6af3c9fc4bca669055ef5fcc07d1856c989125e23042f326b0c2eec9ce48169b"
+  },
+  "dustbox": {
+    "name": "Dustbox",
+    "source": "dist/Dustbox.ZDL",
+    "source_sha256": "84776f81c89d385f9bc62bda1560b6e4ce6add3c28db55d0e94a20ee7f37ff41",
+    "symbol": "picEffectType_Dustbox",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "3a411ad17ce7a9fef8b05bf2ee156d6bca8364fdad7ed8f1c09038acfc574f9e"
+  },
+  "eugate": {
+    "name": "EuGate",
+    "source": "dist/EuGate.ZDL",
+    "source_sha256": "00203fe6565d039346940cc0ccc6cf9c0aea97cda0427ac3f14b6ee726b0b807",
+    "symbol": "picEffectType_EuGate",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "7dcf2c922220a4ea679c33c72e88ca2c0fed71e91c1dd3092d89571842af7e06"
+  },
+  "flower": {
+    "name": "Flower",
+    "source": "dist/Flower.ZDL",
+    "source_sha256": "cd57ae26bd66974dbfd7df9aa06a55ca044bdc32e46e5729d60625a3d7fb56b6",
+    "symbol": "picEffectType_Flower",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "0ddf28aacd2ddacc18219edd702623f660bc6c921c58d27fd57f9f55d67b87c7"
+  },
+  "formant": {
+    "name": "Choral",
+    "source": "dist/Choral.ZDL",
+    "source_sha256": "5e3ca6a1c25359bc40b068c64df1c649ae26071c5b87673b50593df0d1db98d2",
+    "symbol": "picEffectType_Choral",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "3ada499ec459ab124cebdfc84c5cd76fb6b0fb5a37aebce92a63b7ff2d510315"
+  },
+  "galactic": {
+    "name": "Galactic",
+    "source": "dist/Galactic.ZDL",
+    "source_sha256": "48d56674eb083d214806754fa96bfdb4f1cb12b417aae718444c86bd85c42764",
+    "symbol": "picEffectType_Galactic",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "ff784a62dc063b5118a5d65d911f1dada732b8dff9fd16a20b988274d4a40fe0"
+  },
+  "genloss": {
+    "name": "GenLoss",
+    "source": "dist/GenLoss.ZDL",
+    "source_sha256": "3f5f88154146eab99291b0876461196fcc895294d21a813aa01d965323dea2d4",
+    "symbol": "picEffectType_GenLoss",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "363e885df60ba4a16a457aa4dbc35e579a0b6e4d97058ac214c496a519c672ea"
+  },
+  "griddly": {
+    "name": "GridDly",
+    "source": "dist/GridDly.ZDL",
+    "source_sha256": "812ed8b9f6181688b3659044a56a8cb1bf8561dd4b4d16c6ffbf8f1b15c7ff3d",
+    "symbol": "picEffectType_GridDly",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "832a4442de021b9a190e4c1cfa8c5ddf4d4ee14628267cb524408bdec183b518"
+  },
+  "gyre": {
+    "name": "Gyre",
+    "source": "dist/Gyre.ZDL",
+    "source_sha256": "e804f0d47e0236b6527de0734153ddafe81e4fda82e44df8838e6b9e3c8bc73a",
+    "symbol": "picEffectType_Gyre",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "f33549e6e5c60241e44b9592ab0e4d45fb0f2973af4018ffc3a3a5af21d906d3"
+  },
+  "howl": {
+    "name": "Howl",
+    "source": "dist/Howl.ZDL",
+    "source_sha256": "a9e8f6831f92ccd953ba89450a9824233ca4b7aa8c2909ad6f610fa94bc7030e",
+    "symbol": "picEffectType_Howl",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "fd2ee28bd74bcfc3b110b73f0741bb142207a2d2227b7577a217bce8f6995824"
+  },
+  "hydra": {
+    "name": "Hydra",
+    "source": "dist/Hydra.ZDL",
+    "source_sha256": "643cf62329064034e83f8b670881664b44568fd874eeb0f246f98684b9357ac3",
+    "symbol": "picEffectType_Hydra",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "211c54a9eb16e1d851746f9255538e34281d7750549b99449e30d572646bcea2"
+  },
+  "klang": {
+    "name": "Klang",
+    "source": "dist/Klang.ZDL",
+    "source_sha256": "ffaa1f0bb00e087a7d0fee634c0cea76c56983cb4c0b65fe189f95ed64ea8283",
+    "symbol": "picEffectType_Klang",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "92689806143c689c407edc44c32c20fc2f3f618a2ead40607774f38fb1e75842"
+  },
+  "mangle": {
+    "name": "Mangle",
+    "source": "dist/Mangle.ZDL",
+    "source_sha256": "571d984f91e669e1e5cc8badff72ea24854e3859ca212157328a5974f792fcf5",
+    "symbol": "picEffectType_Mangle",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "0debd6365d0e3982d9c8e7d503f3773b77f9d5c05f4e3512b701d614afe6c7f9"
+  },
+  "microloom": {
+    "name": "Microlm",
+    "source": "dist/Microlm.ZDL",
+    "source_sha256": "1299cbc150a5a4afe225ebb1ebc5100a67c618cc2226018752a1d58040af6884",
+    "symbol": "picEffectType_Microlm",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "a06e785764d982f46b47d187723b706f533d6dbb1a9817756421c6c84e7332b8"
+  },
+  "oxide": {
+    "name": "Oxide",
+    "source": "dist/Oxide.ZDL",
+    "source_sha256": "bcd8ed29219244ef834602b5e6a2b344c50798e0d8e763dcea591d50be4ce05e",
+    "symbol": "picEffectType_Oxide",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "d3c02d06aa484a3668ef092af68c1ad5bd5dfadb0a5a807ebf20bf267b74e96f"
+  },
+  "rewire": {
+    "name": "Rewire",
+    "source": "dist/Rewire.ZDL",
+    "source_sha256": "8ae029c110cadaf8ae56b72d22745c656f064d5409d4573b30d4be3b274de717",
+    "symbol": "picEffectType_Rewire",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "85731bf290ba34df5081e6d1d2300e85c1cbb7e0a7e3b8813eec58645f287f6f"
+  },
+  "rooms": {
+    "name": "Rooms",
+    "source": "dist/Rooms.ZDL",
+    "source_sha256": "3de9807d94bc8946970a5a2bb8c703d703f8ddaa0d0593e73a5da87f153f7e79",
+    "symbol": "picEffectType_Rooms",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "ff96e7d325d7c3a92a59022e7f4013630f64a122831764ae6afa883881104596"
+  },
+  "scorch": {
+    "name": "Scorch",
+    "source": "dist/Scorch.ZDL",
+    "source_sha256": "6a966eed1c43ac9079454657c13d1992d306fcc373047564e9fc097bf4a724b4",
+    "symbol": "picEffectType_Scorch",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "d8baf62562748946f07c731646acce2ad52ba8c6342a41f0bac21135319753ed"
+  },
+  "scrub": {
+    "name": "Scrub",
+    "source": "dist/Scrub.ZDL",
+    "source_sha256": "bfbc98307b36231f385beb65b35f873b75cc32c08dd44de8ba1d2e4cee3840d3",
+    "symbol": "picEffectType_Scrub",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "1fbb867fccc3afcb6387095c72f3195e02bd3e0095fed74c22f1e44f0acd1a07"
+  },
+  "sgnl": {
+    "name": "SGNL",
+    "source": "dist/SGNL.ZDL",
+    "source_sha256": "1a27ab980ba2502df3257d13ee7afd54a4e88c021dd509aaa551f12f28ad61f2",
+    "symbol": "picEffectType_SGNL",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "65674a07c3ff9dc1e324ca51a0a62603223bda467c2cfe44bb7dc8dbbb43931d"
+  },
+  "shatter": {
+    "name": "Shatter",
+    "source": "dist/Shatter.ZDL",
+    "source_sha256": "5438e223c368910482728edd20a9e057d217a37db1411e20705f676123e849ff",
+    "symbol": "picEffectType_Shatter",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "a90872fb7b8d4b707ad72075ac52a8d6b796fd9873a1ebd2f6382793678470d3"
+  },
+  "spiral": {
+    "name": "Spiral",
+    "source": "dist/Spiral.ZDL",
+    "source_sha256": "ed3b6c57ee3b5b83216eadbf2623514ab5dfc90b43f6c183556fd96c142f8f2d",
+    "symbol": "picEffectType_Spiral",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "e0815b3e936ef6e85c543d8ad1103652f5f7d62fc0b41e3a95ffcb978e7507c6"
+  },
+  "spool": {
+    "name": "Spool",
+    "source": "dist/Spool.ZDL",
+    "source_sha256": "b5ffc1530c6f84b77b3c3ccf603a50bee88d32ce13817dfc43d434fed34b8f93",
+    "symbol": "picEffectType_Spool",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "ae6f65112acc35d277970c3a48beadbbd4059ce7dd0d5387874a539a389ae144"
+  },
+  "stasis": {
+    "name": "Stasis",
+    "source": "dist/Stasis.ZDL",
+    "source_sha256": "185ef8fc70e010201817d82496b41da2d48ff67830b241610c368bc925bd9706",
+    "symbol": "picEffectType_Stasis",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "4726af8bb58558ac107c1089d2e4df5536fa58027fd671ed499b14fa64dcb3dc"
+  },
+  "sweep": {
+    "name": "Sweep",
+    "source": "dist/Sweep.ZDL",
+    "source_sha256": "1add846aa0cc7a748310fb01fe27bb186cc09f473f371a79165bcef939db9907",
+    "symbol": "picEffectType_Sweep",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "5b4faa80931708ad36b4edba0f8850859ff06c4481f22b8e55af1f1f7e6219e8"
+  },
+  "synceq": {
+    "name": "SyncEQ",
+    "source": "dist/SyncEQ.ZDL",
+    "source_sha256": "4d0268c0deba8efb24b56c88358b02634b1178a637b38f0ba069f07e4bfdf297",
+    "symbol": "picEffectType_SyncEQ",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "26395afafcbd8e0aa7854f7da907456eeffaded10c3a7358e510311e043a5e75"
+  },
+  "taffy": {
+    "name": "Taffy",
+    "source": "dist/Taffy.ZDL",
+    "source_sha256": "c3c9fd31d8977dfe4149dc90e723631db999f0d79b384b7d0a7a75fcae8adef6",
+    "symbol": "picEffectType_Taffy",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "4e2846507a46237787a77d9923373c5516061bc1be653d9d1e327edd02a34af7"
+  },
+  "wavefold": {
+    "name": "WaveFold",
+    "source": "dist/WaveFold.ZDL",
+    "source_sha256": "8d3b30bd2be8cee9c6778c1b7591e712efcc1418f01fe75a25441e24c8c17e43",
+    "symbol": "picEffectType_WaveFold",
+    "crop": [
+      0,
+      0,
+      128,
+      36
+    ],
+    "png_sha256": "a4f24b62af6ad51a96a236a8a0e8cdc86b16a111f9461fa853d74d9bd6f83ddd"
+  }
+}

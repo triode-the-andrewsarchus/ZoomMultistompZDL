@@ -84,6 +84,23 @@ comparison from independently measured high-level output compression.
 All 34 have current binary/source provenance and verified stock-audio restoration;
 the accepted campaigns contain 271 recordings. The complete set is now retained.
 
+### Original artwork on Plus
+
+All 34 original title/illustration panels are preserved in
+[`src/msplus/artwork`](../src/msplus/artwork/README.md). The Plus build adapts
+them into its 72×97 browser and 102×128 edit icons, retaining the original
+pixel art rather than the temporary text-only placeholders. The old knob row
+is excluded because the Plus renders its controls separately. Artwork updates
+change only the embedded ICON pixels, companion ZIC and required CRC; DSP,
+parameters and identities remain byte-identical to their tested versions.
+
+`tools/msplus/artwork.py` repackages existing builds offline and also runs after
+normal builds. Qualification checks the variant against the exact archived
+hardware-tested binary, allowing only ICON/CRC changes and requiring the ZIC
+to match the current source artwork. It retains the original hardware evidence
+and records the artwork variant separately; it does not claim that these
+new containers were the binaries used in the earlier DSP captures.
+
 ### WaveFold input sensitivity
 
 Manual audition exposed a gap in the selected hardware checks: the WaveFold

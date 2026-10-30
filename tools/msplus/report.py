@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 from upstream import ROOT
-from install_set import check_measurements, check_sources
+from install_set import check_measurements, check_sources, check_binary
 from audio import require_loopback
 
 
@@ -44,8 +44,9 @@ def effect_row(folder, evidence):
         row['stock_baseline_healthy'] = True
         check_measurements(folder.name, evidence)
         check_sources(folder, manifest, evidence)
-        if row['current_build_sha256'] != row['tested_binary_sha256']:
-            raise RuntimeError('Current binary differs from hardware-tested binary')
+        artwork = check_binary(folder, evidence, row['tested_binary_sha256'])
+        if artwork:
+            row['artwork_only_variant'] = artwork
         row.update(ready_for_retention=True, status='PASS: selected standalone checks and current restoration/provenance gates')
     except (RuntimeError, FileNotFoundError, KeyError) as error:
         row.update(status='UNQUALIFIED: ' + str(error), qualification_error=str(error))

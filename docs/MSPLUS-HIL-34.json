@@ -3,8 +3,8 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 22,
-  "tool_fault_tests": 18,
+  "native_tests": 23,
+  "tool_fault_tests": 19,
   "return_gain_db": 0,
   "ports": [
     {
@@ -14,7 +14,7 @@
       "family": "original",
       "build_report": "src/msplus/arrakis/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "408edfc32df926ecf9e106842e29bc652725599c0f6f874aa3e25014b305045f",
+      "current_build_sha256": "3f3c68565a4a5e33142d29860a408a4ed2c2e07c4d541465fb5773e107609733",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -41,6 +41,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/arrakis/arrakis.c": "1307aa858171492b9f689a501049943659d89b00487dba1bd6a0e2730b38d4a3"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "408edfc32df926ecf9e106842e29bc652725599c0f6f874aa3e25014b305045f",
+        "artwork_binary_sha256": "3f3c68565a4a5e33142d29860a408a4ed2c2e07c4d541465fb5773e107609733",
+        "dsp_sha256": "62d80354b1cb59b5efc54913719fc74dea72378f1696ef4d73ff2c9ef4145857",
+        "source_sha256": "ff89d3d947e239b33389d35799710efac9f0ec6a91455add31d99c00e556beec",
+        "icon_sha256": "23640a936017fb00eb4b1b7012563faf017ebc7b1052ac8eb4eaad91bf3e6cdb",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -50,7 +58,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/breather/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ef93fd56a2931350e3d6be0d974671ab9cab2eb98534de1d469f07e67ab33484",
+      "current_build_sha256": "3599e7d79096de7923c4b1159fb822b73062cfa6505f38540ce92bf9f49213a5",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -79,6 +87,14 @@
         "build/msplus/matujuice/src/custom/breather/manifest_pedal.json": "2466f5a885178912d735fd9c53b45e640ae60c0a758746e643a3c87f571ec50d",
         "build/msplus/matujuice/src/custom/breather/breather.c": "2fa49935f2b6dc651711ec8e5dff1a025666686d93ac72c5b082220d2c4bf1b6",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "ef93fd56a2931350e3d6be0d974671ab9cab2eb98534de1d469f07e67ab33484",
+        "artwork_binary_sha256": "3599e7d79096de7923c4b1159fb822b73062cfa6505f38540ce92bf9f49213a5",
+        "dsp_sha256": "644652f93e3a221c6b492583c00e9024ed73217f1e2dd414f9ee3ffd43e900d4",
+        "source_sha256": "4dfbf4bcc11ae5c3c9ef7c217e180c453aeb9c09d656a68cbb8f1c10c2cf9f66",
+        "icon_sha256": "74b677806e71c3f6a26f9e8d628d59676f5ebbc23924711029f9eb30a2af1532",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -88,7 +104,7 @@
       "family": "original",
       "build_report": "src/msplus/corrupt/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
+      "current_build_sha256": "e3d7a7249d4200f09803f438d4840c740f6c383b83800199484505ab313a1aa2",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -116,6 +132,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/corrupt/corrupt.c": "7e5782e55dd7e60191e26184aec640faf5022107239fc8cc06d2e60fbe65d3da"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
+        "artwork_binary_sha256": "e3d7a7249d4200f09803f438d4840c740f6c383b83800199484505ab313a1aa2",
+        "dsp_sha256": "b3371b29502239bd870fecea36c246590acce7e33998ebefe654828f8f4ed64b",
+        "source_sha256": "b09d58a5a4d5a98392a5887a88729e960e74696362742770e26288300ef999be",
+        "icon_sha256": "56d856e0dbe43211c7a1a822774d10eace32b2591a37e28bbc3288c370f1685b",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -125,7 +149,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dirtbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
+      "current_build_sha256": "b3c15150b47645f87d24114bc96aad07eac18d470e76fe447cf0fe44fec096f4",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -153,6 +177,14 @@
         "build/msplus/matujuice/src/custom/dirtbox/manifest_pedal.json": "33f33b136f9b626d8cf72a67b0702098f697e833fac476f89646b0c9d5860037",
         "build/msplus/matujuice/src/custom/dirtbox/dirtbox.c": "138c7babebe48ebf547c8c57d9f8d408b8de395e57285e2a88001a8ae27755f5",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
+        "artwork_binary_sha256": "b3c15150b47645f87d24114bc96aad07eac18d470e76fe447cf0fe44fec096f4",
+        "dsp_sha256": "b97b73d967d5fa8cc23d72e6235c7a79c10daac6d980d3101c9b9952ddbee1d5",
+        "source_sha256": "bace1a0e78379c703b685fec363939e9068cfe031f060f4176ceb447c121c42d",
+        "icon_sha256": "d1ea8afca37380d3626f1f0b24be4cbc1e04a4d6364f6fbedcc7ed8ba41bce81",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -162,7 +194,7 @@
       "family": "original",
       "build_report": "src/msplus/dissolve/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "4a447d2b6feb0e6048dc725ea1507d694f95a6fd4d4989884949c6c612008acb",
+      "current_build_sha256": "e33b83d9d2fb26ecc109dd1212c7eb3588395fd2a72b45997c5f63944196414f",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -189,6 +221,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/dissolve/dissolve.c": "a6cbbf109ba97e5688c58ca9c76e55cf250ab473d7998c5711206a27d97fc647"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "4a447d2b6feb0e6048dc725ea1507d694f95a6fd4d4989884949c6c612008acb",
+        "artwork_binary_sha256": "e33b83d9d2fb26ecc109dd1212c7eb3588395fd2a72b45997c5f63944196414f",
+        "dsp_sha256": "8481fcd419a440db2365c2c55cbb3c18fe07b826dbe823b92bc3318368aa07cf",
+        "source_sha256": "fca2d7aa3db45f2b60cc020aabf5cdd8343d453af9ded81941dbd4ec7e3d5b98",
+        "icon_sha256": "3c695c36e71da13d7e88deb5119f68ea2fa152d9da033840820a71ddbc87aa67",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -198,7 +238,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dualshft/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "8ba2ce481db790950beb5fe3076c027af4491d7b030d902ef23d5269550b4414",
+      "current_build_sha256": "1594dc66eba6830267de9dbc4b3c3c17bf17f3da761901530af0af8110b02200",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -227,6 +267,14 @@
         "build/msplus/matujuice/src/custom/dualshft/manifest_pedal.json": "48668d2e42ac265a74a5ee70c6e5c8ed6fc265455910c8e980ceda1a5477aa0d",
         "build/msplus/matujuice/src/custom/dualshft/dualshft.c": "d0b79ac32e0d377cb34046f156caade3fb0ac1800f2eb5c18be1759b1f4c5c17",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "8ba2ce481db790950beb5fe3076c027af4491d7b030d902ef23d5269550b4414",
+        "artwork_binary_sha256": "1594dc66eba6830267de9dbc4b3c3c17bf17f3da761901530af0af8110b02200",
+        "dsp_sha256": "d6c8f8297b4b7bf9c138b68f94b48f21f81dbf0a55dde0f2f7baf497ea59e05d",
+        "source_sha256": "7df794f675c79414744e533209d355e24da7c08d79573a659aafeb2b4528ec11",
+        "icon_sha256": "2f19578020fc2e8cc6c7da1013992cdf181c46e8805452442b0b3b369c2f1cdb",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -236,7 +284,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dubsiren/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1b2dca67f218c00318a9eb766eb6a29959a12952409d63b0fb7760d055bb7ed8",
+      "current_build_sha256": "f8e7addef165ae07ef5d41dc07586d65c243a5c5274c060d682f09a1b5cf3097",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -264,6 +312,14 @@
         "build/msplus/matujuice/src/custom/dubsiren/manifest_pedal.json": "d4ceac6fea421e357e97d88a653c21fb4fef67206c4e928b59327b058f96daf5",
         "build/msplus/matujuice/src/custom/dubsiren/dubsiren.c": "50e7bb8b94af0dad750531151fafb1f042f72f0506b7169a0b1a53ddf84ddbe7",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "1b2dca67f218c00318a9eb766eb6a29959a12952409d63b0fb7760d055bb7ed8",
+        "artwork_binary_sha256": "f8e7addef165ae07ef5d41dc07586d65c243a5c5274c060d682f09a1b5cf3097",
+        "dsp_sha256": "3655f13a8ab5b83d4fd0497233b6f0f3f16534fbb8df5489db8cae042abe9f3a",
+        "source_sha256": "6af3c9fc4bca669055ef5fcc07d1856c989125e23042f326b0c2eec9ce48169b",
+        "icon_sha256": "29716a783cacc85397706d5c6e37c5409a32fc07cf62549f64b80c7fccc3170a",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -273,7 +329,7 @@
       "family": "original",
       "build_report": "src/msplus/dustbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+      "current_build_sha256": "60d6a5b76b81c2309d7f698355a0948615ad102e2617fe2c91b50fd77d1470c5",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -299,6 +355,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/dustbox/dustbox.c": "9842544e2152699725ded1bc2fe4cac0328f1ea8e0247559ec5129d295914a29"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+        "artwork_binary_sha256": "60d6a5b76b81c2309d7f698355a0948615ad102e2617fe2c91b50fd77d1470c5",
+        "dsp_sha256": "ef68d79561f35311dc11742528defcd260cb80d32de518f98ae4f93555acde27",
+        "source_sha256": "3a411ad17ce7a9fef8b05bf2ee156d6bca8364fdad7ed8f1c09038acfc574f9e",
+        "icon_sha256": "173295484c4b4ff90ebfae885a6a580673651fb44c291b28c2956a4faabdc504",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -308,7 +372,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/eugate/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "c37506e1b2873da4e786e41a36cbf149ac60e9a19d426ab12a3d83976061800b",
+      "current_build_sha256": "ba97c2dabb8874465e9b6c59cfe5824ec445cd546436029af12f2122a7de8f1a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -338,6 +402,14 @@
         "build/msplus/matujuice/src/custom/eugate/manifest_pedal.json": "a573aea29b9d8f72985422d070e92c46fa2d64be5143868c4926faadab6c42f4",
         "build/msplus/matujuice/src/custom/eugate/eugate.c": "a53619b2022d3092f8541c668fa548a60ffdab43ddc92521d0ffddd2cbbedec7",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "c37506e1b2873da4e786e41a36cbf149ac60e9a19d426ab12a3d83976061800b",
+        "artwork_binary_sha256": "ba97c2dabb8874465e9b6c59cfe5824ec445cd546436029af12f2122a7de8f1a",
+        "dsp_sha256": "574de8019366ab1f69efbe113113398a6b582f0d8e03e8a646fa118f45df5b14",
+        "source_sha256": "7dcf2c922220a4ea679c33c72e88ca2c0fed71e91c1dd3092d89571842af7e06",
+        "icon_sha256": "734bbecdc3a377efd6ed7f57904b41dc120efad22933d1128b1cf74177b6a1ad",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -347,7 +419,7 @@
       "family": "original",
       "build_report": "src/msplus/flower/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
+      "current_build_sha256": "6c14751978b00720f4d5d8601a140961466e00438877e59a92bf0e1318f73c9c",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -374,6 +446,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/flower/flower.c": "509f252da9d9c175582a9a05645f8e261638c066910207bea7b82cb14b2e57d6"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
+        "artwork_binary_sha256": "6c14751978b00720f4d5d8601a140961466e00438877e59a92bf0e1318f73c9c",
+        "dsp_sha256": "206a319e4dd054432c9bb3b21fb5e8f98dace5e6c7839bbe4050d143ac872dcc",
+        "source_sha256": "0ddf28aacd2ddacc18219edd702623f660bc6c921c58d27fd57f9f55d67b87c7",
+        "icon_sha256": "f37ff004b58e3279eeeca368ce4bbf3f94fc955c6377e64be6685e58ba6bcf1c",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -383,7 +463,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/formant/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "a8ffe626bc6591435968a7ab9097ad65a8e41dee91a28f4bf29f62f71c2c6e28",
+      "current_build_sha256": "d40a63a8f21eac026e02f445fa769feb01cfeb2bd783420af58df28d3680f022",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -412,6 +492,14 @@
         "build/msplus/matujuice/src/custom/formant/manifest_pedal.json": "71b5ceefb586b58df37d901490f25a17750a424ef2e4d21bd28e23c5ef7f89c2",
         "build/msplus/matujuice/src/custom/formant/formant.c": "cdc2bfcd36f0edb825f97ea49981bdc12edbec9e63d7706fbb2162eb228ecfb3",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "a8ffe626bc6591435968a7ab9097ad65a8e41dee91a28f4bf29f62f71c2c6e28",
+        "artwork_binary_sha256": "d40a63a8f21eac026e02f445fa769feb01cfeb2bd783420af58df28d3680f022",
+        "dsp_sha256": "799c0be7be0ee6e0b5c9798ef2d476bebbde93f25f33ea851a9ca5fb62fdaef5",
+        "source_sha256": "3ada499ec459ab124cebdfc84c5cd76fb6b0fb5a37aebce92a63b7ff2d510315",
+        "icon_sha256": "d276ff1f11c1461630d3953b9ff09c9f86f48492704054599da0e7c5b113278b",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -421,7 +509,7 @@
       "family": "original",
       "build_report": "src/msplus/galactic/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
+      "current_build_sha256": "62c6955131c60e5b507084a8fed4cea28c64a094a0306d57ab1292e977584718",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -451,6 +539,14 @@
         "src/airwindows/galactic/galactic.c": "6b5e818b4d74a03b95de793fe62ff4532e9e0bae9d7252dad4887164b3d34736",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
+        "artwork_binary_sha256": "62c6955131c60e5b507084a8fed4cea28c64a094a0306d57ab1292e977584718",
+        "dsp_sha256": "f27735cc030a6e55f6e8a2989e0e96a4e022632708748b7e9f432f5fe9a979ec",
+        "source_sha256": "ff784a62dc063b5118a5d65d911f1dada732b8dff9fd16a20b988274d4a40fe0",
+        "icon_sha256": "d48624b35b08c597e7398124cb4cadfbc81f92b63d99d7abf744f1d700e12641",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -460,7 +556,7 @@
       "family": "original",
       "build_report": "src/msplus/genloss/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "be23a59f485b60faa14ba6bb3a1a96b200ccb932fbc0b71b9052fb1dae231714",
+      "current_build_sha256": "0e28da8254e11c088de697e5b94b3c4f3f4321eb37516b07e603abced15ebfbd",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -487,6 +583,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/genloss/genloss.c": "b828776b15704a40b32b9ec2a404480c026ee0bb1ad01933595111120b89e277"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "be23a59f485b60faa14ba6bb3a1a96b200ccb932fbc0b71b9052fb1dae231714",
+        "artwork_binary_sha256": "0e28da8254e11c088de697e5b94b3c4f3f4321eb37516b07e603abced15ebfbd",
+        "dsp_sha256": "f479467f54c8f87f52f77c1f2d289e2ecf36fdcc92a27536323f15542c5cb527",
+        "source_sha256": "363e885df60ba4a16a457aa4dbc35e579a0b6e4d97058ac214c496a519c672ea",
+        "icon_sha256": "c684c8c9c1c609053b43a644fca43af70c8309ad35e9018fb0eb1e48c3a78055",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -496,7 +600,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/griddly/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "90727db42a6cda7b88c3de864b0de2cb2b11411f9ba39658c106926b7fb60c30",
+      "current_build_sha256": "8f4251ed2189c792c128e3f26b82ebdd3cb4494586d7f30240050f2262b9a2b4",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -528,6 +632,14 @@
         "build/msplus/matujuice/src/custom/griddly/manifest_pedal.json": "a7f8c78628f00ac3f4f86124a7abc645215b8c8dd89c74b9966c90f61a4d821f",
         "build/msplus/matujuice/src/custom/griddly/griddly.c": "7ed37ee59a95be8bf3fdc060e46bc32a1c54a5ed58eb28315e03ad0d591896e6",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "90727db42a6cda7b88c3de864b0de2cb2b11411f9ba39658c106926b7fb60c30",
+        "artwork_binary_sha256": "8f4251ed2189c792c128e3f26b82ebdd3cb4494586d7f30240050f2262b9a2b4",
+        "dsp_sha256": "4421ff90c2c21a7aa4aa0dce896542dabac2d7efc0b19dc6bc7a8b858e643102",
+        "source_sha256": "832a4442de021b9a190e4c1cfa8c5ddf4d4ee14628267cb524408bdec183b518",
+        "icon_sha256": "8d213ea8b39bb2d7b5ebdd8707ac5dccf06ba22bc27182a0be1447d4eaa1bb19",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -537,7 +649,7 @@
       "family": "original",
       "build_report": "src/msplus/gyre/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "27479645b204afbf0156379608e5b48580803d29dcf55a23545d295e8c5fca70",
+      "current_build_sha256": "31fb4bf6e1828838e79570e477ad2cf3e3a9b7fa385d4504b43f9d2b94047554",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -564,6 +676,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/gyre/gyre.c": "93ccf567adea3623523796f08f4962895d9f10e0577d816b3255795ce915bae7"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "27479645b204afbf0156379608e5b48580803d29dcf55a23545d295e8c5fca70",
+        "artwork_binary_sha256": "31fb4bf6e1828838e79570e477ad2cf3e3a9b7fa385d4504b43f9d2b94047554",
+        "dsp_sha256": "f964e616030e81c3c5cc7e0ee4f3b2ffe9bce9374239b6475a8f164f3dcee4e1",
+        "source_sha256": "f33549e6e5c60241e44b9592ab0e4d45fb0f2973af4018ffc3a3a5af21d906d3",
+        "icon_sha256": "9edfe5f49aae2967e346f2550ba187ad3ea4078bb5aeadfa486be8db812caa25",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -573,7 +693,7 @@
       "family": "original",
       "build_report": "src/msplus/howl/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
+      "current_build_sha256": "1ccbd80595751309e0ac693eb4b849d95bbfec9528fb2133dba0443f15efb0fd",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -600,6 +720,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/howl/howl.c": "ce118f36d911c6b5b4e2d9c01e2e1a7daeea4fc0f6bcddb97d4e5b551fe94b68"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
+        "artwork_binary_sha256": "1ccbd80595751309e0ac693eb4b849d95bbfec9528fb2133dba0443f15efb0fd",
+        "dsp_sha256": "24b0f00ef4f69ff1875075089b76141b7bc5628f75739af366cd98e313c3ad66",
+        "source_sha256": "fd2ee28bd74bcfc3b110b73f0741bb142207a2d2227b7577a217bce8f6995824",
+        "icon_sha256": "1d7fdfbb7a54f8d804ab3b3cc429ac2d9e59125561b0f86a4af999b86a0856a3",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -609,7 +737,7 @@
       "family": "original",
       "build_report": "src/msplus/hydra/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "85d69b0a8bb44e157070d4ac79b59eae02a9f87eb648376d83cf3134f44371a6",
+      "current_build_sha256": "afc23d9f149261defe4ea7f93f33627ed507fbbceb7c5dd9ed3c8e6e40f03308",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -636,6 +764,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/hydra/hydra.c": "67cd433c780490ab7a90d69fdce9842bc21537ca16335347508275b49aaea7f1"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "85d69b0a8bb44e157070d4ac79b59eae02a9f87eb648376d83cf3134f44371a6",
+        "artwork_binary_sha256": "afc23d9f149261defe4ea7f93f33627ed507fbbceb7c5dd9ed3c8e6e40f03308",
+        "dsp_sha256": "18c86b5e8f34829e311021f24a403efcc93021fbff29e97a397297436ab6600d",
+        "source_sha256": "211c54a9eb16e1d851746f9255538e34281d7750549b99449e30d572646bcea2",
+        "icon_sha256": "525feffaf2487ffcf51029036860f0be33af323ec215ffc0c32659e0c1fad4ca",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -645,7 +781,7 @@
       "family": "original",
       "build_report": "src/msplus/klang/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
+      "current_build_sha256": "48fecdfd7016d55eb7aefaac401786aa0f20052e525064302ca9aff98b5c887b",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -673,6 +809,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/klang/klang.c": "a9fee170b31849addd07656c2e386bb95ed1a26865184214e9c5d3d375232206"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
+        "artwork_binary_sha256": "48fecdfd7016d55eb7aefaac401786aa0f20052e525064302ca9aff98b5c887b",
+        "dsp_sha256": "8e29521fb32388a88519043e934830f4e7c82c75b5c760c99f9cca15ed9bd048",
+        "source_sha256": "92689806143c689c407edc44c32c20fc2f3f618a2ead40607774f38fb1e75842",
+        "icon_sha256": "087462985e28baac0936be442beb745f8e0884d734a5194404dc4c5d494f95ed",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -682,7 +826,7 @@
       "family": "original",
       "build_report": "src/msplus/mangle/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "d052cf8a32579d689eeb249926a247f48850f00900b2087133cd2df0851b0087",
+      "current_build_sha256": "9ca9a0551ea997dc654533fd00223671ea727e219df1505a47afce7d80e26968",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -709,6 +853,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/mangle/mangle.c": "c8d69c78405e4b598616de18cf051f0ec93224c7e3ae5a5fa42ef96265e37684"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "d052cf8a32579d689eeb249926a247f48850f00900b2087133cd2df0851b0087",
+        "artwork_binary_sha256": "9ca9a0551ea997dc654533fd00223671ea727e219df1505a47afce7d80e26968",
+        "dsp_sha256": "e2dc7b3e3d6b31a909ddc6a182ccc5be360e3dad13888a9afdec7a1200c61b4b",
+        "source_sha256": "0debd6365d0e3982d9c8e7d503f3773b77f9d5c05f4e3512b701d614afe6c7f9",
+        "icon_sha256": "4da97c778d90e7bb319cc16c608ffc603de06345ae5e725cb76ee511af5c3990",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -718,7 +870,7 @@
       "family": "original",
       "build_report": "src/msplus/microloom/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
+      "current_build_sha256": "87998249bf11189a19fd6911f70486a852d17d2d6212e4c970cf62cfd67abe19",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -745,6 +897,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/microloom/microloom.c": "87497f0029baf0cbaaa1d604575c82fdf325e4cc02606c869f854a2303e5e3c1"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
+        "artwork_binary_sha256": "87998249bf11189a19fd6911f70486a852d17d2d6212e4c970cf62cfd67abe19",
+        "dsp_sha256": "8ee4162cbc657abc57c9a7cfe151bae8b9621f61e150aae7f9987fedc4d22b88",
+        "source_sha256": "a06e785764d982f46b47d187723b706f533d6dbb1a9817756421c6c84e7332b8",
+        "icon_sha256": "36d026cc42d841148dcee7aa784fea78c14c2802b50dd476e982b8c368b95f88",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -754,7 +914,7 @@
       "family": "original",
       "build_report": "src/msplus/oxide/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
+      "current_build_sha256": "20a17f6c8a4fee2dc80ebf6ec615527061327c4d94cd1209624835036fb234e8",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -784,6 +944,14 @@
         "src/airwindows/totape9/totape9.c": "2af8b64be7700d6b5b8993ba4300a8d8f72ac9311fbd0bf54e67666e83e30da0",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
+        "artwork_binary_sha256": "20a17f6c8a4fee2dc80ebf6ec615527061327c4d94cd1209624835036fb234e8",
+        "dsp_sha256": "4c43c8b30eaa79a6627b6bf94681f304d0850e41620dab4a1f7dbe2d23b7c116",
+        "source_sha256": "d3c02d06aa484a3668ef092af68c1ad5bd5dfadb0a5a807ebf20bf267b74e96f",
+        "icon_sha256": "e5aa3727fdcfa10acd42ba61e6fb653ac684e6c5fbc985d632156973ea17652a",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -793,7 +961,7 @@
       "family": "original",
       "build_report": "src/msplus/rewire/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "89934bc2b2d1eddaf15ce71db411d95b466c8bd0d82554f6a5f905bc16fb1e54",
+      "current_build_sha256": "ea5fa5906151ac789748401be49fcdf903d9126dbe3df352beb2d6c45ac12caa",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -820,6 +988,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/rewire/rewire.c": "321c1b44389499b74299931c9f11c38065bfde72ae9e368bd64961b5ec1fafdd"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "89934bc2b2d1eddaf15ce71db411d95b466c8bd0d82554f6a5f905bc16fb1e54",
+        "artwork_binary_sha256": "ea5fa5906151ac789748401be49fcdf903d9126dbe3df352beb2d6c45ac12caa",
+        "dsp_sha256": "5178a92dc9e6771bfb2961ecb707d830890b76e27e65d541ef7c508c20c5853c",
+        "source_sha256": "85731bf290ba34df5081e6d1d2300e85c1cbb7e0a7e3b8813eec58645f287f6f",
+        "icon_sha256": "e27bf1654c4fd387b2406396264de2d31a4b91b1ac217921f0e360641d84396c",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -829,7 +1005,7 @@
       "family": "original",
       "build_report": "src/msplus/rooms/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
+      "current_build_sha256": "b58dbebf82c2e3ccd98fd02b48d50869b293eccd91a1b1629b83cb45235f9184",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -856,6 +1032,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/rooms/rooms.c": "141d54d94abf8a666793474c3e12be6c37a4d95a160dc276034c36647bb55d59"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
+        "artwork_binary_sha256": "b58dbebf82c2e3ccd98fd02b48d50869b293eccd91a1b1629b83cb45235f9184",
+        "dsp_sha256": "8fc1ff8730f45fb37fbcabd1eda247bb4c9f5369bf764dbcf294c24845a9abaa",
+        "source_sha256": "ff96e7d325d7c3a92a59022e7f4013630f64a122831764ae6afa883881104596",
+        "icon_sha256": "311169930236c60f077a5383d23a12d3f5f9f8453e1ecb1345bdf89b9befa82b",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -865,7 +1049,7 @@
       "family": "original",
       "build_report": "src/msplus/scorch/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+      "current_build_sha256": "2e57384e52e6186a3ad5255dd4ec77fa0118a7c0916d8e04cd74f5bbfa953a37",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -893,6 +1077,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+        "artwork_binary_sha256": "2e57384e52e6186a3ad5255dd4ec77fa0118a7c0916d8e04cd74f5bbfa953a37",
+        "dsp_sha256": "5567dae3611483d5361590ceadfa61d5919c2207c199559ece76e0afd0c05e69",
+        "source_sha256": "d8baf62562748946f07c731646acce2ad52ba8c6342a41f0bac21135319753ed",
+        "icon_sha256": "e639f3d1b35a75175922f0a020c293958273a5458fdbeee2c784ed2484c8717a",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -902,7 +1094,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/scrub/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "fadd7a95d0a8d05ed3213a46b6546c014a10ebd2bae8448eaf87fb8aa177ee85",
+      "current_build_sha256": "56619646e6e0b55e238b1ddc221599cdba2d61d09be0124ec73bf37e96b5350a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -934,6 +1126,14 @@
         "build/msplus/matujuice/src/custom/scrub/manifest_pedal.json": "a66b12d6c37f64be7362582a53166819c65403408c3b8e2df5f23e09278caa7f",
         "build/msplus/matujuice/src/custom/scrub/scrub.c": "8a2653cae8201dc13dc5e8af2fa9ab66a9a06a7fa0d3a161fafa8fea7b75c5dc",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "fadd7a95d0a8d05ed3213a46b6546c014a10ebd2bae8448eaf87fb8aa177ee85",
+        "artwork_binary_sha256": "56619646e6e0b55e238b1ddc221599cdba2d61d09be0124ec73bf37e96b5350a",
+        "dsp_sha256": "85fcc4ae241fa3844a5ec4612d4814d2a5632ba7aa91f234fb4dede34553961f",
+        "source_sha256": "1fbb867fccc3afcb6387095c72f3195e02bd3e0095fed74c22f1e44f0acd1a07",
+        "icon_sha256": "88db5e522da05fc8823ab28c7a4ba3b866cf664fd77d0e58ff6d547a419a8747",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -943,7 +1143,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sgnl/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "4d92625a75e49a512bc698369bc820509a3a010b7a49d6726c42604e9d6fd70c",
+      "current_build_sha256": "df0f949d6aaf1dfd448cf4c863ac6478c0ed26954d8a8ba0d48cf16ed8769397",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -972,6 +1172,14 @@
         "build/msplus/matujuice/src/custom/sgnl/manifest_pedal.json": "27fede33c0a0029d3c75a1a1059aa491a0ad62bd269d700667792db68fc27d5f",
         "build/msplus/matujuice/src/custom/sgnl/sgnl.c": "aa15e6e030051f828e490ae0688898478b342aca332dee289a4699ac3e831590",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "4d92625a75e49a512bc698369bc820509a3a010b7a49d6726c42604e9d6fd70c",
+        "artwork_binary_sha256": "df0f949d6aaf1dfd448cf4c863ac6478c0ed26954d8a8ba0d48cf16ed8769397",
+        "dsp_sha256": "8f8c71f49d0b1e64c67b56b3ec4123c698a477691975743566398f7e97d3bb66",
+        "source_sha256": "65674a07c3ff9dc1e324ca51a0a62603223bda467c2cfe44bb7dc8dbbb43931d",
+        "icon_sha256": "1280ae93799eb835e2fbc69ada825477c8635484853a0932d0494ef4b0f53765",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -981,7 +1189,7 @@
       "family": "original",
       "build_report": "src/msplus/shatter/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
+      "current_build_sha256": "e267491c32cd3fe2ae66ba20c680be72294c602b61de4a70d763e4d2e413bd91",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1008,6 +1216,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/shatter/shatter.c": "ea65fffa8d98670597314d0814a80e62488880ed73208d63cb10acfc1bf32795"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
+        "artwork_binary_sha256": "e267491c32cd3fe2ae66ba20c680be72294c602b61de4a70d763e4d2e413bd91",
+        "dsp_sha256": "529ae4e03b22f00c8b8fdf258f599042bc0d49b4a2376bea36eba52c35897c3d",
+        "source_sha256": "a90872fb7b8d4b707ad72075ac52a8d6b796fd9873a1ebd2f6382793678470d3",
+        "icon_sha256": "676773cd2f3ebb01e9de63a4b5ea56d00537fd6cab03cb514240f5ea5ab072b1",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1017,7 +1233,7 @@
       "family": "original",
       "build_report": "src/msplus/spiral/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "b978492de267482028f720004cdefaaa62752c5336fcbcf62e5cf3cf8fb34471",
+      "current_build_sha256": "5812b150976093ad6bd61425c7d6407087b7de4f2bf4fc7606fdfab8e3a75429",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1044,6 +1260,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/spiral/spiral.c": "03cc2c42b34e095212d2a4da864e712a9ffa7d0e9e34eefbd63b9f52112264ce"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "b978492de267482028f720004cdefaaa62752c5336fcbcf62e5cf3cf8fb34471",
+        "artwork_binary_sha256": "5812b150976093ad6bd61425c7d6407087b7de4f2bf4fc7606fdfab8e3a75429",
+        "dsp_sha256": "5e86921018d6372b4ea79f69588c4abacc2f67e42180391ca5c8c43c8eda931c",
+        "source_sha256": "e0815b3e936ef6e85c543d8ad1103652f5f7d62fc0b41e3a95ffcb978e7507c6",
+        "icon_sha256": "90281717ba768301b070ae17ba5dfad6768a2d1d4dc0ae0c39c82476ed4d5cf1",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1053,7 +1277,7 @@
       "family": "original",
       "build_report": "src/msplus/spool/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
+      "current_build_sha256": "1a622ff519a3fd990953153b06fa84d250d5462bf93581c34b7ebb512961ef7a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1083,6 +1307,14 @@
         "src/airwindows/tapeecho4/tapeecho4.c": "e113ec842938821d56e607ba65ddd6ae53f11117257fbd657a06bb0e0a57d6f8",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
+        "artwork_binary_sha256": "1a622ff519a3fd990953153b06fa84d250d5462bf93581c34b7ebb512961ef7a",
+        "dsp_sha256": "babdf8b68b41353a8b9e4be0ddb6e13c424866c641befc361eb31cd9d77563fb",
+        "source_sha256": "ae6f65112acc35d277970c3a48beadbbd4059ce7dd0d5387874a539a389ae144",
+        "icon_sha256": "ba1a057036e33b04192a2aa951de37161b1d3579178f1a56f7a01791bcd58954",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1092,7 +1324,7 @@
       "family": "original",
       "build_report": "src/msplus/stasis/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
+      "current_build_sha256": "f6849b71fc2e26d123465886c1a97aa8670bfdeb8b8ce7d5b33524b33e482f5d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1120,6 +1352,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/stasis/stasis.c": "3a9179159c9a6d70e80738eede3eadff974e6b9e4831448242dfeeb012a4aafb"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
+        "artwork_binary_sha256": "f6849b71fc2e26d123465886c1a97aa8670bfdeb8b8ce7d5b33524b33e482f5d",
+        "dsp_sha256": "d9b1d404a4f6ea3fa3efa41dabd22f1ca69d888f3f2c5ec0a1cda7537df22985",
+        "source_sha256": "4726af8bb58558ac107c1089d2e4df5536fa58027fd671ed499b14fa64dcb3dc",
+        "icon_sha256": "0732815a55ed9c689380d8f5148284ba3bb8e66077e1a3677cef74eb68905000",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1129,7 +1369,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sweep/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
+      "current_build_sha256": "3c45de4df59e2fb409918734553e388f84082cc428e1d461ec93854857146054",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1158,6 +1398,14 @@
         "build/msplus/matujuice/src/custom/sweep/manifest_pedal.json": "f80c281329c5cb0662526e600850cd901274248bed3d31be225a82af615e918e",
         "build/msplus/matujuice/src/custom/sweep/sweep.c": "3055ac9a55f45e75b872597e39a3bf2ab1cf000d76c180e85aa313094d474bc5",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
+        "artwork_binary_sha256": "3c45de4df59e2fb409918734553e388f84082cc428e1d461ec93854857146054",
+        "dsp_sha256": "34af9d9e7b828b3edf4b9f2f8621455db6352318fcada68db61a004ca38e7c4b",
+        "source_sha256": "5b4faa80931708ad36b4edba0f8850859ff06c4481f22b8e55af1f1f7e6219e8",
+        "icon_sha256": "0bf39e88ea1126c938ab9a44187a3d5c45c2394bb4764a0088c917debc8193b2",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1167,7 +1415,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
+      "current_build_sha256": "9c3333823bd7885caf8c103ae0f3e3b8bc79a422a6a824903fc2e4ee36c3814d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1194,6 +1442,14 @@
         "build/msplus/matujuice/src/custom/synceq/manifest_pedal.json": "30cc497e2aebff5ab72e282df1653ac640d124d7ef4f62ef263b405996b6eb3a",
         "build/msplus/matujuice/src/custom/synceq/synceq.c": "f2429c1c44e7555cd52d2e3a2b7c8b797052ee3be2b81245f11df802e69505ef",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
+        "artwork_binary_sha256": "9c3333823bd7885caf8c103ae0f3e3b8bc79a422a6a824903fc2e4ee36c3814d",
+        "dsp_sha256": "c0ce976e1e4492ec468cf2dd43c2a7df905973698e0eea2aedb0e59f7df35305",
+        "source_sha256": "26395afafcbd8e0aa7854f7da907456eeffaded10c3a7358e510311e043a5e75",
+        "icon_sha256": "ae380ccb28da276cfba7873e511072c8ccd392276bdf64a1935779559dc2545d",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1203,7 +1459,7 @@
       "family": "original",
       "build_report": "src/msplus/taffy/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
+      "current_build_sha256": "2ceb0a58231b51a40002205e8fe90ac8c8371665a0376a613d571d379a139a8e",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1230,6 +1486,14 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/taffy/taffy.c": "26279405b8a3c96b9c15cd62d7c952c67c932fde14c3dae9042c4a77117a324f"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
+        "artwork_binary_sha256": "2ceb0a58231b51a40002205e8fe90ac8c8371665a0376a613d571d379a139a8e",
+        "dsp_sha256": "a4b96675d0ec5b106dbae4bc2aaffb8d6447bc80d684568c26faedcd6bab1191",
+        "source_sha256": "4e2846507a46237787a77d9923373c5516061bc1be653d9d1e327edd02a34af7",
+        "icon_sha256": "36ebe57714c6525a9b628b72a3592fcb0e991830ac66d262891f6368f2489703",
+        "dsp_byte_identical": true
       }
     },
     {
@@ -1239,7 +1503,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/wavefold/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
+      "current_build_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1269,6 +1533,14 @@
         "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
         "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "d34bb1035a16feea26ef2a17d9bac9b2905c6fffa2021a929d88879a76692b4e",
+        "artwork_binary_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
+        "dsp_sha256": "1de2a26193db445f8194b9236779f7879477b3fdb26f3627023cb55d827e82bd",
+        "source_sha256": "a4f24b62af6ad51a96a236a8a0e8cdc86b16a111f9461fa853d74d9bd6f83ddd",
+        "icon_sha256": "48719e93290cbc10a8d7c8c03210c5b03673e6303c3631aa777b1b368ae8fcfb",
+        "dsp_byte_identical": true
       }
     }
   ],
@@ -1324,14 +1596,14 @@
   },
   "verification_logs": {
     "native": {
-      "path": "build/msplus/native-rng-pcm15-all-01.log",
-      "tests": 22,
-      "sha256": "bd554eb1d107ab46c9a89a265227f1c8d9a6d5344f34eb034b53690dee2129b6"
+      "path": "build/msplus/native-artwork-01.log",
+      "tests": 23,
+      "sha256": "4b87e346d04c8ec0b336e7005236e1cc936705e4d203c355f1dc995e7c415eb9"
     },
     "tools": {
-      "path": "build/msplus/tools-scorch-linear-03.log",
-      "tests": 18,
-      "sha256": "ad358fb264482a6cb530c9cc3c24a52acb9d5c411d9c608acc2c163eea69ed38"
+      "path": "build/msplus/tools-artwork-01.log",
+      "tests": 19,
+      "sha256": "7f1bdff2773bc61b6e1638535ec36aef08524ca9207d0e0eeb43c62b87ffc697"
     }
   }
 }

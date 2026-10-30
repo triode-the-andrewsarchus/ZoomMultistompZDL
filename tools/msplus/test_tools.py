@@ -11,6 +11,43 @@ from backup import CheckedInput
 from audio import analyze, require_loopback
 
 
+class ArtworkTests(unittest.TestCase):
+    def test_artwork_preserves_all_non_icon_bytes_and_rejects_other_changes(self):
+        import json
+        import zlib
+        import zoomzt2
+        from artwork import ROOT, apply, check_variant, render_frames
+        from zd2_from_scratch import build_zd2, ICON_TILE_BYTES
+        original = build_zd2(blob=b'original DSP', name='XXTEST', groupname='DELAY',
+                             group=7, eid=0x07001300, icon=bytes(ICON_TILE_BYTES))
+        cover = ROOT / 'src/msplus/artwork/wavefold.png'
+        self.assertEqual([im.size for im in render_frames(cover)], [(72, 97), (102, 128)])
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / 'wavefold'
+            (folder / 'build').mkdir(parents=True)
+            (folder / 'manifest.json').write_text(json.dumps(dict(filename='XXTEST')))
+            artifact = folder / 'build/XXTEST.ZD2'
+            artifact.write_bytes(original)
+            proof = apply(folder)
+            modified = artifact.read_bytes()
+            zic = artifact.with_suffix('.ZIC').read_bytes()
+            self.assertTrue(proof['dsp_byte_identical'])
+            check_variant(original, modified, zic, cover)
+            apply(folder)
+            self.assertEqual(artifact.read_bytes(), modified, 'Artwork packaging must be idempotent')
+            for section in ('DATA', 'INFO', 'ICON'):
+                parsed = zoomzt2.ZD2.parse(modified)
+                changed = bytearray(parsed[section].data)
+                changed[0] ^= 1
+                parsed[section].data = bytes(changed)
+                damaged = bytearray(zoomzt2.ZD2.build(parsed))
+                damaged[8:12] = (zlib.crc32(damaged[12:-16]) ^ 0xffffffff).to_bytes(4, 'little')
+                with self.subTest(section=section), self.assertRaises(ValueError):
+                    check_variant(original, bytes(damaged), zic, cover)
+            with self.assertRaises(ValueError):
+                check_variant(original, modified, zic[:-1], cover)
+
+
 class BackupTests(unittest.TestCase):
     def packet(self, body, length=None):
         n = len(body) if length is None else length
