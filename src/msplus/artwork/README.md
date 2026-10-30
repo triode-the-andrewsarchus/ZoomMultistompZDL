@@ -1,4 +1,17 @@
-# Original cover artwork for MS Plus
+# Artwork for MS Plus
+
+The current icons are independently drawn at both Plus resolutions in `native/`:
+72×97 and 102×128. Titles are typeset at each size, with a pedal body, four
+controls, footswitch and an effect-specific motif inspired by the original art.
+The normal Plus build and artwork-only update use these native frames directly.
+See [the complete preview](../../../docs/images/msplus-native-artwork.png).
+
+`native/designs.json` records the design choices, font and all 68 PNG hashes.
+`tools/msplus/art_designs.py` regenerates them using Pillow and the recorded
+DejaVu font. The committed PNGs are the packaging inputs; regeneration is not
+needed to install them. This is authored pixel art, with no factory image data.
+
+The legacy panels below remain as provenance and design references.
 
 These 34 monochrome 128×36 panels preserve the authored title and illustration
 from each original effect's 128×64 cover. Most use rows 0–35; Stasis uses
@@ -11,9 +24,8 @@ included. Matujuice's twelve designs retain their MIT attribution in
 [MATUJUICE-LICENSE](../MATUJUICE-LICENSE); the other designs belong to this
 repository's original effect pack.
 
-`tools/msplus/artwork.py` places each panel inside a portrait pedal frame, using
-nearest-neighbor pixels and the original LCD's approximately 3:2 pixel aspect.
-It creates both supported icon sizes, 72×97 and 102×128, with Stomphacks' ZIC
+The earlier artwork revision placed each cropped panel inside a portrait pedal
+frame. `tools/msplus/artwork.py` now packages the native frames with Stomphacks' ZIC
 builder and zoom-zt2's stripe encoder. The first frame also replaces the ZD2's
 embedded ICON payload. This ports static artwork; it does not transplant the
 old firmware's knob positions or UI renderer.

@@ -1,0 +1,357 @@
+{
+  "designs": {
+    "arrakis": [
+      0,
+      [
+        "ARRAKIS"
+      ],
+      "wave",
+      "dunes"
+    ],
+    "breather": [
+      1,
+      [
+        "BREATHER"
+      ],
+      "wave",
+      "breath"
+    ],
+    "corrupt": [
+      0,
+      [
+        "CORRUPT"
+      ],
+      "blocks",
+      "glitch"
+    ],
+    "dirtbox": [
+      0,
+      [
+        "DIRT",
+        "BOX"
+      ],
+      "wave",
+      "square"
+    ],
+    "dissolve": [
+      1,
+      [
+        "DISSOLVE"
+      ],
+      "blocks",
+      "dissolve"
+    ],
+    "dualshft": [
+      1,
+      [
+        "DUAL",
+        "SHIFT"
+      ],
+      "wave",
+      "dual"
+    ],
+    "dubsiren": [
+      0,
+      [
+        "DUB",
+        "SIREN"
+      ],
+      "radial",
+      "siren"
+    ],
+    "dustbox": [
+      0,
+      [
+        "DUSTBOX"
+      ],
+      "wave",
+      "octave"
+    ],
+    "eugate": [
+      1,
+      [
+        "EUCLID",
+        "GATE"
+      ],
+      "radial",
+      "euclid"
+    ],
+    "flower": [
+      1,
+      [
+        "FLOWER"
+      ],
+      "radial",
+      "flower"
+    ],
+    "formant": [
+      1,
+      [
+        "CHORAL"
+      ],
+      "radial",
+      "voices"
+    ],
+    "galactic": [
+      0,
+      [
+        "GALACTIC"
+      ],
+      "radial",
+      "orbit"
+    ],
+    "genloss": [
+      0,
+      [
+        "GEN",
+        "LOSS"
+      ],
+      "tape",
+      "broken"
+    ],
+    "griddly": [
+      1,
+      [
+        "GRID",
+        "DELAY"
+      ],
+      "blocks",
+      "grid"
+    ],
+    "gyre": [
+      0,
+      [
+        "GYRE"
+      ],
+      "radial",
+      "spiral"
+    ],
+    "howl": [
+      0,
+      [
+        "HOWL"
+      ],
+      "radial",
+      "rings"
+    ],
+    "hydra": [
+      0,
+      [
+        "HYDRA"
+      ],
+      "wave",
+      "hydra"
+    ],
+    "klang": [
+      1,
+      [
+        "KLANG"
+      ],
+      "radial",
+      "rings"
+    ],
+    "mangle": [
+      0,
+      [
+        "MANGLE"
+      ],
+      "wave",
+      "mangle"
+    ],
+    "microloom": [
+      1,
+      [
+        "MICRO",
+        "LOOM"
+      ],
+      "blocks",
+      "weave"
+    ],
+    "oxide": [
+      0,
+      [
+        "OXIDE"
+      ],
+      "tape",
+      "oxide"
+    ],
+    "rewire": [
+      0,
+      [
+        "REWIRE"
+      ],
+      "blocks",
+      "routing"
+    ],
+    "rooms": [
+      1,
+      [
+        "ROOMS"
+      ],
+      "room",
+      "room"
+    ],
+    "scorch": [
+      0,
+      [
+        "SCORCH"
+      ],
+      "blocks",
+      "bolt"
+    ],
+    "scrub": [
+      1,
+      [
+        "SCRUB"
+      ],
+      "tape",
+      "scrub"
+    ],
+    "sgnl": [
+      0,
+      [
+        "S.GN_L"
+      ],
+      "blocks",
+      "signal"
+    ],
+    "shatter": [
+      1,
+      [
+        "SHATTER"
+      ],
+      "blocks",
+      "shatter"
+    ],
+    "spiral": [
+      1,
+      [
+        "SPIRAL"
+      ],
+      "radial",
+      "spiral"
+    ],
+    "spool": [
+      1,
+      [
+        "SPOOL"
+      ],
+      "tape",
+      "spool"
+    ],
+    "stasis": [
+      0,
+      [
+        "STASIS"
+      ],
+      "wave",
+      "freeze"
+    ],
+    "sweep": [
+      1,
+      [
+        "SWEEP"
+      ],
+      "wave",
+      "sweep"
+    ],
+    "synceq": [
+      1,
+      [
+        "SYNC",
+        "EQ"
+      ],
+      "blocks",
+      "eq"
+    ],
+    "taffy": [
+      1,
+      [
+        "TAFFY"
+      ],
+      "wave",
+      "stretch"
+    ],
+    "wavefold": [
+      0,
+      [
+        "WAVE",
+        "FOLD"
+      ],
+      "blocks",
+      "cascade"
+    ]
+  },
+  "font": "DejaVuSansCondensed-Bold.ttf",
+  "font_sha256": "586556501565e46ad356a5efcc2f6e81375230323ad5a2a1c4cc8211a6c5ef2e",
+  "png_sha256": {
+    "arrakis-72x97.png": "ee80b89c10a0ac9819a79e67b982c5120683ea503dd1dc55a583be0cfbfdec59",
+    "arrakis-102x128.png": "740e53f3c6c14c16a683758f222c19f56c93cb48cd10111560338aa29b5ee694",
+    "breather-72x97.png": "2ae9b25e8b19225c2c3aa61db01c345fb7c2f7a34d88d7f4a09a712001164646",
+    "breather-102x128.png": "5e71e867a76a8fd16e2d30e8f589dd609794b48d5420826c06a6816e47b10efc",
+    "corrupt-72x97.png": "d8ab26bcae1035b5df62d15c82cdb4b5305f7e7789c6755411e8f146e391b2f3",
+    "corrupt-102x128.png": "4ce0eed043742a19c5d818930d6d16a1d281cfce06c1250ef280dc2f8660a2bc",
+    "dirtbox-72x97.png": "8c5753b87d703a61f83053e692d48a07952795624c8086a1f9a61d3c47a3970f",
+    "dirtbox-102x128.png": "9957132f095fb07af8c384879c2ed4ccadd029091e32e8634412c49bd521cb21",
+    "dissolve-72x97.png": "6b8808ab7a292e632b5db5ccb843f85a4611296f8527b5e91490a0a162e554b2",
+    "dissolve-102x128.png": "a3079329b73ef342e84619cac027f0d588dd32aab3de65760b5de29646e6975d",
+    "dualshft-72x97.png": "35bfe0c24cf1899c511b88d5703c77f9bd68d97fa435540430fa442ba623e77e",
+    "dualshft-102x128.png": "d1a16704198084c7852a94878181455c7a262a89610def927aa4bff4847d4cca",
+    "dubsiren-72x97.png": "2a0be2ca26cb8ccdaa7b54a544cf9196367359dafbc50cdbba3ae7009957e763",
+    "dubsiren-102x128.png": "5b18fad5a6f8195ea67bee99ab95cb1551e634e0f49556c9fe30e7ba3ad8e7d8",
+    "dustbox-72x97.png": "0f6780694c3eaad7d25240c22e19b4099ef5140e8282a71c545dd6c51065245f",
+    "dustbox-102x128.png": "321eaa4f9c55b517067dbab317c2c69c280b6b0e48357fedeb5e8cca1a5bc3d8",
+    "eugate-72x97.png": "366da0deaf6fa99f4566f1f59498b72bbfc61ef76268c648e291b3039f77ab14",
+    "eugate-102x128.png": "cb1551d6f70a3d4bc30f1f46e7ff85ea8942a3551e6817a7e60ea5060cc1d052",
+    "flower-72x97.png": "2be879a5cd6b3cce8fe33274670a544b704a0602af562c475644941322913ddf",
+    "flower-102x128.png": "5e7aa952bab73ded4187635be3da7e07cb477e53d9286ad9f5d4d6b4ac24a0af",
+    "formant-72x97.png": "3ca996409b6f1e846196325ea0e378ca6616ddd61567826863c29ad8b9526b22",
+    "formant-102x128.png": "17492a807f5299038023c97148bc8e1343be214c468fa599f135b62e9cf239a4",
+    "galactic-72x97.png": "818042f0fe7a85f53af1cff8dc998aa4ffd8205839ac53c5b3e4537c5ca1b90d",
+    "galactic-102x128.png": "502e590317ad237f9168ae42d1e4814dbea3a79fe708670af56aee94df869d3f",
+    "genloss-72x97.png": "35ffcc37adaa234f3fd2d3bb0023845f5a6009c836aaf5cfd37cd729cd43746f",
+    "genloss-102x128.png": "1b930e5979bbd806bf8ed74bcb2c653c96d5f8c13db19667a7d8895dd20c166a",
+    "griddly-72x97.png": "cb655cf76df451178e5304b6d6aec2d7f5b7247324d0db99d47d69f4d399d6cc",
+    "griddly-102x128.png": "882bb005029a4315abb064887974638c32f77c1e650e044b535f2937b23217c5",
+    "gyre-72x97.png": "cbecbdd5bf8c1bd315a01f1753d2e0690a68e6b1ed33d40e7c9a0126ec30edc7",
+    "gyre-102x128.png": "f0d7dd744b37e2eb09df1ea29b7b833b9526c0cafa5748b3d30c71b0e0abce45",
+    "howl-72x97.png": "59c61132beae4f3a6727c7d23afa2673cf81a0faa5440aa5a4c680dae5892891",
+    "howl-102x128.png": "40dbe5318dc5d30db751353072d269f9a73538f5373a938eb753f2f667f1e289",
+    "hydra-72x97.png": "9cc6f350b25681839bba7db996057c52cb1384a9ef299200a1c0ba642e79a019",
+    "hydra-102x128.png": "568f7156480ca4b4429f4e480a1070aed9535fd29d929e7525fa525a618845c1",
+    "klang-72x97.png": "50e07becd59e67757144e68ffcce8dbabe2fcb5312a22c7a8e6d24f239af075f",
+    "klang-102x128.png": "013ab443d1b1bc84ab0a46afc4c35795d7e1853fae3c16b9f1ac94f9346af00b",
+    "mangle-72x97.png": "b11268ef8742b696fa8ed7c0b5cf9d99f855bbf13d8ba45733e997e1ee82240e",
+    "mangle-102x128.png": "e889ec3457a6652fe6f38edfc06c38328d9ead41833985db33d326fa70545e5e",
+    "microloom-72x97.png": "6b61be95112a5a088da78151710dedd52e3c7d6ce074b094e2f897d5906b3004",
+    "microloom-102x128.png": "2ebd9f8449140c179e6554f0a0774f16cbfb1574fb87f227b4ec9eb6466734e4",
+    "oxide-72x97.png": "f29f35d6a625969b7f3ada0988a57c209d22b5b1e23c17cd68236f87ca53cb17",
+    "oxide-102x128.png": "7ebbaaf1e20cfea8eecfd9e5f20ee39edb85b960d54a87bca8ea9103072f3347",
+    "rewire-72x97.png": "ec7d41356e1db90ab4de0a6b587bc2adf67c0a3ae082fdf53bbcbb4ea318f476",
+    "rewire-102x128.png": "dafe3205090b463bdecd55e8b20552b0fb920b5d245449a460a259b9ff269dd8",
+    "rooms-72x97.png": "b9444a4e472dde1a3ecff5d205a0d01a7a8c11b6c90bba7900627d54fd965891",
+    "rooms-102x128.png": "0962022c213bd42dd83e14e5f20bcfdc65d45c90b81bab7368d7b380349bd8ad",
+    "scorch-72x97.png": "e97d276e75097f3ba44740678d8d72a7bcaba666020bee794676e1b52fd6d602",
+    "scorch-102x128.png": "592bf3a59e63a2adf6e7c1062fe88545a39c16811f3f50b867602b657088c67d",
+    "scrub-72x97.png": "3312dc3044e081e084baa675ed925f5357df5ac97cbec8eaeea8bb280dcda4a8",
+    "scrub-102x128.png": "ad684cb3255964686cb7329df78a6019c31aace2245ed262ec168eb4217a5338",
+    "sgnl-72x97.png": "5af596ecab55d20aff2a5f0a83f632cbe93ecdcb97be34a9664aac61405b60c1",
+    "sgnl-102x128.png": "157231ed89de6909a6dbcaea51d773033de87f4b44413d8b1ed0c1c0774dc1e7",
+    "shatter-72x97.png": "9386af293faf364337d7d34a51e98e3c901eccec87f28fd086bf5a5fe91e215f",
+    "shatter-102x128.png": "a74328777277832ed123c54f8e32bd4e3dcb42d7f16d742ce2b11ada62eb8b6e",
+    "spiral-72x97.png": "715c78e4b60a1e740f723748af2bb95e1214f5d469d6894d09e029a5e18461da",
+    "spiral-102x128.png": "df36e35da91f219fc2526b7fbb2582237ace52af632910dcb717d20b19ca1315",
+    "spool-72x97.png": "8f3c4dc1ffaa737616ad35d29f3e2862274c7a5ce75954f4f918c0566801ee57",
+    "spool-102x128.png": "4d8a767c56bee19be44950dde636572916de5abec9884d3b88f6c9be2d012aba",
+    "stasis-72x97.png": "f0209ae5f8d4323fff9c1b18d139263a807403a5e334f6ccddf4f3c321e70e0e",
+    "stasis-102x128.png": "13798dad38054e3c9e31a7f32ca5272ac8fb22eb1f48b23b75f1414566ffb322",
+    "sweep-72x97.png": "56412b4fb6b00231b6c838c1b6aea48fd6227d9d4e23bed0a4c49d6c84c8d4d7",
+    "sweep-102x128.png": "c5c9c5fba5326512c7e16ff54738e8219c0447417cd2b8c78f98148ec7eea48b",
+    "synceq-72x97.png": "d3a688f95b3c975b9a7b5251c53b32ee00958c7726400dff047d476381ceed74",
+    "synceq-102x128.png": "3610c7635d413f1d14edad4bd72ec63063ea37833fe3cffc5730fd3709e5aafa",
+    "taffy-72x97.png": "8177dc8cc0094e4a3fa20a21e16ae451d3779650fe75898c1eaabb88afc3ac45",
+    "taffy-102x128.png": "e8994a0ff144f5d89cf9f7481d0f7c27306f8d67af2e970e67c4be576da4ecc8",
+    "wavefold-72x97.png": "ee8cde8b43af450e18dff166cb1e105079ba440fa1039819ddcb127b6d1f08ff",
+    "wavefold-102x128.png": "24b2336563c6d61a9d05c3f89799018067a0f01a62c5e7985ce8c75c27782575"
+  }
+}

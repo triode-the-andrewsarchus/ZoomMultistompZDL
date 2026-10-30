@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Adapt original cover pixels to Plus icons without recompiling any DSP.
+"""Package native Plus artwork without recompiling any DSP.
 
 Uses Stomphacks' ZIC builder/envelope checks and zoom-zt2's bitmap transport.
 Only the fixed-size ICON payload and container CRC may change in a ZD2.
@@ -10,7 +10,7 @@ import json
 import zlib
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image
 from upstream import ROOT
 import zoomzt2
 from convert_zic import restripe
@@ -18,31 +18,16 @@ from zd2_from_scratch import ICON_FRAMES, build_zic, verify_envelope, verify_zic
 
 
 def render_frames(cover):
-    with Image.open(cover) as source:
-        if source.size != (128, 36) or source.mode != '1':
-            raise ValueError('Expected an original 128x36 monochrome artwork panel')
-        frames = []
-        for width, height in ICON_FRAMES:
-            image = Image.new('1', (width, height), 1)
-            draw = ImageDraw.Draw(image)
-            draw.rounded_rectangle((1, 1, width-2, height-2), radius=6, outline=0, width=2)
-            # Decorative pedal controls; live controls remain firmware-owned.
-            radius = max(3, width//15)
-            for x in (width//4, width//2, 3*width//4):
-                y = height//7
-                draw.ellipse((x-radius, y-radius, x+radius, y+radius), outline=0)
-                draw.line((x, y-radius, x, y), fill=0)
-            # Original LCD pixels were taller than wide (the repository's
-            # previews use approximately 3:2). Preserve that visible aspect.
-            panel = source.resize((width-8, round((width-8)*54/128)), Image.Resampling.NEAREST)
-            image.paste(panel, (4, height//4))
-            y = 2*height//3
-            draw.ellipse((width//2-2, y-2, width//2+2, y+2), fill=0)
-            y = height-18
-            draw.ellipse((width//2-8, y-8, width//2+8, y+8), outline=0, width=2)
-            draw.ellipse((width//2-4, y-4, width//2+4, y+4), outline=0)
-            frames.append(image)
-        return frames
+    # Each frame is authored at its own resolution, including all lettering.
+    # Legacy cropped panels remain as inspiration/provenance, not UI content.
+    frames = []
+    for width, height in ICON_FRAMES:
+        path = Path(cover).parent / 'native' / f'{Path(cover).stem}-{width}x{height}.png'
+        with Image.open(path) as source:
+            if source.size != (width, height) or source.mode != '1':
+                raise ValueError('Expected a native-size monochrome Plus icon: ' + str(path))
+            frames.append(source.copy())
+    return frames
 
 
 def icon_pair(cover):
@@ -70,7 +55,8 @@ def check_variant(original, modified, zic, cover):
     return dict(original_sha256=hashlib.sha256(original).hexdigest(),
                 artwork_binary_sha256=hashlib.sha256(modified).hexdigest(),
                 dsp_sha256=hashlib.sha256(bytes(before.DATA.data)).hexdigest(),
-                source_sha256=hashlib.sha256(Path(cover).read_bytes()).hexdigest(),
+                source_sha256=hashlib.sha256(b''.join(frame.tobytes() for frame in render_frames(cover))).hexdigest(),
+                artwork_format='native Plus icons, independently authored sizes',
                 icon_sha256=hashlib.sha256(zic).hexdigest(), dsp_byte_identical=True)
 
 
@@ -108,7 +94,7 @@ def main():
         parser.error('Unknown artwork: ' + ', '.join(sorted(set(args.effects)-available)))
     for name in args.effects or sorted(available):
         apply(ROOT / 'src/msplus' / name)
-        print(name + ': original art adapted; DSP and all other sections unchanged')
+        print(name + ': native Plus art packaged; DSP and all other sections unchanged')
 
 
 if __name__ == '__main__':
