@@ -83,4 +83,7 @@ backup byte-for-byte. Exact evidence is
 Never save a patch that
 contains experimental effects; autosave remains OFF.
 
-Artwork changes are deferred. The existing icon pixels are retained.
+At the DSP checkpoint above, artwork changes were deferred. The subsequent
+October 30 [native artwork update](MSPLUS-DEVELOPMENT.md#native-plus-artwork-installed-october-30)
+replaced all 34 icon pairs, including WaveFold, while preserving the tested
+DSP, parameters, IDs and versions byte-for-byte.

@@ -14,7 +14,7 @@
       "family": "original",
       "build_report": "src/msplus/arrakis/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "3f3c68565a4a5e33142d29860a408a4ed2c2e07c4d541465fb5773e107609733",
+      "current_build_sha256": "579ce0d4634d021f50bc3e222097c76df1c503250f53cc1c3fb93a125b7ac5ff",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -44,10 +44,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "408edfc32df926ecf9e106842e29bc652725599c0f6f874aa3e25014b305045f",
-        "artwork_binary_sha256": "3f3c68565a4a5e33142d29860a408a4ed2c2e07c4d541465fb5773e107609733",
+        "artwork_binary_sha256": "579ce0d4634d021f50bc3e222097c76df1c503250f53cc1c3fb93a125b7ac5ff",
         "dsp_sha256": "62d80354b1cb59b5efc54913719fc74dea72378f1696ef4d73ff2c9ef4145857",
-        "source_sha256": "ff89d3d947e239b33389d35799710efac9f0ec6a91455add31d99c00e556beec",
-        "icon_sha256": "23640a936017fb00eb4b1b7012563faf017ebc7b1052ac8eb4eaad91bf3e6cdb",
+        "source_sha256": "96bd653c6e64de47801c10383069114be875a19fc3dbf9b924d9ba6cc0cc9e51",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "26235c06804612e6711a123950df41a493400a31168a99326e73bed285b2008b",
         "dsp_byte_identical": true
       }
     },
@@ -58,7 +59,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/breather/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "3599e7d79096de7923c4b1159fb822b73062cfa6505f38540ce92bf9f49213a5",
+      "current_build_sha256": "2376339e7d7dbac3e58510621e9a03d79d047fc41678e4d70cd03e00f431edc9",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -90,10 +91,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "ef93fd56a2931350e3d6be0d974671ab9cab2eb98534de1d469f07e67ab33484",
-        "artwork_binary_sha256": "3599e7d79096de7923c4b1159fb822b73062cfa6505f38540ce92bf9f49213a5",
+        "artwork_binary_sha256": "2376339e7d7dbac3e58510621e9a03d79d047fc41678e4d70cd03e00f431edc9",
         "dsp_sha256": "644652f93e3a221c6b492583c00e9024ed73217f1e2dd414f9ee3ffd43e900d4",
-        "source_sha256": "4dfbf4bcc11ae5c3c9ef7c217e180c453aeb9c09d656a68cbb8f1c10c2cf9f66",
-        "icon_sha256": "74b677806e71c3f6a26f9e8d628d59676f5ebbc23924711029f9eb30a2af1532",
+        "source_sha256": "1b63153ad10bd2a93a8c8a72d1ffa206020a9c5065d5d1b2e0b6d41e30f39254",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "bbbffda4d2350b2e37083428a81e68dcc6d52d8f1c5d3893fa91e9c5997b5ef1",
         "dsp_byte_identical": true
       }
     },
@@ -104,7 +106,7 @@
       "family": "original",
       "build_report": "src/msplus/corrupt/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "e3d7a7249d4200f09803f438d4840c740f6c383b83800199484505ab313a1aa2",
+      "current_build_sha256": "c13bb45e82c170c3bffc8fee09a6358036c87381df359de969f86d5e9986e75f",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -135,10 +137,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "ad9a86272dbe14de42288049d74434a732881aa6e18135554f4c9d6cae558f38",
-        "artwork_binary_sha256": "e3d7a7249d4200f09803f438d4840c740f6c383b83800199484505ab313a1aa2",
+        "artwork_binary_sha256": "c13bb45e82c170c3bffc8fee09a6358036c87381df359de969f86d5e9986e75f",
         "dsp_sha256": "b3371b29502239bd870fecea36c246590acce7e33998ebefe654828f8f4ed64b",
-        "source_sha256": "b09d58a5a4d5a98392a5887a88729e960e74696362742770e26288300ef999be",
-        "icon_sha256": "56d856e0dbe43211c7a1a822774d10eace32b2591a37e28bbc3288c370f1685b",
+        "source_sha256": "a380fb516f852f347f06f7395f5ba93be07a56385dce9028a7152db5794aece8",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "5ad3635e3834568434d491a73505906d95d5f87fad435df727532d895a8b27bc",
         "dsp_byte_identical": true
       }
     },
@@ -149,7 +152,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dirtbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "b3c15150b47645f87d24114bc96aad07eac18d470e76fe447cf0fe44fec096f4",
+      "current_build_sha256": "1a7822bc580ac92fbe91dcab769d4ef1cb1c0f9c106733768b462d36c9afb67d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -180,10 +183,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
-        "artwork_binary_sha256": "b3c15150b47645f87d24114bc96aad07eac18d470e76fe447cf0fe44fec096f4",
+        "artwork_binary_sha256": "1a7822bc580ac92fbe91dcab769d4ef1cb1c0f9c106733768b462d36c9afb67d",
         "dsp_sha256": "b97b73d967d5fa8cc23d72e6235c7a79c10daac6d980d3101c9b9952ddbee1d5",
-        "source_sha256": "bace1a0e78379c703b685fec363939e9068cfe031f060f4176ceb447c121c42d",
-        "icon_sha256": "d1ea8afca37380d3626f1f0b24be4cbc1e04a4d6364f6fbedcc7ed8ba41bce81",
+        "source_sha256": "b9525e82733c048dac2f56171bd9a2e729dfb2cdb155cf9c0ab3ce3dc4be2cf1",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "9681c07339a36ded388e2449ec22addde52d283f17f3daedd3a6430446c0bd0a",
         "dsp_byte_identical": true
       }
     },
@@ -194,7 +198,7 @@
       "family": "original",
       "build_report": "src/msplus/dissolve/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "e33b83d9d2fb26ecc109dd1212c7eb3588395fd2a72b45997c5f63944196414f",
+      "current_build_sha256": "dbb62d31f45cc386edefec2adbf7cd4032ad8d6d07cd1133b488fb3dec004eeb",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -224,10 +228,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "4a447d2b6feb0e6048dc725ea1507d694f95a6fd4d4989884949c6c612008acb",
-        "artwork_binary_sha256": "e33b83d9d2fb26ecc109dd1212c7eb3588395fd2a72b45997c5f63944196414f",
+        "artwork_binary_sha256": "dbb62d31f45cc386edefec2adbf7cd4032ad8d6d07cd1133b488fb3dec004eeb",
         "dsp_sha256": "8481fcd419a440db2365c2c55cbb3c18fe07b826dbe823b92bc3318368aa07cf",
-        "source_sha256": "fca2d7aa3db45f2b60cc020aabf5cdd8343d453af9ded81941dbd4ec7e3d5b98",
-        "icon_sha256": "3c695c36e71da13d7e88deb5119f68ea2fa152d9da033840820a71ddbc87aa67",
+        "source_sha256": "a3022972f649401ebf97544c8eccf10cdf582b83a81e9664f9bcafd537826748",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "833c58c47cbec3567649d6d79049d66ef527210692ec7b53ce2679b297ae80d6",
         "dsp_byte_identical": true
       }
     },
@@ -238,7 +243,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dualshft/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1594dc66eba6830267de9dbc4b3c3c17bf17f3da761901530af0af8110b02200",
+      "current_build_sha256": "564e3338ea2d89b3d63d0fec7ca31e3fae731f5f14d6b5fbbe4b82e99ccb6d0a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -270,10 +275,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "8ba2ce481db790950beb5fe3076c027af4491d7b030d902ef23d5269550b4414",
-        "artwork_binary_sha256": "1594dc66eba6830267de9dbc4b3c3c17bf17f3da761901530af0af8110b02200",
+        "artwork_binary_sha256": "564e3338ea2d89b3d63d0fec7ca31e3fae731f5f14d6b5fbbe4b82e99ccb6d0a",
         "dsp_sha256": "d6c8f8297b4b7bf9c138b68f94b48f21f81dbf0a55dde0f2f7baf497ea59e05d",
-        "source_sha256": "7df794f675c79414744e533209d355e24da7c08d79573a659aafeb2b4528ec11",
-        "icon_sha256": "2f19578020fc2e8cc6c7da1013992cdf181c46e8805452442b0b3b369c2f1cdb",
+        "source_sha256": "bb40bbfca1981dc43cddbf0ca11109fa88ccd49acef148cfde12bb3d6c1b9fad",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "6e7ae72f5b7e0b3e55aa82d265fa1de9c57e8b982a522beb2bd667647c4aceba",
         "dsp_byte_identical": true
       }
     },
@@ -284,7 +290,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dubsiren/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "f8e7addef165ae07ef5d41dc07586d65c243a5c5274c060d682f09a1b5cf3097",
+      "current_build_sha256": "1ff7384506163a4f6cbcfb88569da8e346517245a25d2ce55a4a25170889e5fa",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -315,10 +321,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "1b2dca67f218c00318a9eb766eb6a29959a12952409d63b0fb7760d055bb7ed8",
-        "artwork_binary_sha256": "f8e7addef165ae07ef5d41dc07586d65c243a5c5274c060d682f09a1b5cf3097",
+        "artwork_binary_sha256": "1ff7384506163a4f6cbcfb88569da8e346517245a25d2ce55a4a25170889e5fa",
         "dsp_sha256": "3655f13a8ab5b83d4fd0497233b6f0f3f16534fbb8df5489db8cae042abe9f3a",
-        "source_sha256": "6af3c9fc4bca669055ef5fcc07d1856c989125e23042f326b0c2eec9ce48169b",
-        "icon_sha256": "29716a783cacc85397706d5c6e37c5409a32fc07cf62549f64b80c7fccc3170a",
+        "source_sha256": "0342006624f46e4df8629b3ff34edeb338ec79e4593b42e727d6d78b1cd748e4",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "347ab7a5db78191094f88344f99a01575659d1762fa55e3a28a128ff97a629db",
         "dsp_byte_identical": true
       }
     },
@@ -329,7 +336,7 @@
       "family": "original",
       "build_report": "src/msplus/dustbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "60d6a5b76b81c2309d7f698355a0948615ad102e2617fe2c91b50fd77d1470c5",
+      "current_build_sha256": "54335377c9a06f7ee655ae6c2bd9f7fab4f4be291033639b6106fb189ed13a5d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -358,10 +365,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
-        "artwork_binary_sha256": "60d6a5b76b81c2309d7f698355a0948615ad102e2617fe2c91b50fd77d1470c5",
+        "artwork_binary_sha256": "54335377c9a06f7ee655ae6c2bd9f7fab4f4be291033639b6106fb189ed13a5d",
         "dsp_sha256": "ef68d79561f35311dc11742528defcd260cb80d32de518f98ae4f93555acde27",
-        "source_sha256": "3a411ad17ce7a9fef8b05bf2ee156d6bca8364fdad7ed8f1c09038acfc574f9e",
-        "icon_sha256": "173295484c4b4ff90ebfae885a6a580673651fb44c291b28c2956a4faabdc504",
+        "source_sha256": "c4112ecc2e46c795c8164dd124cea96664139ca1baeae928ae176fbc0564e490",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "adb2c2170f16fbd534de99136130f9b8010d0a843ceb037ba52cf65fe8f5927e",
         "dsp_byte_identical": true
       }
     },
@@ -372,7 +380,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/eugate/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ba97c2dabb8874465e9b6c59cfe5824ec445cd546436029af12f2122a7de8f1a",
+      "current_build_sha256": "f89358a49c5df9513906cd427849ea5274c39e27847b0407854d240f9587ae12",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -405,10 +413,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "c37506e1b2873da4e786e41a36cbf149ac60e9a19d426ab12a3d83976061800b",
-        "artwork_binary_sha256": "ba97c2dabb8874465e9b6c59cfe5824ec445cd546436029af12f2122a7de8f1a",
+        "artwork_binary_sha256": "f89358a49c5df9513906cd427849ea5274c39e27847b0407854d240f9587ae12",
         "dsp_sha256": "574de8019366ab1f69efbe113113398a6b582f0d8e03e8a646fa118f45df5b14",
-        "source_sha256": "7dcf2c922220a4ea679c33c72e88ca2c0fed71e91c1dd3092d89571842af7e06",
-        "icon_sha256": "734bbecdc3a377efd6ed7f57904b41dc120efad22933d1128b1cf74177b6a1ad",
+        "source_sha256": "889ad2319fa4eee17ead47918abf7dd88cc9b8a49921ed42a1b3f2ef7fb0a2d0",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "05b1c9e924c3c247683ef9c471e83fc46a2aa41512c247aba80118eccfbc9894",
         "dsp_byte_identical": true
       }
     },
@@ -419,7 +428,7 @@
       "family": "original",
       "build_report": "src/msplus/flower/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "6c14751978b00720f4d5d8601a140961466e00438877e59a92bf0e1318f73c9c",
+      "current_build_sha256": "edd78241323b929d80c44955b4c7ba252516d3c0d29a1d56e2f3e5eea04c142a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -449,10 +458,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "70e3b1b706cb85babe78b923dc8abe129cfa2baaf5dcb293fd957e3ddc4bde6d",
-        "artwork_binary_sha256": "6c14751978b00720f4d5d8601a140961466e00438877e59a92bf0e1318f73c9c",
+        "artwork_binary_sha256": "edd78241323b929d80c44955b4c7ba252516d3c0d29a1d56e2f3e5eea04c142a",
         "dsp_sha256": "206a319e4dd054432c9bb3b21fb5e8f98dace5e6c7839bbe4050d143ac872dcc",
-        "source_sha256": "0ddf28aacd2ddacc18219edd702623f660bc6c921c58d27fd57f9f55d67b87c7",
-        "icon_sha256": "f37ff004b58e3279eeeca368ce4bbf3f94fc955c6377e64be6685e58ba6bcf1c",
+        "source_sha256": "acb7bf09d8670f0921d3a1a26dbf95dcd399d0c337ee931005b2f639e0074f33",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "761caa1b2e788e3126311c156631b55f7d4bb7c1dde98538aed7ea941672204a",
         "dsp_byte_identical": true
       }
     },
@@ -463,7 +473,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/formant/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "d40a63a8f21eac026e02f445fa769feb01cfeb2bd783420af58df28d3680f022",
+      "current_build_sha256": "9e551665b1f5e868a2f75ccb7c67385f964a80e54b0ddc7e2f17df307fcc6baf",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -495,10 +505,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "a8ffe626bc6591435968a7ab9097ad65a8e41dee91a28f4bf29f62f71c2c6e28",
-        "artwork_binary_sha256": "d40a63a8f21eac026e02f445fa769feb01cfeb2bd783420af58df28d3680f022",
+        "artwork_binary_sha256": "9e551665b1f5e868a2f75ccb7c67385f964a80e54b0ddc7e2f17df307fcc6baf",
         "dsp_sha256": "799c0be7be0ee6e0b5c9798ef2d476bebbde93f25f33ea851a9ca5fb62fdaef5",
-        "source_sha256": "3ada499ec459ab124cebdfc84c5cd76fb6b0fb5a37aebce92a63b7ff2d510315",
-        "icon_sha256": "d276ff1f11c1461630d3953b9ff09c9f86f48492704054599da0e7c5b113278b",
+        "source_sha256": "24dd1ea4c55c82de998e3f48f9fc4189350ca6b3fb00a4c7b9d1fb6f6a9116b5",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "13eac3e7c27b4491aafda59416355e2296083f8c05461290878b9daacb39c451",
         "dsp_byte_identical": true
       }
     },
@@ -509,7 +520,7 @@
       "family": "original",
       "build_report": "src/msplus/galactic/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "62c6955131c60e5b507084a8fed4cea28c64a094a0306d57ab1292e977584718",
+      "current_build_sha256": "9ff6ea7f6ccfed63608590eeca8a17836060f7d24c0c95c265c1bd300d6c3084",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -542,10 +553,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "0221241715f46ce26739163d7cd45e603c1b9ba837e5f1bf5f733e275a3e61d2",
-        "artwork_binary_sha256": "62c6955131c60e5b507084a8fed4cea28c64a094a0306d57ab1292e977584718",
+        "artwork_binary_sha256": "9ff6ea7f6ccfed63608590eeca8a17836060f7d24c0c95c265c1bd300d6c3084",
         "dsp_sha256": "f27735cc030a6e55f6e8a2989e0e96a4e022632708748b7e9f432f5fe9a979ec",
-        "source_sha256": "ff784a62dc063b5118a5d65d911f1dada732b8dff9fd16a20b988274d4a40fe0",
-        "icon_sha256": "d48624b35b08c597e7398124cb4cadfbc81f92b63d99d7abf744f1d700e12641",
+        "source_sha256": "580aace83ed25aee487a2b8e23f91c18e9d1a617aaa97f9d596af2027dbc4149",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "a6c3cd9ce0143044b3401305ec3cfb0b0fb7ceacfcc9a31c9b2cb2185b998217",
         "dsp_byte_identical": true
       }
     },
@@ -556,7 +568,7 @@
       "family": "original",
       "build_report": "src/msplus/genloss/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "0e28da8254e11c088de697e5b94b3c4f3f4321eb37516b07e603abced15ebfbd",
+      "current_build_sha256": "bb15253972f6a9e7439e447065850dbdcb73d5b077562a6730d40cfcff4ddf56",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -586,10 +598,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "be23a59f485b60faa14ba6bb3a1a96b200ccb932fbc0b71b9052fb1dae231714",
-        "artwork_binary_sha256": "0e28da8254e11c088de697e5b94b3c4f3f4321eb37516b07e603abced15ebfbd",
+        "artwork_binary_sha256": "bb15253972f6a9e7439e447065850dbdcb73d5b077562a6730d40cfcff4ddf56",
         "dsp_sha256": "f479467f54c8f87f52f77c1f2d289e2ecf36fdcc92a27536323f15542c5cb527",
-        "source_sha256": "363e885df60ba4a16a457aa4dbc35e579a0b6e4d97058ac214c496a519c672ea",
-        "icon_sha256": "c684c8c9c1c609053b43a644fca43af70c8309ad35e9018fb0eb1e48c3a78055",
+        "source_sha256": "5956bae160e03dd2bb086e62310ad98e4b727c5b616933ea2e111dc46563f658",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "402181b412753dd0cbd9f7943a0279bd795a8809294ece2095c28feb8f57ea54",
         "dsp_byte_identical": true
       }
     },
@@ -600,7 +613,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/griddly/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "8f4251ed2189c792c128e3f26b82ebdd3cb4494586d7f30240050f2262b9a2b4",
+      "current_build_sha256": "2babe495ce75ee1c49d514607121d21edb0f71b651b17d68bd67ceee65b64174",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -635,10 +648,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "90727db42a6cda7b88c3de864b0de2cb2b11411f9ba39658c106926b7fb60c30",
-        "artwork_binary_sha256": "8f4251ed2189c792c128e3f26b82ebdd3cb4494586d7f30240050f2262b9a2b4",
+        "artwork_binary_sha256": "2babe495ce75ee1c49d514607121d21edb0f71b651b17d68bd67ceee65b64174",
         "dsp_sha256": "4421ff90c2c21a7aa4aa0dce896542dabac2d7efc0b19dc6bc7a8b858e643102",
-        "source_sha256": "832a4442de021b9a190e4c1cfa8c5ddf4d4ee14628267cb524408bdec183b518",
-        "icon_sha256": "8d213ea8b39bb2d7b5ebdd8707ac5dccf06ba22bc27182a0be1447d4eaa1bb19",
+        "source_sha256": "d5a23ad3a541bf0559056f366cfef80e83ea79e74d19373447ed53b42dfb6f23",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "13db5802620d1b473e3a47d9551eacd1f58fd78c5bc913a39bc44aae9488916d",
         "dsp_byte_identical": true
       }
     },
@@ -649,7 +663,7 @@
       "family": "original",
       "build_report": "src/msplus/gyre/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "31fb4bf6e1828838e79570e477ad2cf3e3a9b7fa385d4504b43f9d2b94047554",
+      "current_build_sha256": "84575280026ee0cd9c5ffbe06c484014647dbb872018adcca1d8961f3ad73c76",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -679,10 +693,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "27479645b204afbf0156379608e5b48580803d29dcf55a23545d295e8c5fca70",
-        "artwork_binary_sha256": "31fb4bf6e1828838e79570e477ad2cf3e3a9b7fa385d4504b43f9d2b94047554",
+        "artwork_binary_sha256": "84575280026ee0cd9c5ffbe06c484014647dbb872018adcca1d8961f3ad73c76",
         "dsp_sha256": "f964e616030e81c3c5cc7e0ee4f3b2ffe9bce9374239b6475a8f164f3dcee4e1",
-        "source_sha256": "f33549e6e5c60241e44b9592ab0e4d45fb0f2973af4018ffc3a3a5af21d906d3",
-        "icon_sha256": "9edfe5f49aae2967e346f2550ba187ad3ea4078bb5aeadfa486be8db812caa25",
+        "source_sha256": "22e707cbdc828f23869df631321554bd3e67a6245628db5e6c01b0c6e26200a5",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "5480e0d91d0349b6b7f77287e87241b70a46a38f79b223aaa42d9e2ad4b68c3a",
         "dsp_byte_identical": true
       }
     },
@@ -693,7 +708,7 @@
       "family": "original",
       "build_report": "src/msplus/howl/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1ccbd80595751309e0ac693eb4b849d95bbfec9528fb2133dba0443f15efb0fd",
+      "current_build_sha256": "3f03e126146b9a9ed4312981d76bb470f289b3af26c033d166d52416691a7558",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -723,10 +738,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "3c11f08d25af7fa43ef28e371e71f4163e0d4cb70a682c5dd9ddda5362b063d5",
-        "artwork_binary_sha256": "1ccbd80595751309e0ac693eb4b849d95bbfec9528fb2133dba0443f15efb0fd",
+        "artwork_binary_sha256": "3f03e126146b9a9ed4312981d76bb470f289b3af26c033d166d52416691a7558",
         "dsp_sha256": "24b0f00ef4f69ff1875075089b76141b7bc5628f75739af366cd98e313c3ad66",
-        "source_sha256": "fd2ee28bd74bcfc3b110b73f0741bb142207a2d2227b7577a217bce8f6995824",
-        "icon_sha256": "1d7fdfbb7a54f8d804ab3b3cc429ac2d9e59125561b0f86a4af999b86a0856a3",
+        "source_sha256": "a8440d2d92c818547766a2389bdcd695194ffb93c3c76ffa28f810f815509ed7",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "2ddb5f5c832e41cebf8c6a1da33ef5ea27b013f446c45e9339e6d985248146b4",
         "dsp_byte_identical": true
       }
     },
@@ -737,7 +753,7 @@
       "family": "original",
       "build_report": "src/msplus/hydra/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "afc23d9f149261defe4ea7f93f33627ed507fbbceb7c5dd9ed3c8e6e40f03308",
+      "current_build_sha256": "abe6157fd1318c5df4901a5d4a02053c3b0609be8225298c8295454f882efe80",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -767,10 +783,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "85d69b0a8bb44e157070d4ac79b59eae02a9f87eb648376d83cf3134f44371a6",
-        "artwork_binary_sha256": "afc23d9f149261defe4ea7f93f33627ed507fbbceb7c5dd9ed3c8e6e40f03308",
+        "artwork_binary_sha256": "abe6157fd1318c5df4901a5d4a02053c3b0609be8225298c8295454f882efe80",
         "dsp_sha256": "18c86b5e8f34829e311021f24a403efcc93021fbff29e97a397297436ab6600d",
-        "source_sha256": "211c54a9eb16e1d851746f9255538e34281d7750549b99449e30d572646bcea2",
-        "icon_sha256": "525feffaf2487ffcf51029036860f0be33af323ec215ffc0c32659e0c1fad4ca",
+        "source_sha256": "1aaca3c86aefcf897db624d64fc9b2b4fd85b75bda9c24ccf047ee9ae2fda28b",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "1473fec3ccec6341a14b221b733eb90e6a7294a7a2800df819912ab53714fe4e",
         "dsp_byte_identical": true
       }
     },
@@ -781,7 +798,7 @@
       "family": "original",
       "build_report": "src/msplus/klang/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "48fecdfd7016d55eb7aefaac401786aa0f20052e525064302ca9aff98b5c887b",
+      "current_build_sha256": "5895de36be2c0fffe5bde4a153f736fbcb533c8205bf3c9704592508bbb751c9",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -812,10 +829,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "1b313bd8a027a9bfd3c5ea84a031df686bfa76d10f26c1da38d23e3c05873359",
-        "artwork_binary_sha256": "48fecdfd7016d55eb7aefaac401786aa0f20052e525064302ca9aff98b5c887b",
+        "artwork_binary_sha256": "5895de36be2c0fffe5bde4a153f736fbcb533c8205bf3c9704592508bbb751c9",
         "dsp_sha256": "8e29521fb32388a88519043e934830f4e7c82c75b5c760c99f9cca15ed9bd048",
-        "source_sha256": "92689806143c689c407edc44c32c20fc2f3f618a2ead40607774f38fb1e75842",
-        "icon_sha256": "087462985e28baac0936be442beb745f8e0884d734a5194404dc4c5d494f95ed",
+        "source_sha256": "540429658fa46508a6da34c284607a0eb357d5d5d19b68d2291239f58ee7ba00",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "d403185b16173b38cd3af031a5d99da14683479288fa62b9d2a513f3fba073f5",
         "dsp_byte_identical": true
       }
     },
@@ -826,7 +844,7 @@
       "family": "original",
       "build_report": "src/msplus/mangle/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "9ca9a0551ea997dc654533fd00223671ea727e219df1505a47afce7d80e26968",
+      "current_build_sha256": "028c472ec820176c00c722241dc6a634b1557ad139339e6be5898606a15db1c3",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -856,10 +874,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "d052cf8a32579d689eeb249926a247f48850f00900b2087133cd2df0851b0087",
-        "artwork_binary_sha256": "9ca9a0551ea997dc654533fd00223671ea727e219df1505a47afce7d80e26968",
+        "artwork_binary_sha256": "028c472ec820176c00c722241dc6a634b1557ad139339e6be5898606a15db1c3",
         "dsp_sha256": "e2dc7b3e3d6b31a909ddc6a182ccc5be360e3dad13888a9afdec7a1200c61b4b",
-        "source_sha256": "0debd6365d0e3982d9c8e7d503f3773b77f9d5c05f4e3512b701d614afe6c7f9",
-        "icon_sha256": "4da97c778d90e7bb319cc16c608ffc603de06345ae5e725cb76ee511af5c3990",
+        "source_sha256": "4c2dbdf68795002a7433404e025ba7245ed190ca95aeeace8b67116796658d0e",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "3ae543131847f26fdf39e1c89d2ef87923d05b2a15b668d40333feef06ba1a4c",
         "dsp_byte_identical": true
       }
     },
@@ -870,7 +889,7 @@
       "family": "original",
       "build_report": "src/msplus/microloom/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "87998249bf11189a19fd6911f70486a852d17d2d6212e4c970cf62cfd67abe19",
+      "current_build_sha256": "d7362cb8f53f32fcd664cba7e9fcfa297bdb5e799dca37710fcfd0984c267a3f",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -900,10 +919,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
-        "artwork_binary_sha256": "87998249bf11189a19fd6911f70486a852d17d2d6212e4c970cf62cfd67abe19",
+        "artwork_binary_sha256": "d7362cb8f53f32fcd664cba7e9fcfa297bdb5e799dca37710fcfd0984c267a3f",
         "dsp_sha256": "8ee4162cbc657abc57c9a7cfe151bae8b9621f61e150aae7f9987fedc4d22b88",
-        "source_sha256": "a06e785764d982f46b47d187723b706f533d6dbb1a9817756421c6c84e7332b8",
-        "icon_sha256": "36d026cc42d841148dcee7aa784fea78c14c2802b50dd476e982b8c368b95f88",
+        "source_sha256": "c8ee53c34c4c52779cabf0a4c8015ff39cd2f35bb368910f286388c5671fd746",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "bceb1e08f7ba953947bf5784e7c19ede132170f151e6a43f20d2111edb1af94d",
         "dsp_byte_identical": true
       }
     },
@@ -914,7 +934,7 @@
       "family": "original",
       "build_report": "src/msplus/oxide/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "20a17f6c8a4fee2dc80ebf6ec615527061327c4d94cd1209624835036fb234e8",
+      "current_build_sha256": "e0c132519282f10a7203b281a5748f1329d8a0115a4f1074fd5eb34e5db20a2b",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -947,10 +967,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
-        "artwork_binary_sha256": "20a17f6c8a4fee2dc80ebf6ec615527061327c4d94cd1209624835036fb234e8",
+        "artwork_binary_sha256": "e0c132519282f10a7203b281a5748f1329d8a0115a4f1074fd5eb34e5db20a2b",
         "dsp_sha256": "4c43c8b30eaa79a6627b6bf94681f304d0850e41620dab4a1f7dbe2d23b7c116",
-        "source_sha256": "d3c02d06aa484a3668ef092af68c1ad5bd5dfadb0a5a807ebf20bf267b74e96f",
-        "icon_sha256": "e5aa3727fdcfa10acd42ba61e6fb653ac684e6c5fbc985d632156973ea17652a",
+        "source_sha256": "78f64fdcafd59c4516e90b5d1e548abe49077d7491f9edb27cf02bb9b7f06ab5",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "041544559870631b82d72a300f0ef89e4b996b9be8c0ea711cece7f47fd83fa8",
         "dsp_byte_identical": true
       }
     },
@@ -961,7 +982,7 @@
       "family": "original",
       "build_report": "src/msplus/rewire/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ea5fa5906151ac789748401be49fcdf903d9126dbe3df352beb2d6c45ac12caa",
+      "current_build_sha256": "65574e2f7486d90c8f72b3c147064b552c8afb63ddc2ea15c38e7bbc2d009ce2",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -991,10 +1012,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "89934bc2b2d1eddaf15ce71db411d95b466c8bd0d82554f6a5f905bc16fb1e54",
-        "artwork_binary_sha256": "ea5fa5906151ac789748401be49fcdf903d9126dbe3df352beb2d6c45ac12caa",
+        "artwork_binary_sha256": "65574e2f7486d90c8f72b3c147064b552c8afb63ddc2ea15c38e7bbc2d009ce2",
         "dsp_sha256": "5178a92dc9e6771bfb2961ecb707d830890b76e27e65d541ef7c508c20c5853c",
-        "source_sha256": "85731bf290ba34df5081e6d1d2300e85c1cbb7e0a7e3b8813eec58645f287f6f",
-        "icon_sha256": "e27bf1654c4fd387b2406396264de2d31a4b91b1ac217921f0e360641d84396c",
+        "source_sha256": "eea5200881fafc4eb513794fd54b901ab2415b844d458a55f107f7b0072264a5",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "27a35dcf56638c057e2cea4d9af3f4b81b2fd66d49f9281175b76457613f7ce2",
         "dsp_byte_identical": true
       }
     },
@@ -1005,7 +1027,7 @@
       "family": "original",
       "build_report": "src/msplus/rooms/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "b58dbebf82c2e3ccd98fd02b48d50869b293eccd91a1b1629b83cb45235f9184",
+      "current_build_sha256": "d52ee532dd2a32b3380801645b32116f0ba551fc5cc57b6634adc3736f224159",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1035,10 +1057,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
-        "artwork_binary_sha256": "b58dbebf82c2e3ccd98fd02b48d50869b293eccd91a1b1629b83cb45235f9184",
+        "artwork_binary_sha256": "d52ee532dd2a32b3380801645b32116f0ba551fc5cc57b6634adc3736f224159",
         "dsp_sha256": "8fc1ff8730f45fb37fbcabd1eda247bb4c9f5369bf764dbcf294c24845a9abaa",
-        "source_sha256": "ff96e7d325d7c3a92a59022e7f4013630f64a122831764ae6afa883881104596",
-        "icon_sha256": "311169930236c60f077a5383d23a12d3f5f9f8453e1ecb1345bdf89b9befa82b",
+        "source_sha256": "687476c7d4aefe7b69847829662d4758c424215193efd0a7fe0adc87cc7b1290",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "f5f76592b618ecc7e22e5631032da2798db6793a23caf13f808494b771359ed4",
         "dsp_byte_identical": true
       }
     },
@@ -1049,7 +1072,7 @@
       "family": "original",
       "build_report": "src/msplus/scorch/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "2e57384e52e6186a3ad5255dd4ec77fa0118a7c0916d8e04cd74f5bbfa953a37",
+      "current_build_sha256": "89e502822022e7ce9ba0fd0b7ee704bae3de3f566c001b79af795202a32ca58f",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1080,10 +1103,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
-        "artwork_binary_sha256": "2e57384e52e6186a3ad5255dd4ec77fa0118a7c0916d8e04cd74f5bbfa953a37",
+        "artwork_binary_sha256": "89e502822022e7ce9ba0fd0b7ee704bae3de3f566c001b79af795202a32ca58f",
         "dsp_sha256": "5567dae3611483d5361590ceadfa61d5919c2207c199559ece76e0afd0c05e69",
-        "source_sha256": "d8baf62562748946f07c731646acce2ad52ba8c6342a41f0bac21135319753ed",
-        "icon_sha256": "e639f3d1b35a75175922f0a020c293958273a5458fdbeee2c784ed2484c8717a",
+        "source_sha256": "45f04aa06662209807224b5fdaf32fb59ccb522dfdffb7f0ef874adf1460043e",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "a5e54f3385d3a40833fa18f1021ec3d171b2940d3f7fe69316348b0541b2f9db",
         "dsp_byte_identical": true
       }
     },
@@ -1094,7 +1118,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/scrub/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "56619646e6e0b55e238b1ddc221599cdba2d61d09be0124ec73bf37e96b5350a",
+      "current_build_sha256": "63eb83810e2026a0bb02ec8e863e723ab7c03951228eb6ec239070c7ee4682f4",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1129,10 +1153,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "fadd7a95d0a8d05ed3213a46b6546c014a10ebd2bae8448eaf87fb8aa177ee85",
-        "artwork_binary_sha256": "56619646e6e0b55e238b1ddc221599cdba2d61d09be0124ec73bf37e96b5350a",
+        "artwork_binary_sha256": "63eb83810e2026a0bb02ec8e863e723ab7c03951228eb6ec239070c7ee4682f4",
         "dsp_sha256": "85fcc4ae241fa3844a5ec4612d4814d2a5632ba7aa91f234fb4dede34553961f",
-        "source_sha256": "1fbb867fccc3afcb6387095c72f3195e02bd3e0095fed74c22f1e44f0acd1a07",
-        "icon_sha256": "88db5e522da05fc8823ab28c7a4ba3b866cf664fd77d0e58ff6d547a419a8747",
+        "source_sha256": "9de48676bf456a29cf30f74f2a36558d7479703e6d5cea189a2a44f5fdef2c61",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "f0cf689994f468a0d314f8f172d52f595d75921ef02563586f6af256f83bff0b",
         "dsp_byte_identical": true
       }
     },
@@ -1143,7 +1168,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sgnl/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "df0f949d6aaf1dfd448cf4c863ac6478c0ed26954d8a8ba0d48cf16ed8769397",
+      "current_build_sha256": "ef84c1239a05b05f23b973aa5e42df9c2b424538c015322b6c60a4583604b659",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1175,10 +1200,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "4d92625a75e49a512bc698369bc820509a3a010b7a49d6726c42604e9d6fd70c",
-        "artwork_binary_sha256": "df0f949d6aaf1dfd448cf4c863ac6478c0ed26954d8a8ba0d48cf16ed8769397",
+        "artwork_binary_sha256": "ef84c1239a05b05f23b973aa5e42df9c2b424538c015322b6c60a4583604b659",
         "dsp_sha256": "8f8c71f49d0b1e64c67b56b3ec4123c698a477691975743566398f7e97d3bb66",
-        "source_sha256": "65674a07c3ff9dc1e324ca51a0a62603223bda467c2cfe44bb7dc8dbbb43931d",
-        "icon_sha256": "1280ae93799eb835e2fbc69ada825477c8635484853a0932d0494ef4b0f53765",
+        "source_sha256": "2652df610b10052c1c90445d176bbb1cdb5bc2467a4d74731fd8d6a89b0ce6ee",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "1d09dde760caef5093ec384be742a5d399c9158a4b3fe2695b19ae7075d586f0",
         "dsp_byte_identical": true
       }
     },
@@ -1189,7 +1215,7 @@
       "family": "original",
       "build_report": "src/msplus/shatter/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "e267491c32cd3fe2ae66ba20c680be72294c602b61de4a70d763e4d2e413bd91",
+      "current_build_sha256": "616acfd8bcf534d057a2d4e16c32818bbf0747669c4e984a19141dcd5248d38d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1219,10 +1245,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
-        "artwork_binary_sha256": "e267491c32cd3fe2ae66ba20c680be72294c602b61de4a70d763e4d2e413bd91",
+        "artwork_binary_sha256": "616acfd8bcf534d057a2d4e16c32818bbf0747669c4e984a19141dcd5248d38d",
         "dsp_sha256": "529ae4e03b22f00c8b8fdf258f599042bc0d49b4a2376bea36eba52c35897c3d",
-        "source_sha256": "a90872fb7b8d4b707ad72075ac52a8d6b796fd9873a1ebd2f6382793678470d3",
-        "icon_sha256": "676773cd2f3ebb01e9de63a4b5ea56d00537fd6cab03cb514240f5ea5ab072b1",
+        "source_sha256": "0c7b3c8f62d2092c6f68e0ced3a782c46a007fef2af1bc66e525b33e3440ea72",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "3997cf674e8ec517b8bb4e81c47733865804776059a1cd147debd83476745b74",
         "dsp_byte_identical": true
       }
     },
@@ -1233,7 +1260,7 @@
       "family": "original",
       "build_report": "src/msplus/spiral/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "5812b150976093ad6bd61425c7d6407087b7de4f2bf4fc7606fdfab8e3a75429",
+      "current_build_sha256": "f108e7c1ab4bec0ef636f9901329b3d3c86b962cfcc7c6e1038fb93cd30799f1",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1263,10 +1290,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "b978492de267482028f720004cdefaaa62752c5336fcbcf62e5cf3cf8fb34471",
-        "artwork_binary_sha256": "5812b150976093ad6bd61425c7d6407087b7de4f2bf4fc7606fdfab8e3a75429",
+        "artwork_binary_sha256": "f108e7c1ab4bec0ef636f9901329b3d3c86b962cfcc7c6e1038fb93cd30799f1",
         "dsp_sha256": "5e86921018d6372b4ea79f69588c4abacc2f67e42180391ca5c8c43c8eda931c",
-        "source_sha256": "e0815b3e936ef6e85c543d8ad1103652f5f7d62fc0b41e3a95ffcb978e7507c6",
-        "icon_sha256": "90281717ba768301b070ae17ba5dfad6768a2d1d4dc0ae0c39c82476ed4d5cf1",
+        "source_sha256": "a8a7df25b2865b0efc3f13428aa84914278c1112bffc7312317d8564b4ee532c",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "35a095e02197695d8c057e958080513e94fbbf6bbc389c06555d53916b99ceeb",
         "dsp_byte_identical": true
       }
     },
@@ -1277,11 +1305,11 @@
       "family": "original",
       "build_report": "src/msplus/spool/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1a622ff519a3fd990953153b06fa84d250d5462bf93581c34b7ebb512961ef7a",
+      "current_build_sha256": "82a17b9dd012b29cbfcc7f9a40907a359f5b004dc3f273a21a4678f86983159f",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/spool/hil/analysis.json",
+      "evidence": "build/msplus/native-art-spool-hil-20261030-01/spool/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1292,7 +1320,7 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
+      "tested_binary_sha256": "82a17b9dd012b29cbfcc7f9a40907a359f5b004dc3f273a21a4678f86983159f",
       "source_fingerprints": {
         "src/msplus/spool/manifest.json": "8561fbbebbb543c36e3175c56fc2094038ec1ded8a2005e71c56c3d8a9b348d7",
         "src/msplus/spool/spool.c": "1450aa0f9ef684927242149d07e149859d243fbe2f0439f744c5786655168470",
@@ -1303,18 +1331,10 @@
         "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
-        "src/airwindows/tapeecho4/manifest.json": "dc328918ac11390aa86e8713f9e4a35def702c19703a7b151131dc2a1a19ec21",
+        "src/airwindows/tapeecho4/manifest.json": "be23454f48b6d850c7aff44edd8ab99ec0505e34a322bb94cd01c78e58eafbfc",
         "src/airwindows/tapeecho4/tapeecho4.c": "e113ec842938821d56e607ba65ddd6ae53f11117257fbd657a06bb0e0a57d6f8",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "7a1693fad6a29f34ed63fb475e9b89398e0d35013a0ba9c6e19f60017b3e0ece",
-        "artwork_binary_sha256": "1a622ff519a3fd990953153b06fa84d250d5462bf93581c34b7ebb512961ef7a",
-        "dsp_sha256": "babdf8b68b41353a8b9e4be0ddb6e13c424866c641befc361eb31cd9d77563fb",
-        "source_sha256": "ae6f65112acc35d277970c3a48beadbbd4059ce7dd0d5387874a539a389ae144",
-        "icon_sha256": "ba1a057036e33b04192a2aa951de37161b1d3579178f1a56f7a01791bcd58954",
-        "dsp_byte_identical": true
       }
     },
     {
@@ -1324,7 +1344,7 @@
       "family": "original",
       "build_report": "src/msplus/stasis/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "f1094061f5e2f62e88dcd760e5c74818b1c0e8f3ccf7902076257979e2efb28e",
+      "current_build_sha256": "a22cb6def5c72648b38b60fea48ba7e9a965400351aa6d82f9cd32ddf34fe92c",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1355,10 +1375,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
-        "artwork_binary_sha256": "f1094061f5e2f62e88dcd760e5c74818b1c0e8f3ccf7902076257979e2efb28e",
+        "artwork_binary_sha256": "a22cb6def5c72648b38b60fea48ba7e9a965400351aa6d82f9cd32ddf34fe92c",
         "dsp_sha256": "d9b1d404a4f6ea3fa3efa41dabd22f1ca69d888f3f2c5ec0a1cda7537df22985",
-        "source_sha256": "b5263e70d310d48a490d8c978f51b162d67b57ff36a0740d7bb5b826f56b887f",
-        "icon_sha256": "220e8a334608f273a4d02e4ee3d9c74acc093a518ae9e9da2ae5dac86e0245f8",
+        "source_sha256": "e261801d98b40f2562b20b734d569b21eb0e1a161ec2f632720d536aaa4b548c",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "3244be504121d92df32cb2f772b179f7f6c3dde8217029c6378cfa934be42ecb",
         "dsp_byte_identical": true
       }
     },
@@ -1369,7 +1390,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/sweep/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "3c45de4df59e2fb409918734553e388f84082cc428e1d461ec93854857146054",
+      "current_build_sha256": "555625dec2981a2fcaed29754f85565fb6a24d8533d55dd3d605757131b3c0c9",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1401,10 +1422,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
-        "artwork_binary_sha256": "3c45de4df59e2fb409918734553e388f84082cc428e1d461ec93854857146054",
+        "artwork_binary_sha256": "555625dec2981a2fcaed29754f85565fb6a24d8533d55dd3d605757131b3c0c9",
         "dsp_sha256": "34af9d9e7b828b3edf4b9f2f8621455db6352318fcada68db61a004ca38e7c4b",
-        "source_sha256": "5b4faa80931708ad36b4edba0f8850859ff06c4481f22b8e55af1f1f7e6219e8",
-        "icon_sha256": "0bf39e88ea1126c938ab9a44187a3d5c45c2394bb4764a0088c917debc8193b2",
+        "source_sha256": "5bb15af237266db0e88363a100a75e7cd14f8e30d43b20146641f554dcb1cdf5",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "91c83156dae903c4edcdcf0e115d6fda98077cfb0999d4b614e5eb7f256f8817",
         "dsp_byte_identical": true
       }
     },
@@ -1415,7 +1437,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "9c3333823bd7885caf8c103ae0f3e3b8bc79a422a6a824903fc2e4ee36c3814d",
+      "current_build_sha256": "d38a0e85f07c603dd33590fd3f11f87e608077a4ccfd696d7f04ffc7651168b5",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1445,10 +1467,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
-        "artwork_binary_sha256": "9c3333823bd7885caf8c103ae0f3e3b8bc79a422a6a824903fc2e4ee36c3814d",
+        "artwork_binary_sha256": "d38a0e85f07c603dd33590fd3f11f87e608077a4ccfd696d7f04ffc7651168b5",
         "dsp_sha256": "c0ce976e1e4492ec468cf2dd43c2a7df905973698e0eea2aedb0e59f7df35305",
-        "source_sha256": "26395afafcbd8e0aa7854f7da907456eeffaded10c3a7358e510311e043a5e75",
-        "icon_sha256": "ae380ccb28da276cfba7873e511072c8ccd392276bdf64a1935779559dc2545d",
+        "source_sha256": "1267c962f7a79130674d607fee2255b0c7221ac08d5d2894e8eeff7de6e03454",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "aebdee72080fe2189e72b29ebf9c38cb6136d63ada161eb86bc61faaad2a85cc",
         "dsp_byte_identical": true
       }
     },
@@ -1459,7 +1482,7 @@
       "family": "original",
       "build_report": "src/msplus/taffy/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "2ceb0a58231b51a40002205e8fe90ac8c8371665a0376a613d571d379a139a8e",
+      "current_build_sha256": "a2018a31de496ff26a93457f902cee3a599832c4a1f7a9bafaa75fa51c7dd23a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1489,10 +1512,11 @@
       },
       "artwork_only_variant": {
         "original_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
-        "artwork_binary_sha256": "2ceb0a58231b51a40002205e8fe90ac8c8371665a0376a613d571d379a139a8e",
+        "artwork_binary_sha256": "a2018a31de496ff26a93457f902cee3a599832c4a1f7a9bafaa75fa51c7dd23a",
         "dsp_sha256": "a4b96675d0ec5b106dbae4bc2aaffb8d6447bc80d684568c26faedcd6bab1191",
-        "source_sha256": "4e2846507a46237787a77d9923373c5516061bc1be653d9d1e327edd02a34af7",
-        "icon_sha256": "36ebe57714c6525a9b628b72a3592fcb0e991830ac66d262891f6368f2489703",
+        "source_sha256": "f428150e03fd5328137c3eded54690dcc6e6d8bdf5b61ddbb1338a30161f26bb",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "8de40e6884f1e7aa80de45e3106cf70328f01c1a4f2738634436ca64f0515365",
         "dsp_byte_identical": true
       }
     },
@@ -1503,7 +1527,7 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/wavefold/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
+      "current_build_sha256": "06f3d3758a35ef04825d8f1626084b0681e2619f1e5a1410060754fea38fe015",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1534,29 +1558,70 @@
         "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
         "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
+      },
+      "artwork_only_variant": {
+        "original_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
+        "artwork_binary_sha256": "06f3d3758a35ef04825d8f1626084b0681e2619f1e5a1410060754fea38fe015",
+        "dsp_sha256": "9bddebbdcbc90d86c4c98240fa45ee7a5b26a65a1f0068e190dbc6fa5327393a",
+        "source_sha256": "67189627cfafeca372ef2e7484bdd42438927beec7a6b5d4a0bfe6f5ea3b0781",
+        "artwork_format": "native Plus icons, independently authored sizes",
+        "icon_sha256": "7c89ee2e9fc253c71274b32f050762a5145a2b97ceeb1462c88b0f07b84bb720",
+        "dsp_byte_identical": true
       }
     }
   ],
-  "bench_blocker": "After confirmed power cycle, stock stereo loopback recovered. Spiral, Rewire, Rooms and SGNL passed. SyncEQ steady-state cases passed, but stock restoration lost audio before uninstall. Further installs stopped. Bypass-before-replacement change is offline-tested and awaits a fresh physical restart for its hardware test.",
-  "safety_audit": "build/msplus/audit-synceq-transition-01/VERIFIED.json",
-  "saved_patches_after_stock_reload": "build/msplus/audit-synceq-transition-01/VERIFIED.json",
-  "experiments_left_installed": 1,
+  "bench_blocker": null,
+  "safety_audit": "build/msplus/native-art-install-20261030-01/audit/VERIFIED.json",
+  "saved_patches_after_stock_reload": "build/msplus/native-art-install-20261030-01/audit/VERIFIED.json",
+  "experiments_left_installed": 34,
   "limitations": [
     "Matujuice legacy dry-tag FOLLOW/Mozaic tempo relay has no verified Plus mapping",
-    "Custom icons and value labels deferred",
     "Multi-slot arena ownership and aggregate DSP load unqualified",
-    "Scorch quantitative comparison fails; acceptance thresholds preserved"
+    "Standalone checks cover selected cases; manual visual review of native artwork remains pending"
   ],
   "counts": {
     "musical_builds": 34,
-    "selected_hardware_checks_passed": 26,
-    "current_retention_gate_passed": 4,
-    "scorch_reference_mismatch": 1,
-    "unqualified_transitions": 2,
-    "not_yet_hardware_tested": 5
+    "selected_hardware_checks_passed": 34,
+    "current_retention_gate_passed": 34,
+    "scorch_reference_mismatch": 0,
+    "unqualified_transitions": 0,
+    "not_yet_hardware_tested": 0
   },
   "installed_ports": [
-    "synceq"
+    "arrakis",
+    "breather",
+    "corrupt",
+    "dirtbox",
+    "dissolve",
+    "dualshft",
+    "dubsiren",
+    "dustbox",
+    "eugate",
+    "flower",
+    "formant",
+    "galactic",
+    "genloss",
+    "griddly",
+    "gyre",
+    "howl",
+    "hydra",
+    "klang",
+    "mangle",
+    "microloom",
+    "oxide",
+    "rewire",
+    "rooms",
+    "scorch",
+    "scrub",
+    "sgnl",
+    "shatter",
+    "spiral",
+    "spool",
+    "stasis",
+    "sweep",
+    "synceq",
+    "taffy",
+    "wavefold"
   ],
   "followup": {
     "after_power_cycle_audit": "build/msplus/audit-after-power-cycle-01/VERIFIED.json",
@@ -1568,7 +1633,7 @@
     "factory_catalogue_entries_unchanged": true,
     "file_sessions_closed": true
   },
-  "last_updated": "2026-10-29",
+  "last_updated": "2026-10-30",
   "october_28_followup": {
     "stock_audio_recheck": "build/msplus/stock-audio-recheck-03/report.json",
     "stock_audio_paths_recovered": false,
@@ -1589,14 +1654,29 @@
   },
   "verification_logs": {
     "native": {
-      "path": "build/msplus/native-wavefold-stages-final.log",
+      "path": "build/msplus/native-art-session-20261030-01/native-tests.log",
       "tests": 28,
-      "sha256": "23f55e482d699c9c5fcfeb6561f9478c33b7603f937bae91afedd3183d6784a9"
+      "sha256": "a1a470ee3cb1b334508d74a6f04d54aaa102a8237b179e52d4a546f8fa4abfbe"
     },
     "tools": {
-      "path": "build/msplus/tools-wavefold-stages-03.log",
+      "path": "build/msplus/native-art-session-20261030-01/tools-tests.log",
       "tests": 24,
-      "sha256": "e620200cb7b1b78965adc5626c566f90e562ede642a1c47657524582aa5420af"
+      "sha256": "601cb3fb8f1400af4a2a76aa6d78756bc3735d1cdad56333735b43e34ba139fa"
     }
+  },
+  "native_artwork": {
+    "icons": 68,
+    "dimensions": [
+      [
+        72,
+        97
+      ],
+      [
+        102,
+        128
+      ]
+    ],
+    "artwork_only_proof": "build/msplus/native-art-install-20261030-01/ARTWORK-ONLY.json",
+    "spool_requalified_after_main_metadata_change": true
   }
 }

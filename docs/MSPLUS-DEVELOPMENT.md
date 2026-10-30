@@ -127,6 +127,43 @@ audio recording, source-to-container equivalence and accepted hardware report:
 `build/msplus/artwork-final-20261029-01/COMPLETE.json`.
 See the [34-effect artwork preview](images/msplus-artwork.png).
 
+### Native Plus artwork installed, October 30
+
+All 34 effects now use the independently authored native Plus icons, with
+separate 72×97 and 102×128 drawings rather than resized legacy cover panels.
+See the [complete native preview](images/msplus-native-artwork.png) and
+[artwork sources](../src/msplus/artwork/README.md).
+
+The fresh pre-update backup verified 374 files and 100 stock-only saved patches.
+Every factory file except the expected custom catalogue matched the original
+factory backup. All 34 installed pairs matched the archived previous local
+artifacts before replacement. Each new ZD2 was independently checked against
+that backup: only ICON pixels and the CRC may differ; DSP, parameters, IDs,
+versions and all other container bytes are unchanged. WaveFold remains 0.11.
+
+The rebase changed Spool's legacy ID/version metadata. Its generated Plus
+parameter header was byte-identical, but the strict source gate correctly
+rejected the changed manifest fingerprint. A fresh Spool hardware audition
+passed all existing checks, recorded current sources and verified restoration
+of stock audio; no provenance check was relaxed or historical capture altered.
+Evidence is `build/msplus/native-art-spool-hil-20261030-01/spool/hil/`.
+
+The complete-set installer dry-ran all removals and installs, removed each old
+custom pair before installing its replacement, and verified readback. The final
+independent audit verified all 68 files, the unchanged factory catalogue and
+all 100 saved patches. Stock stereo loopback passed afterward at −30 dBFS send:
+correlations 0.957/0.958 and gains −20.02/−20.09 dB, without clipping or xruns.
+Autosave remains OFF, the temporary patch is stock-only, and 576,690 bytes remain
+free. The 28 native DSP and 24 tooling/fault tests pass. All 34 pairs remain
+installed for manual visual review; this does not qualify multi-effect chains.
+
+Final proof: `build/msplus/native-art-install-20261030-01/COMPLETE.json`.
+The architecture comparison against the earlier pre-art/WaveFold baseline
+includes the intervening DSP and main changes; overall duplication decreased
+and maximum complexity stayed unchanged. The new offline drawing functions
+branch over the required distinct motifs and layouts; the existing packaging,
+container validation and installation mechanisms are reused.
+
 ### Historical WaveFold 0.10 input sensitivity
 
 This diagnosis applies to the original port, superseded by the
