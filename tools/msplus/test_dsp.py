@@ -9,33 +9,113 @@ from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
-    def test_wavefold_symmetry_range_tracks_input_level(self):
-        # The original piecewise-linear folder needs a threshold crossing.
-        # Auto-level makes straight sections sound dry at quiet input levels;
-        # this is not a bypass or an unmapped SYMM value in the Plus adapter.
-        packed = Kernel('wavefold', arena_bytes=705600)
-        raw = Kernel('wavefold', arena_bytes=705600, raw_state=True)
-        phase = 2*np.pi*1000*np.arange(44160)/44100
-        sine, cosine = np.sin(phase[-4410:]), np.cos(phase[-4410:])
-        for amplitude, drive, expected in ((.0025, 37, [5, 35, 65, 95]),
-                                           (.05, 100, list(range(101)))):
-            folded = []
-            source = np.column_stack([np.zeros(len(phase)), amplitude*np.sin(phase)])
-            for symmetry in range(101):
-                for kernel in (packed, raw):
-                    kernel.state[:] = 0
-                    kernel.state[kernel.guard_word] = kernel.guard
-                    kernel.coeff[5:10] = [drive/100, symmetry/100, 1, .5, 1]
-                actual = np.concatenate([packed.block(b) for b in source.reshape(-1, 16, 2)])
-                reference = np.concatenate([raw.block(b) for b in source.reshape(-1, 16, 2)])
-                np.testing.assert_array_equal(actual, reference)
-                wet = actual[-4410:, 1]  # Bus B is physical left.
-                fundamental = 2*(np.dot(wet, sine)*sine + np.dot(wet, cosine)*cosine)/len(wet)
-                residual = wet - wet.mean() - fundamental
-                thd = np.sqrt(np.mean(residual**2)/np.mean(fundamental**2))
-                if thd > .01:
-                    folded.append(symmetry)
-            self.assertEqual(folded, expected, (amplitude, drive))
+    def test_wavefold_oversampling_reduces_alias_energy(self):
+        kernel=Kernel('wavefold',arena_bytes=705600)
+        kernel.coeff[5:11]=[.7,.5,.5,1,.5,1]
+        t=np.arange(44160)/44100
+        source=np.column_stack([np.zeros(len(t)),.0025*np.sin(2*np.pi*3100*t)])
+        oversampled=np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[-22050:,1]
+        plain=source[-22050:,1]*(2+126*.7**2)
+        for _ in range(5):
+            plain=np.sin(np.pi/2*plain*(.6366197724+2.1633802276*.7))
+        frequencies=np.fft.rfftfreq(len(plain),1/44100)
+        wanted=np.zeros(len(frequencies),bool)
+        for harmonic in range(1,8):
+            wanted |= abs(frequencies-3100*harmonic)<8
+        ratios=[]
+        for audio in (oversampled,plain):
+            power=abs(np.fft.rfft(audio))**2
+            power[0]=0
+            ratios.append(10*np.log10(power[~wanted].sum()/power.sum()))
+        self.assertLess(ratios[0]-ratios[1],-8)
+
+    def test_wavefold_all_symmetry_values_and_voices_at_quiet_levels(self):
+        kernel = Kernel('wavefold', arena_bytes=705600)
+        phase = 2*np.pi*1000*np.arange(26464)/44100
+        source = np.column_stack([np.zeros(len(phase)), np.sin(phase)])
+        for amplitude in (.0008, .0025):
+            for drive in (.4, 1):
+                for voice in (0, .5, 1):
+                    for symmetry in range(101):
+                        kernel.state[:] = 0
+                        kernel.state[kernel.guard_word] = kernel.guard
+                        kernel.coeff[5:11] = [drive, symmetry/100, voice, 1, .5, 1]
+                        out = np.concatenate([kernel.block(b*amplitude) for b in source.reshape(-1,16,2)])
+                        y = out[-8820:,1]
+                        fundamental = 2*abs(np.mean(y*np.exp(-1j*phase[-8820:])))
+                        rms = np.sqrt(np.mean(y*y))
+                        thd = np.sqrt(max(2*rms*rms-fundamental*fundamental, 0))/max(fundamental,1e-12)
+                        with self.subTest(amplitude=amplitude, drive=drive, voice=voice, symmetry=symmetry):
+                            self.assertGreater(thd, .01)
+                            self.assertGreater(rms, amplitude*.2)
+                            self.assertLess(rms, amplitude)
+                            self.assertTrue(np.isfinite(kernel.arena[2:-2].view(np.float32)).all())
+
+    def test_wavefold_voices_filter_before_folding_and_blend_clean_independently(self):
+        phase = np.arange(44160)/44100
+        source = np.column_stack([np.zeros(len(phase)), .0008*(np.sin(2*np.pi*200*phase)+np.sin(2*np.pi*4000*phase))])
+        outputs = []
+        for voice in (0,.5,1):
+            kernel = Kernel('wavefold', arena_bytes=705600)
+            kernel.coeff[5:11] = [0,.5,voice,1,.5,1]
+            outputs.append(np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[:,1])
+        low, full, blend = outputs
+        delayed = np.pad(source[:-12,1], (12,0))
+        np.testing.assert_allclose(blend, .55*full+.45*delayed, atol=2e-9)
+        ratios = []
+        for output in (low,full):
+            segment = output[-22050:]
+            levels = [abs(np.mean(segment*np.exp(-2j*np.pi*f*phase[-22050:]))) for f in (200,4000)]
+            ratios.append(levels[1]/levels[0])
+        self.assertLess(ratios[0]/ratios[1], .15)
+        kernel = Kernel('wavefold', arena_bytes=705600)
+        kernel.coeff[10] = 0  # Overall Mix remains independent of VOICE.
+        actual = np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[:,1]
+        np.testing.assert_allclose(actual, delayed, atol=1e-10)
+
+    def test_wavefold_each_stage_count_matches_independent_sine_reference(self):
+        import ctypes
+        import subprocess
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp)/'probe.c'; library=Path(tmp)/'probe.so'
+            source.write_text('#include "'+str(ROOT/'src/msplus/wavefold/wavefold.c')+'"\n'
+                              'float probe(float x,float gain,float bias,int stages){return wf_cascade(x,gain,bias,stages);}')
+            subprocess.run(['cc','-shared','-fPIC','-O2','-I'+str(ROOT/'src/msplus/wavefold/build'),str(source),'-o',str(library)],check=True)
+            lib=ctypes.CDLL(str(library));lib.probe.argtypes=[ctypes.c_float]*3+[ctypes.c_int];lib.probe.restype=ctypes.c_float
+            x=np.linspace(-2,2,4001).astype(np.float32)
+            for stages in range(1,6):
+                for gain in (.6366197724,1.5,2.8):
+                    for bias in (-.5,0,.5):
+                        expected=x.astype(float)
+                        for stage in range(stages):
+                            sign=1 if stage%2==0 else -1
+                            expected=np.sin(np.pi/2*(expected*np.float32(gain)+sign*bias))-sign*np.sin(np.pi/2*bias)
+                        actual=np.array([lib.probe(float(v),gain,bias,stages) for v in x])
+                        np.testing.assert_allclose(actual,expected,atol=.0003)
+            five=np.array([lib.probe(float(v),2.8,0,5) for v in x])
+            one=np.array([lib.probe(float(v),2.8,0,1) for v in x])
+            self.assertGreater(np.sqrt(np.mean((five-one)**2)),.4)
+
+    def test_wavefold_stage_selector_changes_audio_and_stays_silent_without_input(self):
+        phase=np.arange(26464)/44100
+        source=np.column_stack([np.zeros(len(phase)),.0025*np.sin(2*np.pi*997*phase)])
+        outputs=[]
+        kernel=Kernel('wavefold',arena_bytes=705600)
+        self.assertEqual(kernel.manifest['params'][-1]['values'],['1','2','3','4','5'])
+        for stages in range(5):
+            for voice in (0,.5,1):
+                kernel.state[:]=0;kernel.state[kernel.guard_word]=kernel.guard
+                kernel.coeff[5:12]=[.7,.5,voice,1,.5,1,stages/4]
+                for _ in range(10):
+                    np.testing.assert_array_equal(kernel.block(np.zeros((16,2))),0)
+                out=np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[-8820:,1]
+                self.assertGreater(np.sqrt(np.mean(out*out)),.0002)
+                self.assertTrue(np.isfinite(kernel.arena[2:-2].view(np.float32)).all())
+                if voice==.5:outputs.append(out)
+        for a,b in zip(outputs,outputs[1:]):
+            self.assertGreater(np.sqrt(np.mean((a-b)**2)),.0003)
 
     def test_packed_matujuice_controls_match_raw_state_audio_exactly(self):
         rng = np.random.default_rng(301)
@@ -321,9 +401,11 @@ class DSPTests(unittest.TestCase):
 
     def test_matujuice_left_input_and_grid_delay_bypass_tail(self):
         k = Kernel('wavefold', arena_bytes=705600)
-        k.coeff[9] = 0  # Mix=0 still follows the original mono-left input.
+        k.coeff[10] = 0  # Mix=0 is mono-left, aligned to the 12-sample FIR delay.
         source = np.tile([0.02, 0.01], (16, 1))
-        np.testing.assert_allclose(k.block(source), 0.01, atol=1e-8)
+        delayed = k.block(source)
+        np.testing.assert_array_equal(delayed[:12], 0)
+        np.testing.assert_allclose(delayed[12:], .01, atol=1e-8)
         k.coeff[0] = 0
         np.testing.assert_allclose(k.block(source), source, atol=1e-8)
         k = Kernel('griddly', arena_bytes=705600)

@@ -64,6 +64,8 @@ def stimulus(rate, level_db, kind):
             wave = rng.uniform(-1, 1, count)
         elif kind == 'tone':
             wave = np.sin(2 * np.pi * 997 * t)
+        elif kind == 'two-tone':
+            wave = .5*(np.sin(2*np.pi*200*t)+np.sin(2*np.pi*4000*t))
         else:
             wave = signal.chirp(t, f0=30, f1=18000, t1=1.5, method='logarithmic')
         wave *= signal.windows.tukey(count, 0.04)

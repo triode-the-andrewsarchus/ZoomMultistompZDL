@@ -26,7 +26,7 @@ def check_measurements(name, evidence):
     checks = {'capture_integrity', 'signal_above_noise', 'zero_input_stability'}
     if name in EFFECT_CHECKS:
         checks.add(EFFECT_CHECKS[name][1])
-    if name == 'scorch':
+    if name in ('scorch', 'wavefold'):
         checks.add('native_DSP_harmonics')
     if (evidence.parent / 'dry').is_dir():
         checks.add('dry_path_gain')

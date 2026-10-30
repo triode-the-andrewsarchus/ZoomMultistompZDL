@@ -62,8 +62,19 @@ BUFFERED_PORTS = {'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangl
 
 
 MATU_CASES = {
-    'wavefold': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
-                 ('drive', {'Drive': 100}, 'tone'), ('symmetry', {'Symm': 95, 'Tone': 100}, 'tone')],
+    'wavefold': [('dry', {'Mix': 0}, 'sweep'),
+                 ('wet', {'Drive': 40, 'Symm': 50, 'Voice': 1, 'Tone': 100, 'Level': 50, 'Mix': 100, 'Stages': 4}, 'tone'),
+                 ('drive', {'Drive': 100}, 'tone')]
+                + [(f'd{drive}-s{sym:03}', {'Drive': drive, 'Symm': sym}, 'tone')
+                   for drive in (40, 100) for sym in range(0, 101, 5)]
+                + [('quiet', {'Drive': 40, 'Symm': 50}, 'tone'),
+                   ('loud', {}, 'tone'),
+                   ('voice-full', {'Drive': 0, 'Voice': 1}, 'two-tone'),
+                   ('voice-low', {'Voice': 0}, 'two-tone'),
+                   ('voice-blend', {'Drive': 40, 'Voice': 2}, 'tone'),
+                   ('voice-fold', {'Voice': 1}, 'tone')]
+                + [(f'stage{stages}-voice{voice}', {'Drive': 70, 'Symm': 50, 'Stages': stages-1, 'Voice': voice}, 'tone')
+                   for stages in range(1,6) for voice in (0,1,2)],
     'dualshft': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
                  ('pitch', {'Ptch1': 66, 'Ptch2': 0}, 'tone')],
     'formant': [('dry', {'Mix': 0}, 'sweep'), ('wet', {'Mix': 100}, 'tone'),
@@ -381,6 +392,8 @@ def main():
                 level = -30
                 if manifest['filename'] == 'XXZCRRPT' and label == 'tone':
                     level = -20
+                if args.effect.name == 'wavefold' and label in ('quiet', 'loud'):
+                    level = -40 if label == 'quiet' else -20
                 if args.effect.name == 'rooms' and label in ('mode20', 'mode60'):
                     level = -20
                 reports[label] = capture_trial(args.output / label, kind, level, rig)

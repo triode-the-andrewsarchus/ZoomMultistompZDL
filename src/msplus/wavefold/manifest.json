@@ -2,10 +2,10 @@
   "name": "MJWaveFold",
   "filename": "XXMWAVEF",
   "id": "07001300",
-  "version": "0.10",
+  "version": "0.11",
   "display": "MJ WAVEFOLD",
   "badge": "MJ",
-  "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save.",
+  "description": "Plus redesign: 1-5 sine-folding stages, 4x oversampling, LOW/FULL/BLEND voices. Mono left. Never save.",
   "dspload": 180,
   "kernel": "wavefold.c",
   "state_bytes": 8,
@@ -24,31 +24,55 @@
       "name": "Drive",
       "max": 100,
       "default": 40,
-      "explanation": "Drive control; Matujuice v1.5 taper."
+      "explanation": "Folding intensity; input trim follows the selected number of stages."
     },
     {
       "name": "Symm",
       "max": 100,
       "default": 50,
-      "explanation": "Symm control; Matujuice v1.5 taper."
+      "explanation": "Alternating stage bias, centered at 50; no offset-only dead bands."
+    },
+    {
+      "name": "Voice",
+      "max": 2,
+      "default": 1,
+      "values": [
+        "LOW",
+        "FULL",
+        "BLEND"
+      ],
+      "explanation": "LOW: two-pole input low-pass. FULL: full-spectrum folding. BLEND: parallel clean signal."
     },
     {
       "name": "Tone",
       "max": 100,
       "default": 60,
-      "explanation": "Tone control; Matujuice v1.5 taper."
+      "explanation": "Post-folder low-pass; 100 is open."
     },
     {
       "name": "Level",
       "max": 100,
       "default": 50,
-      "explanation": "Level control; Matujuice v1.5 taper."
+      "explanation": "Matched output level; 50 is unity loudness."
     },
     {
       "name": "Mix",
       "max": 100,
       "default": 100,
-      "explanation": "Mix control; Matujuice v1.5 taper."
+      "explanation": "Linear dry/wet blend; dry aligned to the 12-sample oversampling delay."
+    },
+    {
+      "name": "Stages",
+      "max": 4,
+      "default": 4,
+      "values": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "explanation": "One to five cascaded folding cells; input trim compensates for fewer stages."
     }
   ]
 }

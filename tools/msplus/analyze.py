@@ -10,6 +10,7 @@ import soundfile as sf
 from scipy import signal
 from native import MATU_PORTS
 from reference import validate_linearity
+from wavefold_reference import validate_hardware as validate_wavefold
 
 
 def align(reference, actual, rate):
@@ -173,18 +174,6 @@ def validate_hold(directory, labels, tone=True, first=False):
     return rows, errors
 
 
-def validate_wavefold(directory):
-    audio, rate = sf.read(directory / 'symmetry/return.wav', always_2d=True)
-    rows = []
-    for ch in range(2):
-        segment = audio[int(.8*rate):int(1.8*rate), ch]
-        freq, power = signal.periodogram(segment, fs=rate, window='hann', nfft=2**19)
-        band = (freq > 900) & (freq < 2500)
-        peak = float(freq[band][np.argmax(power[band])])
-        rows.append(dict(channel=ch, expected_hz=1994, measured_hz=peak))
-    errors = [f'WaveFold knee should double the tone: {r}' for r in rows if abs(r['measured_hz']-1994)>2]
-    return rows, errors
-
 
 def validate_modulation(directory, label):
     audio, rate = sf.read(directory / label / 'return.wav', always_2d=True)
@@ -244,7 +233,7 @@ EFFECT_CHECKS = {
                 partial(validate_hold, labels=['tail'], tone=False, first=True)),
     'dubsiren': ('held_or_generated_audio', 'held_or_generated_audio',
                  partial(validate_hold, labels=['siren'], tone=False, first=True)),
-    'wavefold': ('folded_tone', 'fold_knee_frequency_doubling', validate_wavefold),
+    'wavefold': ('folded_tone', 'configurable_wavefolding_and_voices', validate_wavefold),
     'eugate': ('modulation', 'rhythm_envelope_modulation', partial(validate_modulation, label='wet')),
     'breather': ('modulation', 'rhythm_envelope_modulation', partial(validate_modulation, label='pump')),
 }
@@ -272,9 +261,11 @@ def main():
     if (args.directory / 'dry/return.wav').is_file():
         errors.extend(validate_dry(args.directory, reference, args.effect))
         checks.append('dry_path_gain')
-    if args.effect == 'scorch' and args.calibration:
+    if args.effect in ('scorch', 'wavefold') and args.calibration:
         from reference import compare_scorch
-        rows, problems = compare_scorch(args.directory, args.calibration, args.output_probe)
+        from wavefold_reference import compare_native
+        rows, problems = (compare_scorch(args.directory, args.calibration, args.output_probe)
+                          if args.effect == 'scorch' else compare_native(args.directory, args.calibration))
         results['software_reference'] = rows
         errors.extend(problems)
         checks.append('native_DSP_harmonics')
