@@ -366,7 +366,7 @@
   "spool": {
     "name": "Spool",
     "source": "dist/Spool.ZDL",
-    "source_sha256": "b5ffc1530c6f84b77b3c3ccf603a50bee88d32ce13817dfc43d434fed34b8f93",
+    "source_sha256": "66645a569daddec93d7260e53b3c6e7b95d062b705c76c3595edeb16164e0aba",
     "symbol": "picEffectType_Spool",
     "crop": [
       0,
