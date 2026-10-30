@@ -3,8 +3,8 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 23,
-  "tool_fault_tests": 21,
+  "native_tests": 28,
+  "tool_fault_tests": 24,
   "return_gain_db": 0,
   "ports": [
     {
@@ -1503,26 +1503,27 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/wavefold/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
+      "current_build_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/artwork-smoke-01/wavefold/hil/analysis.json",
+      "evidence": "build/msplus/wavefold-stages-hil-01/wavefold/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
         "signal_above_noise",
         "dry_path_gain",
-        "fold_knee_frequency_doubling",
+        "native_DSP_harmonics",
+        "configurable_wavefolding_and_voices",
         "zero_input_stability"
       ],
       "configured_passed": true,
       "analysis_errors": [],
-      "capture_count": 8,
-      "tested_binary_sha256": "58b1b0559a9d9f38b6df2c13a5d6effb5fed299f2bfa37a4e548675a9a49bb59",
+      "capture_count": 70,
+      "tested_binary_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
       "source_fingerprints": {
-        "src/msplus/wavefold/manifest.json": "6ff474d88cf7234e04edf62e63a33201597d68fc8c9eda2f0e77761bc592909c",
-        "src/msplus/wavefold/wavefold.c": "bbe91a9f0c0d42be5588554da7006a8b0d1ea393b9f83b268b805f571289d06c",
+        "src/msplus/wavefold/manifest.json": "d63f029050646e55d5c386b1211f370be6d525775f5d76c0e14a6b814626536f",
+        "src/msplus/wavefold/wavefold.c": "3319a2b1cf65db537b9ca27e23b841876c32138b16e69526b61b48e1471f01cf",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
@@ -1588,14 +1589,14 @@
   },
   "verification_logs": {
     "native": {
-      "path": "build/msplus/native-artwork-01.log",
-      "tests": 23,
-      "sha256": "4b87e346d04c8ec0b336e7005236e1cc936705e4d203c355f1dc995e7c415eb9"
+      "path": "build/msplus/native-wavefold-stages-final.log",
+      "tests": 28,
+      "sha256": "23f55e482d699c9c5fcfeb6561f9478c33b7603f937bae91afedd3183d6784a9"
     },
     "tools": {
-      "path": "build/msplus/tools-artwork-04.log",
-      "tests": 21,
-      "sha256": "07adadaa671fb51814e296e009a8002a33f6ad9be6204b4a495a67b348d1a0ec"
+      "path": "build/msplus/tools-wavefold-stages-03.log",
+      "tests": 24,
+      "sha256": "e620200cb7b1b78965adc5626c566f90e562ede642a1c47657524582aa5420af"
     }
   }
 }

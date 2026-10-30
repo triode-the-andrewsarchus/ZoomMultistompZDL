@@ -12,7 +12,7 @@ square-root method used by the output level matcher.
 | Symm | Alternating bias between cells, centered at 50. |
 | Voice | LOW, FULL or BLEND; default FULL. |
 | Tone | Post-folder low-pass; 100 is fully open. |
-| Level | Output level, with 50 giving matched wet loudness. |
+| Level | Output level; 50 matches folded loudness before the parallel-clean voice blend. |
 | Mix | Linear overall dry/wet blend; default 100. |
 | Stages | 1–5 actual folding cells; default 5. |
 
@@ -47,9 +47,40 @@ state/ABI invariants. A 3.1 kHz, Drive 70 test measures over 8 dB less alias
 energy than an unoversampled independent sine cascade. This is a selected
 aliasing test; high notes and extreme Drive can still alias.
 
-Hardware qualification is in progress. The reviewed campaign covers 42
-Drive/SYMM combinations, quiet/loud inputs, all 15 stage/voice combinations,
-the input-filter voice response, and calibrated native harmonic comparisons.
-Saved patches must remain stock-only and autosave must stay OFF.
+Hardware qualification passed on firmware 1.10. The campaign contains 66
+reviewed cases plus baseline, silence and restoration recordings (70 total),
+covering 42 Drive/SYMM combinations, quiet/loud inputs, all 15 stage/voice
+combinations, input-filter voice response, and calibrated harmonic comparisons.
+The LOW voice reduced 4 kHz relative to 200 Hz by 25.74 dB. All 138 measurable
+native/hardware harmonic comparisons passed unchanged tolerances: maximum
+fundamental error 0.65 dB (limit 1 dB), higher-harmonic error 2.34 dB (limit
+3 dB). All recordings were finite, without full-scale clipping or xruns.
+Native validation passes 28 tests; 24 tooling/fault tests also pass.
+
+The cable mapping had changed since the previous campaign. Both the archived
+0.10 binary and this redesign responded to interface output 8, while the dry
+stereo path remained output7→input3 and output8→input4. The known diagnostic's
+997/1499 Hz outputs independently confirmed that DSP bus A now returns on
+input 3 and bus B on input 4. The harness now recomputes mono routing from the
+actual recorded dry WAVs, rejects ambiguous or inconsistent routes, and uses
+that input for analysis. No DSP tolerance was relaxed.
+
+A fresh, separately measured quiet bus-to-return calibration produced gains
+1.3213659325 and 1.3159428166. The earlier calibration had the opposite channel
+orientation; using it incorrectly failed one stage-three fundamental near a
+sensitive fold position. Current calibration and source data are retained in
+`build/msplus/wavefold-current-calibration-01/`; the original captures remain
+unchanged in `build/msplus/wavefold-stages-hil-01/wavefold/hil/`.
+
+The fresh pre-modification backup contains 374 CRC-verified files and all 100
+stock-only saved patches. Tests restored the stock scratch patch and actual
+stereo audio before removing each experimental/diagnostic pair. The accepted
+WaveFold artifact is retained for manual audition. The final audit read back
+all 68 installed files and rechecked stereo audio after closing file sessions.
+The other 33 effect binaries and all 34 icons match their pre-modification
+backup byte-for-byte. Exact evidence is
+`build/msplus/wavefold-final-20261030-01/COMPLETE.json`.
+Never save a patch that
+contains experimental effects; autosave remains OFF.
 
 Artwork changes are deferred. The existing icon pixels are retained.

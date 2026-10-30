@@ -6,7 +6,8 @@ effects** now build as ZD2 and pass selected standalone hardware checks. All 34
 are installed with adapted original artwork for manual audition. The retained-set audit read
 back all 68 files, confirmed all 100 saved patches unchanged, preserved factory
 catalogue entries and verified stock stereo audio with autosave OFF. The exact
-artwork installation evidence is `build/msplus/artwork-final-20261029-01/COMPLETE.json`.
+latest WaveFold installation evidence is `build/msplus/wavefold-final-20261030-01/COMPLETE.json`.
+The earlier artwork installation evidence is `build/msplus/artwork-final-20261029-01/COMPLETE.json`.
 The earlier DSP retention audit is `build/msplus/retained-34-20261029-01/`. A fresh full
 readback verified all 305 original files except the deliberately updated effect
 list byte-for-byte, including all 302 factory effect/icon/IR files. The final
@@ -33,7 +34,9 @@ The reviewed Rewire/Rooms reruns passed on October 29.
 Matujuice adds WaveFold, DualShft, Choral, EuGate, DubSiren, S.GN_L, Scrub,
 GridDly, SyncEQ, Breather, DirtBox and Sweep. Their pristine MIT-licensed C DSP
 cores come from the pinned v1.5 dependency; the repository contains only Plus
-adapters and its license. Two eight-sample calls per Plus callback preserve
+adapters and its license, with one exception: WaveFold 0.11 now has a
+[Plus-specific DSP redesign](MSPLUS-WAVEFOLD.md), configurable 1–5 stages and
+LOW/FULL/BLEND voices. Two eight-sample calls per Plus callback preserve
 source clock cadence. Active output is mono from physical left input, copied
 to both outputs, matching the original mono DSP path. Ordinary bypass retains
 stereo. DubSiren and GridDly retain their own bypass/tail logic.
@@ -59,7 +62,7 @@ These checks qualify selected standalone cases, not all knob transitions,
 long-duration endurance, every source feature or multi-effect chains.
 
 The [current evidence report](MSPLUS-HIL-34.json) records the latest per-port
-status as of October 29. Previous snapshots remain in Git history.
+status as of October 30. Previous snapshots remain in Git history.
 `tools/msplus/report.py` refreshes it from explicitly ordered campaign directories,
 reusing the installer's actual measurement, restoration and source/binary gates.
 An incomplete or failed newer attempt supersedes an older pass. Test counts come
@@ -83,7 +86,8 @@ Scrub and GridDly subsequently passed hardware tests with full-length, 15-bit
 histories; see the precision note below. Scorch passed after separating DSP
 comparison from independently measured high-level output compression.
 All 34 have current binary/source provenance and verified stock-audio restoration;
-the accepted campaigns contain 271 recordings. The complete set is now retained.
+the accepted campaigns contain 333 recordings, including the redesigned
+WaveFold's 70. The complete set is now retained.
 
 ### Original artwork on Plus
 
@@ -123,7 +127,11 @@ audio recording, source-to-container equivalence and accepted hardware report:
 `build/msplus/artwork-final-20261029-01/COMPLETE.json`.
 See the [34-effect artwork preview](images/msplus-artwork.png).
 
-### WaveFold input sensitivity
+### Historical WaveFold 0.10 input sensitivity
+
+This diagnosis applies to the original port, superseded by the
+[0.11 redesign](MSPLUS-WAVEFOLD.md). The new configurable cascade and voices
+have separate native and hardware qualification.
 
 Manual audition exposed a gap in the selected hardware checks: the WaveFold
 test used SYMM 95, which lies exactly on a folding threshold. That check does
@@ -140,15 +148,14 @@ reproduced this behavior. At DSP input peak 0.0025 and Drive 37, only SYMM
 5, 35, 65 and 95 exceeded 1% harmonic distortion. At input peak 0.05 and
 Drive 100, all 101 values exceeded 1%. These are internal DSP amplitudes,
 not interface output settings. All 202 cases matched the unprotected original
-DSP core bit for bit; `test_wavefold_symmetry_range_tracks_input_level`
-retains this coverage. This is native evidence, not an additional hardware
-sweep. No effect binary or gain scaling was changed.
+DSP core bit for bit, recorded in
+`build/msplus/wavefold-symm-native-01.json`. This was native evidence, not an
+additional hardware sweep. No binary or gain scaling changed at that stage.
+The original test is retained in Git history; the current tests exercise the
+redesigned stages and voices instead.
 
-For audition, try Drive 100 and Mix 100, with Level near 50 to keep the
-output matched. A quiet source can still leave broad straight sections;
-raising the interface's **return** gain cannot increase folding because it
-is downstream of the effect. Making the effect more sensitive would require
-changing its original input-gain range.
+Those quiet-input gaps motivated the replacement DSP. The interface's return
+gain remains downstream of the effect and cannot increase folding.
 
 ## Verified restoration fix and remaining history adapters
 
@@ -181,9 +188,9 @@ and one write site in derived copies, refuses unexpected source layouts, and
 never modifies the pinned upstream source. Derived code and generator hashes
 are included in hardware provenance. Both generated effects pass upstream build
 validation. Exhaustive PCM values, clean-wet reference error, full-arena finiteness,
-canaries and all other native checks pass. With WaveFold's input-sensitivity
-coverage and artwork fault tests, the current total is **23 DSP tests and
-21 tooling tests**.
+canaries and all other native checks pass. With the redesigned WaveFold,
+stage/voice and routing fault coverage, the current total is **28 DSP tests
+and 24 tooling tests**.
 Both ports passed hardware checks and stock restoration in
 `remaining-ports-campaign-20261029-04`. Scrub's held-audio test explicitly selects
 Rec=HOLD after recording; an earlier LIVE-mode test correctly failed when silence
@@ -339,8 +346,8 @@ memory, never changes descriptor fields, and initializes only its own arena.
 See [memory evidence and limits](MSPLUS-MEMORY-RESEARCH.md). Hydra and Stasis
 clear large buffers in bounded steps.
 
-The 34 ZD2/ZIC pairs total **506,929 bytes**. They are all installed alongside
-the factory set, with **580,780 bytes free** after filesystem allocation. Capacity
+The 34 ZD2/ZIC pairs total **510,813 bytes** with WaveFold 0.11. They are all
+installed alongside the factory set, with **576,690 bytes free** after filesystem allocation. Capacity
 to retain all 34 is therefore hardware-verified. Simultaneous processing has
 separate limits: the pedal has
 six effect slots, DSP loads are conservative placeholders, and multi-slot arena
@@ -458,9 +465,13 @@ low-level independent probes established this mapping:
 | Pedal return to input 3 | `AF16Rig Audio Pro:capture_AUX2` |
 | Pedal return to input 4 | `AF16Rig Audio Pro:capture_AUX3` |
 
-Within the DSP, bus B reaches input 3 and bus A reaches input 4. Klang's
-independent detune and the diagnostic's distinct tones establish this reversal.
-The external paths remain output7→input3 and output8→input4.
+The original measurements mapped DSP bus B to input 3 and bus A to input 4.
+After the subsequent manual audition, a fresh distinct-tone diagnostic mapped
+bus A (997 Hz) to input 3 and bus B (1499 Hz) to input 4. Both the archived and
+redesigned mono WaveFold then followed interface output 8. The external dry
+paths remain output7→input3 and output8→input4. WaveFold analysis now verifies
+the actual mono route from recorded dry probes rather than assuming the
+earlier cable orientation.
 
 ```sh
 pw-jack $PY tools/msplus/audio.py build/msplus/probe-01 \
@@ -522,7 +533,28 @@ before its qualified binary was reinstalled for manual audition.
 
 ## Final pedal state and architecture review
 
-The complete set remains installed, with a stock-only scratch patch selected
+The current WaveFold 0.11 build is installed with all 33 other musical effects.
+Its 66 reviewed hardware cases cover the SYMM range, all five stage settings
+and all three voices. All 138 measurable native/hardware harmonics passed the
+unchanged tolerances after independently verifying the current input routing
+and measuring a fresh quiet calibration. The final audit read back all 68
+files, checked every saved patch and factory catalogue entry, and confirmed
+all diagnostics absent. Both stereo paths passed again after file sessions
+closed; autosave is OFF, the current scratch patch is stock-only, and PipeWire
+quantum is restored to 128. All 34 icons and the other 33 effect binaries are
+byte-identical to the pre-modification backup. Artwork redesign is deferred.
+
+`build/msplus/wavefold-final-20261030-01/COMPLETE.json` binds the exact tested
+artifact, accepted analysis, calibration, routing, source fingerprints, final
+readback and audio recordings. Native/tool verification passes 28/24 tests.
+The architecture check keeps maximum complexity at 136 and reduces duplication
+from 10.77% to 10.69%. Remaining flagged complexity is in the required routing,
+stage/voice matrix and calibrated harmonic validators; no common DSP ABI or
+factory handling was changed.
+
+### Earlier retained-set audit (October 29)
+
+At that checkpoint, the complete set was installed with a stock-only scratch patch selected
 and autosave OFF. `build/msplus/retained-34-20261029-01/INSTALLED.json` identifies
 all 34 exact binaries; its audit read back all 68 binaries/icons, checked the
 factory catalogue, all 100 saved patches and the absence of all four diagnostics.

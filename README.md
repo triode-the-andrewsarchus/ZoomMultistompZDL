@@ -47,6 +47,8 @@ Zoom Effect Manager installs the effects. See the [installation guide](docs/INST
   autosave off. [Preview the Plus artwork](docs/images/msplus-artwork.png). Scrub/GridDly use
   15-bit histories; cross-effect FOLLOW sync remains unsupported. See
   [development, limitations and hardware results](docs/MSPLUS-DEVELOPMENT.md).
+  The Plus [WaveFold redesign](docs/MSPLUS-WAVEFOLD.md) adds 1–5 stages and
+  LOW/FULL/BLEND voices with four-times oversampling.
 * **Untested/unsupported:** MS-50G+, MS-60B+ and the Four series. These require
   ZD2; released ZDL files cannot be loaded on them.
 * **NAM on a Plus pedal:** use [nam2zoom](https://github.com/freelender/nam-to-zoom) by Aleksandar Vukasinovic instead
