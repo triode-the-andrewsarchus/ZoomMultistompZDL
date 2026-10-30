@@ -11,6 +11,64 @@ from backup import CheckedInput
 from audio import analyze, require_loopback
 
 
+class WaveFoldToolsTests(unittest.TestCase):
+    def test_mono_input_is_measured_and_ambiguous_or_forged_routes_are_rejected(self):
+        import json
+        import soundfile as sf
+        from audio import analyze
+        from wavefold_reference import mono_input
+        rng=np.random.default_rng(151)
+        sent=rng.normal(0,.01,(8192,2))
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp);dry=folder/'dry';dry.mkdir()
+            sf.write(dry/'send.wav',sent,8000,subtype='FLOAT')
+            for lane in (0,1):
+                returned=np.repeat(np.pad(sent[:-12,lane],(12,0))[:,None],2,axis=1)*.1
+                sf.write(dry/'return.wav',returned,8000,subtype='FLOAT')
+                measured,_=sf.read(dry/'return.wav',always_2d=True)
+                stimulus,_=sf.read(dry/'send.wav',always_2d=True)
+                report=analyze(stimulus,measured,8000);report['xruns']=[]
+                (dry/'report.json').write_text(json.dumps(report))
+                self.assertEqual(mono_input(folder),lane)
+                report['paths']=[dict(row,send=1-lane) for row in report['paths']]
+                (dry/'report.json').write_text(json.dumps(report))
+                with self.assertRaises(ValueError):mono_input(folder)
+            sf.write(dry/'return.wav',np.zeros_like(sent),8000,subtype='FLOAT')
+            with self.assertRaises(ValueError):mono_input(folder)
+
+    def test_hardware_profile_requires_all_stage_voice_and_symmetry_cases(self):
+        import json
+        from audition import reviewed_cases
+        from upstream import ROOT
+        from wavefold_reference import reviewed_labels
+        manifest=json.loads((ROOT/'src/msplus/wavefold/manifest.json').read_text())
+        cases=json.loads(json.dumps(reviewed_cases(manifest)))
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            record=folder/'CASES.json'
+            record.write_text(json.dumps(cases))
+            self.assertEqual(len(reviewed_labels(folder)),59)
+            altered=json.loads(json.dumps(cases))
+            target=next(row for row in altered if row[0]=='stage3-voice1')
+            target[1].append([8,0])  # Stage 1 must not be accepted as stage 3.
+            record.write_text(json.dumps(altered))
+            with self.assertRaisesRegex(ValueError,'Stage/voice'):
+                reviewed_labels(folder)
+            record.write_text(json.dumps([row for row in cases if row[0]!='d40-s050']))
+            with self.assertRaises(KeyError):
+                reviewed_labels(folder)
+
+    def test_native_comparison_rejects_unusable_calibration(self):
+        import json
+        from wavefold_reference import compare_native
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp);calibration=folder/'calibration.json'
+            for gains in ([0,1.3],[1.3],[float('nan'),1.3],[10,1.3]):
+                calibration.write_text(json.dumps(dict(bus_to_return=gains)))
+                with self.assertRaisesRegex(ValueError,'calibration'):
+                    compare_native(folder,calibration)
+
+
 class ArtworkTests(unittest.TestCase):
     def test_original_art_crops_exclude_legacy_live_value_boxes(self):
         import hashlib

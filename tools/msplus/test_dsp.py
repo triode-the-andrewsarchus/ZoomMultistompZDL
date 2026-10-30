@@ -1,5 +1,6 @@
 """Compile the real Plus kernels natively; exercise state/coeff/bus safety."""
 import re
+from itertools import product
 import unittest
 
 import numpy as np
@@ -9,6 +10,23 @@ from native import Kernel, ROOT, MATU_PORTS
 
 
 class DSPTests(unittest.TestCase):
+    def test_wavefold_live_control_changes_stay_bounded(self):
+        kernel=Kernel('wavefold',arena_bytes=705600)
+        t=np.arange(88208)/44100
+        source=np.column_stack([np.zeros(len(t)),.01*np.sin(2*np.pi*997*t)])
+        peaks=[]
+        for index,block in enumerate(source.reshape(-1,16,2)):
+            if index%64==0:
+                mode=index//64
+                kernel.coeff[5:12]=[(mode%5)/4,(mode%3)/2,(mode%3)/2,1,.5,1,(mode%5)/4]
+            out=kernel.block(block)
+            self.assertTrue(np.isfinite(out).all())
+            peaks.append(float(np.max(abs(out))))
+        self.assertLess(max(peaks),.3)
+        self.assertGreater(np.mean(peaks[-100:]),.001)
+        np.testing.assert_array_equal(kernel.arena[:2],[0xcafef00d]*2)
+        np.testing.assert_array_equal(kernel.arena[-2:],[0xcafef00d]*2)
+
     def test_wavefold_oversampling_reduces_alias_energy(self):
         kernel=Kernel('wavefold',arena_bytes=705600)
         kernel.coeff[5:11]=[.7,.5,.5,1,.5,1]
@@ -85,15 +103,14 @@ class DSPTests(unittest.TestCase):
             subprocess.run(['cc','-shared','-fPIC','-O2','-I'+str(ROOT/'src/msplus/wavefold/build'),str(source),'-o',str(library)],check=True)
             lib=ctypes.CDLL(str(library));lib.probe.argtypes=[ctypes.c_float]*3+[ctypes.c_int];lib.probe.restype=ctypes.c_float
             x=np.linspace(-2,2,4001).astype(np.float32)
-            for stages in range(1,6):
-                for gain in (.6366197724,1.5,2.8):
-                    for bias in (-.5,0,.5):
-                        expected=x.astype(float)
-                        for stage in range(stages):
-                            sign=1 if stage%2==0 else -1
-                            expected=np.sin(np.pi/2*(expected*np.float32(gain)+sign*bias))-sign*np.sin(np.pi/2*bias)
-                        actual=np.array([lib.probe(float(v),gain,bias,stages) for v in x])
-                        np.testing.assert_allclose(actual,expected,atol=.0003)
+            for stages, gain, bias in product(range(1,6), (.6366197724,1.5,2.8), (-.5,0,.5)):
+                expected=x.astype(float)
+                for stage in range(stages):
+                    sign=1 if stage%2==0 else -1
+                    expected=np.sin(np.pi/2*(expected*np.float32(gain)+sign*bias))-sign*np.sin(np.pi/2*bias)
+                actual=np.array([lib.probe(float(v),gain,bias,stages) for v in x])
+                with self.subTest(stages=stages,gain=gain,bias=bias):
+                    np.testing.assert_allclose(actual,expected,atol=.0003)
             five=np.array([lib.probe(float(v),2.8,0,5) for v in x])
             one=np.array([lib.probe(float(v),2.8,0,1) for v in x])
             self.assertGreater(np.sqrt(np.mean((five-one)**2)),.4)
@@ -104,16 +121,16 @@ class DSPTests(unittest.TestCase):
         outputs=[]
         kernel=Kernel('wavefold',arena_bytes=705600)
         self.assertEqual(kernel.manifest['params'][-1]['values'],['1','2','3','4','5'])
-        for stages in range(5):
-            for voice in (0,.5,1):
-                kernel.state[:]=0;kernel.state[kernel.guard_word]=kernel.guard
-                kernel.coeff[5:12]=[.7,.5,voice,1,.5,1,stages/4]
-                for _ in range(10):
-                    np.testing.assert_array_equal(kernel.block(np.zeros((16,2))),0)
-                out=np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[-8820:,1]
-                self.assertGreater(np.sqrt(np.mean(out*out)),.0002)
-                self.assertTrue(np.isfinite(kernel.arena[2:-2].view(np.float32)).all())
-                if voice==.5:outputs.append(out)
+        for stages, voice in product(range(5), (0,.5,1)):
+            kernel.state[:]=0;kernel.state[kernel.guard_word]=kernel.guard
+            kernel.coeff[5:12]=[.7,.5,voice,1,.5,1,stages/4]
+            for _ in range(10):
+                np.testing.assert_array_equal(kernel.block(np.zeros((16,2))),0)
+            out=np.concatenate([kernel.block(b) for b in source.reshape(-1,16,2)])[-8820:,1]
+            self.assertGreater(np.sqrt(np.mean(out*out)),.0002)
+            self.assertTrue(np.isfinite(kernel.arena[2:-2].view(np.float32)).all())
+            outputs.append(out)
+        outputs=outputs[1::3]  # FULL voice for each successive stage count.
         for a,b in zip(outputs,outputs[1:]):
             self.assertGreater(np.sqrt(np.mean((a-b)**2)),.0003)
 

@@ -9,8 +9,10 @@ import numpy as np
 import soundfile as sf
 from scipy import signal
 from native import MATU_PORTS
-from reference import validate_linearity
-from wavefold_reference import validate_hardware as validate_wavefold
+from reference import validate_linearity, compare_scorch
+from wavefold_reference import validate_hardware as validate_wavefold, compare_native, mono_input
+
+NATIVE_CHECKS = {'scorch': compare_scorch, 'wavefold': compare_native}
 
 
 def align(reference, actual, rate):
@@ -46,11 +48,11 @@ def compare(reference, actual, rate):
     return results
 
 
-def tone_metrics(directory, mono=False):
+def tone_metrics(directory, mono=False, mono_channel=0):
     audio, rate = sf.read(directory / 'return.wav', always_2d=True)
     metrics = []
     for ch in range(2):
-        start = int((0.8 if mono else 0.8 + ch * 2.5) * rate)
+        start = int((0.8 + mono_channel*2.5 if mono else 0.8 + ch * 2.5) * rate)
         segment = audio[start:start + int(0.8 * rate), ch]
         freq = np.fft.rfftfreq(len(segment), 1 / rate)
         power = np.abs(np.fft.rfft(segment * signal.windows.hann(len(segment)))) ** 2
@@ -63,7 +65,7 @@ def tone_metrics(directory, mono=False):
     return metrics
 
 
-def load_captures(directory, reference, rate, mono=False):
+def load_captures(directory, reference, rate, mono=False, mono_channel=0):
     results = {}
     for folder in sorted(directory.iterdir()):
         if folder.name in ('baseline', 'restored') or not (folder / 'return.wav').is_file():
@@ -72,13 +74,13 @@ def load_captures(directory, reference, rate, mono=False):
         if report['xruns'] or not report['finite'] or report['clipped']:
             raise SystemExit(f'Invalid capture: {folder}')
         if report['kind'] == 'tone':
-            results[folder.name] = tone_metrics(folder, mono)
+            results[folder.name] = tone_metrics(folder, mono, mono_channel)
             continue
         audio, actual_rate = sf.read(folder / 'return.wav', always_2d=True)
         if actual_rate != rate:
             raise SystemExit('Capture rates differ')
         if report['kind'] == 'sweep':
-            ref = np.repeat(reference[:, :1], 2, axis=1) if mono else reference
+            ref = np.repeat(reference[:, mono_channel:mono_channel+1], 2, axis=1) if mono else reference
             results[folder.name] = compare(ref, audio, rate)
         else:
             results[folder.name] = dict(peak=np.max(abs(audio), axis=0).tolist(),
@@ -143,12 +145,12 @@ def validate_tracking(directory):
     return rows, errors
 
 
-def validate_dry(directory, reference, effect):
+def validate_dry(directory, reference, effect, mono_channel=0):
     audio, rate = sf.read(directory / 'dry/return.wav', always_2d=True)
     if effect == 'klang':
         reference, _ = sf.read(directory / 'baseline-tone/return.wav', always_2d=True)
     if effect in MATU_PORTS:
-        reference = np.repeat(reference[:, :1], 2, axis=1)
+        reference = np.repeat(reference[:, mono_channel:mono_channel+1], 2, axis=1)
     expected = -6.0206 if effect in ('scorch', 'genloss', 'hydra', 'spiral', 'rewire', 'gyre') else 0
     return [f'{effect} dry gain mismatch: {row}' for row in compare(reference, audio, rate)
             if abs(row['gain_db'] - expected) > 0.5]
@@ -239,6 +241,23 @@ EFFECT_CHECKS = {
 }
 
 
+def verify_effect(directory, effect, calibration=None, output_probe=None):
+    """Run the effect-specific reference and signature validation phase."""
+    results, errors, checks = {}, [], []
+    if calibration and effect in NATIVE_CHECKS:
+        rows, problems = NATIVE_CHECKS[effect](directory, calibration, output_probe)
+        results['software_reference'] = rows
+        errors.extend(problems)
+        checks.append('native_DSP_harmonics')
+    if effect in EFFECT_CHECKS:
+        key, label, validate = EFFECT_CHECKS[effect]
+        rows, problems = validate(directory)
+        results[key] = rows
+        errors.extend(problems)
+        checks.append(label)
+    return results, errors, checks
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('directory', type=Path)
@@ -248,7 +267,8 @@ def main():
     ap.add_argument('--effect', choices=['gain', 'linearity', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
-    results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS)
+    lane = mono_input(args.directory) if args.effect == 'wavefold' else 0
+    results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS, lane)
     errors = validate_gain(args.directory, reference, results) if args.gain_check else []
     checks = ['capture_integrity']
     rows, problems = validate_activity(args.directory)
@@ -259,22 +279,13 @@ def main():
         errors = validate_gain(args.directory, reference, results)
         checks.append('gain_curve')
     if (args.directory / 'dry/return.wav').is_file():
-        errors.extend(validate_dry(args.directory, reference, args.effect))
+        errors.extend(validate_dry(args.directory, reference, args.effect, lane))
         checks.append('dry_path_gain')
-    if args.effect in ('scorch', 'wavefold') and args.calibration:
-        from reference import compare_scorch
-        from wavefold_reference import compare_native
-        rows, problems = (compare_scorch(args.directory, args.calibration, args.output_probe)
-                          if args.effect == 'scorch' else compare_native(args.directory, args.calibration))
-        results['software_reference'] = rows
-        errors.extend(problems)
-        checks.append('native_DSP_harmonics')
-    if args.effect in EFFECT_CHECKS:
-        key, label, validate = EFFECT_CHECKS[args.effect]
-        rows, problems = validate(args.directory)
-        results[key] = rows
-        errors.extend(problems)
-        checks.append(label)
+    effect_results, effect_errors, effect_checks = verify_effect(
+        args.directory, args.effect, args.calibration, args.output_probe)
+    results.update(effect_results)
+    errors.extend(effect_errors)
+    checks.extend(effect_checks)
     if (args.directory / 'silence/return.wav').exists():
         rows, problems = check_silence(args.directory)
         results['silence_stability'] = rows
