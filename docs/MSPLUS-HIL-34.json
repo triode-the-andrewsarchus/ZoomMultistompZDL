@@ -4,7 +4,7 @@
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
   "native_tests": 23,
-  "tool_fault_tests": 20,
+  "tool_fault_tests": 21,
   "return_gain_db": 0,
   "ports": [
     {
@@ -1324,7 +1324,7 @@
       "family": "original",
       "build_report": "src/msplus/stasis/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "f6849b71fc2e26d123465886c1a97aa8670bfdeb8b8ce7d5b33524b33e482f5d",
+      "current_build_sha256": "f1094061f5e2f62e88dcd760e5c74818b1c0e8f3ccf7902076257979e2efb28e",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
@@ -1355,10 +1355,10 @@
       },
       "artwork_only_variant": {
         "original_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
-        "artwork_binary_sha256": "f6849b71fc2e26d123465886c1a97aa8670bfdeb8b8ce7d5b33524b33e482f5d",
+        "artwork_binary_sha256": "f1094061f5e2f62e88dcd760e5c74818b1c0e8f3ccf7902076257979e2efb28e",
         "dsp_sha256": "d9b1d404a4f6ea3fa3efa41dabd22f1ca69d888f3f2c5ec0a1cda7537df22985",
-        "source_sha256": "4726af8bb58558ac107c1089d2e4df5536fa58027fd671ed499b14fa64dcb3dc",
-        "icon_sha256": "0732815a55ed9c689380d8f5148284ba3bb8e66077e1a3677cef74eb68905000",
+        "source_sha256": "b5263e70d310d48a490d8c978f51b162d67b57ff36a0740d7bb5b826f56b887f",
+        "icon_sha256": "220e8a334608f273a4d02e4ee3d9c74acc093a518ae9e9da2ae5dac86e0245f8",
         "dsp_byte_identical": true
       }
     },
@@ -1601,9 +1601,9 @@
       "sha256": "4b87e346d04c8ec0b336e7005236e1cc936705e4d203c355f1dc995e7c415eb9"
     },
     "tools": {
-      "path": "build/msplus/tools-artwork-03.log",
-      "tests": 20,
-      "sha256": "c90f2b59421e225c907898fb7de8ce414f517f46cd7fed3aa0c489c7e7629d91"
+      "path": "build/msplus/tools-artwork-04.log",
+      "tests": 21,
+      "sha256": "07adadaa671fb51814e296e009a8002a33f6ad9be6204b4a495a67b348d1a0ec"
     }
   }
 }

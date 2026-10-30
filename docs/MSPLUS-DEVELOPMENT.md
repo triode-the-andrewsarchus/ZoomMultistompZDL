@@ -161,7 +161,7 @@ are included in hardware provenance. Both generated effects pass upstream build
 validation. Exhaustive PCM values, clean-wet reference error, full-arena finiteness,
 canaries and all other native checks pass. With WaveFold's input-sensitivity
 coverage and artwork fault tests, the current total is **23 DSP tests and
-20 tooling tests**.
+21 tooling tests**.
 Both ports passed hardware checks and stock restoration in
 `remaining-ports-campaign-20261029-04`. Scrub's held-audio test explicitly selects
 Rec=HOLD after recording; an earlier LIVE-mode test correctly failed when silence

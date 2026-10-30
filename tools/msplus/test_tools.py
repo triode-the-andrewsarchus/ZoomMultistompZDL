@@ -12,6 +12,33 @@ from audio import analyze, require_loopback
 
 
 class ArtworkTests(unittest.TestCase):
+    def test_original_art_crops_exclude_legacy_live_value_boxes(self):
+        import hashlib
+        import json
+        import sys
+        from PIL import Image
+        from artwork import ROOT
+        sys.path.insert(0, str(ROOT / 'build'))
+        from decode_picture import decode_picture, read_image_info
+        records = json.loads((ROOT / 'src/msplus/artwork/sources.json').read_text())
+        self.assertEqual(len(records), 34)
+        for name, record in records.items():
+            with self.subTest(effect=name):
+                source = ROOT / record['source']
+                panel = ROOT / 'src/msplus/artwork' / (name + '.png')
+                self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), record['source_sha256'])
+                self.assertEqual(hashlib.sha256(panel.read_bytes()).hexdigest(), record['png_sha256'])
+                x0, y0, x1, y1 = record['crop']
+                self.assertEqual((x1-x0, y1-y0), (128, 36))
+                for _, x, y in read_image_info(str(source))['knobs']:
+                    self.assertTrue(y+15 <= y0 or y >= y1 or x+20 <= x0 or x >= x1,
+                                    'Artwork must exclude old firmware value boxes')
+                pixels, symbol = decode_picture(str(source))
+                self.assertEqual(symbol, record['symbol'])
+                expected = [0 if bit else 255 for row in pixels[y0:y1] for bit in row[x0:x1]]
+                with Image.open(panel) as image:
+                    self.assertEqual(list(image.convert('L').tobytes()), expected)
+
     def test_replacement_rejects_installed_dsp_drift_before_any_pedal_operation(self):
         from unittest.mock import patch
         import artwork

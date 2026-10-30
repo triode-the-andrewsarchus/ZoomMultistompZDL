@@ -1,8 +1,10 @@
 # Original cover artwork for MS Plus
 
 These 34 monochrome 128×36 panels preserve the authored title and illustration
-from each original effect's 128×64 cover. They exclude the old control row at
-y=37 and below: Plus firmware draws the live parameters separately.
+from each original effect's 128×64 cover. Most use rows 0–35; Stasis uses
+rows 28–63 because its original controls are above the illustration. The
+crops exclude every legacy live value box: Plus firmware draws its live
+parameters separately.
 `sources.json` records the original ZDL, its SHA-256, picture symbol, crop and
 extracted PNG hash. Only artwork is extracted; no legacy DSP or Zoom runtime is
 included. Matujuice's twelve designs retain their MIT attribution in

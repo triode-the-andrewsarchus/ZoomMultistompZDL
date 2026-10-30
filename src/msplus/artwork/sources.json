@@ -383,11 +383,11 @@
     "symbol": "picEffectType_Stasis",
     "crop": [
       0,
-      0,
+      28,
       128,
-      36
+      64
     ],
-    "png_sha256": "4726af8bb58558ac107c1089d2e4df5536fa58027fd671ed499b14fa64dcb3dc"
+    "png_sha256": "b5263e70d310d48a490d8c978f51b162d67b57ff36a0740d7bb5b826f56b887f"
   },
   "sweep": {
     "name": "Sweep",
