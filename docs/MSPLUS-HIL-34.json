@@ -4,7 +4,7 @@
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
   "native_tests": 23,
-  "tool_fault_tests": 19,
+  "tool_fault_tests": 20,
   "return_gain_db": 0,
   "ports": [
     {
@@ -1601,9 +1601,9 @@
       "sha256": "4b87e346d04c8ec0b336e7005236e1cc936705e4d203c355f1dc995e7c415eb9"
     },
     "tools": {
-      "path": "build/msplus/tools-artwork-01.log",
-      "tests": 19,
-      "sha256": "7f1bdff2773bc61b6e1638535ec36aef08524ca9207d0e0eeb43c62b87ffc697"
+      "path": "build/msplus/tools-artwork-03.log",
+      "tests": 20,
+      "sha256": "c90f2b59421e225c907898fb7de8ce414f517f46cd7fed3aa0c489c7e7629d91"
     }
   }
 }

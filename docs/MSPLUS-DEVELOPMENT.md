@@ -40,8 +40,8 @@ stereo. DubSiren and GridDly retain their own bypass/tail logic.
 The legacy dry-buffer tempo-tag transport has **no verified Plus mapping**.
 Adapters use its supported no-tag path. Local tempo and twin-tempo changes are
 retained; cross-effect FOLLOW/Mozaic tempo relay is not implemented. Numeric
-parameter controls and placeholder name icons are provided; original artwork
-and custom value labels are deferred.
+parameter controls are provided; original artwork is adapted to Plus icons.
+Custom value labels remain deferred.
 
 Native checks cover all 34 kernels, invalid coefficients, initialization and
 arena canaries, selected control extremes, original-versus-Plus sample math,
@@ -159,7 +159,9 @@ and one write site in derived copies, refuses unexpected source layouts, and
 never modifies the pinned upstream source. Derived code and generator hashes
 are included in hardware provenance. Both generated effects pass upstream build
 validation. Exhaustive PCM values, clean-wet reference error, full-arena finiteness,
-canaries and all other native checks pass: **22 DSP tests and 18 tooling tests**.
+canaries and all other native checks pass. With WaveFold's input-sensitivity
+coverage and artwork fault tests, the current total is **23 DSP tests and
+20 tooling tests**.
 Both ports passed hardware checks and stock restoration in
 `remaining-ports-campaign-20261029-04`. Scrub's held-audio test explicitly selects
 Rec=HOLD after recording; an earlier LIVE-mode test correctly failed when silence
@@ -517,7 +519,7 @@ again, and PipeWire's original forced quantum of 128 was restored. There are
 580,780 bytes free. The pedal is ready for unplugged standalone manual audition.
 Do not save a patch containing an experimental effect. Start with one custom
 effect at a time; multi-instance memory ownership and aggregate CPU use remain
-unqualified. Cross-effect FOLLOW/Mozaic sync and original screen artwork/value
+unqualified. Cross-effect FOLLOW/Mozaic sync and original custom value
 labels remain unported. Scrub/GridDly use the documented 15-bit histories.
 
 `verify.py --installed <port names...>` can audit an exact retained set after

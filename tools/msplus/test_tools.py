@@ -12,6 +12,34 @@ from audio import analyze, require_loopback
 
 
 class ArtworkTests(unittest.TestCase):
+    def test_replacement_rejects_installed_dsp_drift_before_any_pedal_operation(self):
+        from unittest.mock import patch
+        import artwork
+        import install_set
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            evidence = root / 'evidence.json'
+            evidence.write_text('{}')
+            old = root / 'replacement/files'
+            old.mkdir(parents=True)
+            (old / 'XXTEST.ZD2').write_bytes(b'installed code')
+            current = root / 'XXTEST.ZD2'
+            current.write_bytes(b'qualified different code')
+            current.with_suffix('.ZIC').write_bytes(b'icon')
+            argv = ['install_set.py', '--backup', str(root / 'factory'), '--evidence', str(evidence),
+                    '--replace-artwork-from', str(old.parent), '--output', str(root / 'output')]
+            with patch.object(install_set.sys, 'argv', argv), \
+                    patch.object(install_set, 'qualified_artifacts', return_value={'test': current}), \
+                    patch.object(install_set, 'verify_backup') as backup, \
+                    patch.object(artwork, 'check_variant', side_effect=ValueError('DSP changed')), \
+                    patch.object(install_set, 'preflight') as preflight, \
+                    patch.object(install_set, 'upstream_operation') as operation:
+                with self.assertRaisesRegex(ValueError, 'DSP changed'):
+                    install_set.main()
+                self.assertEqual(backup.call_count, 2)
+                preflight.assert_not_called()
+                operation.assert_not_called()
+
     def test_artwork_preserves_all_non_icon_bytes_and_rejects_other_changes(self):
         import json
         import zlib

@@ -36,3 +36,10 @@ Use the documented guarded installer for pedal updates: verify backup and
 stock scratch/audio first, dry-run every pair, uninstall the previous custom
 pair before installing its replacement, and read back both files. Installing
 over an existing filename skips the binary upload in the upstream installer.
+
+For an already installed complete set, `install_set.py` accepts
+`--replace-artwork-from <fresh-full-backup>`. It validates that backup and
+checks each replacement differs only in artwork, dry-runs every install and
+removal before writes, then replaces each pair through the upstream tools.
+Keep `--backup` pointing to the original factory-only backup for the unchanged
+factory catalogue and saved-patch audit. A failed transfer stops the campaign.

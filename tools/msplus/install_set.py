@@ -93,18 +93,31 @@ def main():
     ap.add_argument('--backup', required=True, type=Path)
     ap.add_argument('--evidence', required=True, type=Path)
     ap.add_argument('--output', required=True, type=Path)
+    ap.add_argument('--replace-artwork-from', type=Path,
+                    help='Verified full backup of the installed set; replace only artwork-equivalent pairs')
     args = ap.parse_args()
     artifacts = qualified_artifacts(json.loads(args.evidence.read_text()))
     verify_backup(args.backup)
+    if args.replace_artwork_from:
+        verify_backup(args.replace_artwork_from)
+        from artwork import check_variant
+        for name, artifact in artifacts.items():
+            check_variant((args.replace_artwork_from / 'files' / artifact.name).read_bytes(),
+                          artifact.read_bytes(), artifact.with_suffix('.ZIC').read_bytes(),
+                          ROOT / 'src/msplus/artwork' / (name + '.png'))
     args.output.mkdir(parents=True, exist_ok=False)
     # Check every container/icon locally before the first real install.
     for name, artifact in sorted(artifacts.items()):
         output = args.output / name
         output.mkdir()
         upstream_operation(output, 'install', artifact, dry=True)
+        if args.replace_artwork_from:
+            upstream_operation(output, 'uninstall', artifact, dry=True)
     preflight(args.backup.resolve(), args.output)
     for name, artifact in sorted(artifacts.items()):
         print(f'{name}: installing qualified binary and icon', flush=True)
+        if args.replace_artwork_from:
+            upstream_operation(args.output / name, 'uninstall', artifact)
         upstream_operation(args.output / name, 'install', artifact)
     # Read back every binary/icon, verify the entire catalogue and saved bank.
     with (args.output / 'audit.log').open('w') as log:
