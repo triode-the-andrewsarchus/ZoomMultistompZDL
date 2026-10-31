@@ -558,6 +558,19 @@ class AuditionSafetyTests(unittest.TestCase):
 
 
 class CampaignSafetyTests(unittest.TestCase):
+    def test_missing_reviewed_cases_stops_before_installation(self):
+        import json
+        from unittest.mock import patch
+        import run
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            effect = root / 'src/msplus/test'; effect.mkdir(parents=True)
+            (effect / 'manifest.json').write_text(json.dumps(dict(filename='XXTEST',kernel='unknown.c')))
+            with patch.object(run, 'ROOT', root), patch.object(run, 'upstream_operation') as operation:
+                with self.assertRaisesRegex(ValueError, 'No reviewed test cases'):
+                    run.run_effect('test', root / 'backup', root / 'campaign')
+                operation.assert_not_called()
+
     def test_retained_set_requires_complete_current_passing_evidence(self):
         import hashlib
         import json
@@ -657,6 +670,7 @@ class CampaignSafetyTests(unittest.TestCase):
                 (output / 'hil/RESTORED').write_text('metadata only')
                 return Mock(returncode=0)
             with patch.object(run, 'ROOT', root), patch.object(run, 'upstream_operation') as operation, \
+                    patch.object(run, 'reviewed_cases'), \
                     patch.object(run.subprocess, 'run', side_effect=metadata_only):
                 with self.assertRaisesRegex(RuntimeError, 'audio health unverified'):
                     run.run_effect('test', root / 'backup', output)

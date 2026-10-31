@@ -64,6 +64,7 @@ CASES = {
 
 CASES['XXPSRC01'] = CASES['XXZGAIN']
 CASES['XXPOUT01'] = CASES['XXZGAIN']
+CASES['XXZPLT02'] = PLATEAU_CASES
 
 BUFFERED_PORTS = {'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle',
                   'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'}

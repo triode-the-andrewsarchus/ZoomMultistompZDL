@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from upstream import ROOT, STOMPHACKS
-from audition import TempPatch, verify_backup, capture_trial
+from audition import TempPatch, verify_backup, capture_trial, reviewed_cases
 from audio import physical_ports, AudioRig, temporary_quantum, require_loopback
 from pedal_common import editor_off
 
@@ -34,6 +34,7 @@ def upstream_operation(output, operation, artifact, dry=False):
 def run_effect(name, backup, output, calibration=None, output_probe=None, restore_slot=None):
     effect = ROOT / 'src/msplus' / name
     manifest = json.loads((effect / 'manifest.json').read_text())
+    reviewed_cases(manifest)  # Reject missing coverage before installation.
     artifact = effect / 'build' / (manifest['filename'] + '.ZD2')
     if not artifact.exists() or not (effect / 'build/REPORT.md').is_file():
         raise RuntimeError(f'Build and validate {name} first with tools/msplus/build.py')
