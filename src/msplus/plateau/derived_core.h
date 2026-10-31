@@ -367,7 +367,9 @@ public:
         L_DELAY_2_R_TAP
     };
 
+    #ifndef PLATEAU_EXPLICIT_INIT
     const int kOutputTaps[7] = {266, 2974, 1913, 1996, 1990, 187, 1066};
+#endif
 
     static constexpr float maxDiffusion1 = 0.7f;
     static constexpr float maxDiffusion2 = 0.7f;
@@ -554,6 +556,46 @@ PL_INLINE Dattorro1997Tank::Dattorro1997Tank(const float initSampleRate,
 
 PL_INLINE void Dattorro1997Tank::process(const float leftIn, const float rightIn,
                                float* leftOut, float* rightOut) {
+#ifdef PLATEAU_EXPLICIT_INIT
+
+    tickApfModulation();decay=decayParam;
+    leftSum+=leftIn;rightSum+=rightIn;
+    AllpassFilter *first[]={&leftApf1,&rightApf1},*second[]={&leftApf2,&rightApf2};
+    InterpDelay *delay1[]={&leftDelay1,&rightDelay1},*delay2[]={&leftDelay2,&rightDelay2};
+    OnePoleLPFilter *lowpass[]={&leftHighCutFilter,&rightHighCutFilter};
+    OnePoleHPFilter *highpass[]={&leftLowCutFilter,&rightLowCutFilter},*dc[]={&leftOutDCBlock,&rightOutDCBlock};
+    float sums[]={leftSum,rightSum};
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned ch=0;ch<2;++ch){
+        first[ch]->input=sums[ch];delay1[ch]->input=first[ch]->process();delay1[ch]->process();
+        lowpass[ch]->input=delay1[ch]->output;highpass[ch]->input=lowpass[ch]->process();
+        second[ch]->input=(delay1[ch]->output*(1.0f-fade)+highpass[ch]->process()*fade)*decay;
+        delay2[ch]->input=second[ch]->process();delay2[ch]->process();
+    }
+    rightSum=leftDelay2.output*decay;leftSum=rightDelay2.output*decay;
+    float outputs[2];
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned ch=0;ch<2;++ch){
+        unsigned other=1-ch;
+        dc[ch]->input=first[ch]->output;
+        dc[ch]->input+=delay1[ch]->tap(scaledOutputTaps[0]);
+        dc[ch]->input+=delay1[ch]->tap(scaledOutputTaps[1]);
+        dc[ch]->input-=second[ch]->delay.tap(scaledOutputTaps[2]);
+        dc[ch]->input+=delay2[ch]->tap(scaledOutputTaps[3]);
+        dc[ch]->input-=delay1[other]->tap(scaledOutputTaps[4]);
+        dc[ch]->input-=second[other]->delay.tap(scaledOutputTaps[5]);
+        dc[ch]->input-=delay2[other]->tap(scaledOutputTaps[6]);
+        outputs[ch]=dc[ch]->process()*.5f;
+    }
+    *leftOut=outputs[0];*rightOut=outputs[1];
+    fade+=fadeStep*fadeDir;fade=fade<0?0:(fade>1?1:fade);
+
+#else
+
     tickApfModulation();
 
     decay = decayParam;
@@ -605,6 +647,8 @@ PL_INLINE void Dattorro1997Tank::process(const float leftIn, const float rightIn
 
     fade += fadeStep * fadeDir;
     fade = (fade < 0.f) ? 0.f : ((fade > 1.f) ? 1.f : fade);
+#endif
+
 }
 
 PL_INLINE void Dattorro1997Tank::freeze(bool freezeFlag) {
@@ -736,10 +780,24 @@ PL_INLINE void Dattorro1997Tank::initialiseDelaysAndApfs() {
 }
 
 PL_INLINE void Dattorro1997Tank::tickApfModulation() {
+#ifdef PLATEAU_EXPLICIT_INIT
+
+    TriSawLFO *lfos[]={&lfo1,&lfo2,&lfo3,&lfo4};
+    InterpDelay *delays[]={&leftApf1.delay,&leftApf2.delay,&rightApf1.delay,&rightApf2.delay};
+    float times[]={scaledLeftApf1Time,scaledLeftApf2Time,scaledRightApf1Time,scaledRightApf2Time};
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned i=0;i<4;++i)delays[i]->setDelayTime(lfos[i]->process()*lfoExcursion+times[i]);
+
+#else
+
     leftApf1.delay.setDelayTime(lfo1.process() * lfoExcursion + scaledLeftApf1Time);
     leftApf2.delay.setDelayTime(lfo2.process() * lfoExcursion + scaledLeftApf2Time);
     rightApf1.delay.setDelayTime(lfo3.process() * lfoExcursion + scaledRightApf1Time);
     rightApf2.delay.setDelayTime(lfo4.process() * lfoExcursion + scaledRightApf2Time);
+#endif
+
 }
 
 PL_INLINE void Dattorro1997Tank::rescaleApfAndDelayTimes() {
@@ -762,9 +820,19 @@ PL_INLINE void Dattorro1997Tank::rescaleApfAndDelayTimes() {
 }
 
 PL_INLINE void Dattorro1997Tank::rescaleTapTimes() {
-    for (size_t i = 0; i < scaledOutputTaps.size(); ++i) {
+    #ifndef PLATEAU_EXPLICIT_INIT
+for (size_t i = 0; i < scaledOutputTaps.size(); ++i) {
         scaledOutputTaps[i] = (int)((float)kOutputTaps[i] * sampleRateScale);
     }
+#else
+    scaledOutputTaps[0] = (int)(266.0f * sampleRateScale);
+    scaledOutputTaps[1] = (int)(2974.0f * sampleRateScale);
+    scaledOutputTaps[2] = (int)(1913.0f * sampleRateScale);
+    scaledOutputTaps[3] = (int)(1996.0f * sampleRateScale);
+    scaledOutputTaps[4] = (int)(1990.0f * sampleRateScale);
+    scaledOutputTaps[5] = (int)(187.0f * sampleRateScale);
+    scaledOutputTaps[6] = (int)(1066.0f * sampleRateScale);
+#endif
 }
 
 PL_INLINE Dattorro::Dattorro(const float initMaxSampleRate,
@@ -803,11 +871,22 @@ PL_INLINE void Dattorro::process(float leftInput, float rightInput) {
     inputHpf.process();
     preDelay.input = inputHpf.output;
     preDelay.process();
+
+#ifdef PLATEAU_EXPLICIT_INIT
+    AllpassFilter *apfs[]={&inApf1,&inApf2,&inApf3,&inApf4};
+    float value=preDelay.output;
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned i=0;i<4;++i){apfs[i]->input=value;value=apfs[i]->process();}
+    tankFeed=preDelay.output*(1.0f-diffuseInput)+value*diffuseInput;
+#else
     inApf1.input = preDelay.output;
     inApf2.input = inApf1.process();
     inApf3.input = inApf2.process();
     inApf4.input = inApf3.process();
     tankFeed = preDelay.output * (1.f - diffuseInput) + inApf4.process() * diffuseInput;
+#endif
 
     tank.process(tankFeed, tankFeed, &leftOut, &rightOut);
 }

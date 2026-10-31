@@ -5,19 +5,29 @@
   "version": "0.11",
   "display": "SRC DEV",
   "badge": "DEV",
-  "description": "Offline only full core plus SRC integration; never installed.",
+  "description": "Offline full core/SRC/output-stage integration; startup/control mapping incomplete; NEVER INSTALL.",
   "dspload": 220,
   "kernel": "core.cpp",
   "state_bytes": 8,
   "scaffold": "cleanroom",
   "kernel_section": "text",
   "allow_stack": true,
-  "opt_for_space": 1,
+  "opt_for_space": 2,
   "params": [
     {
       "name": "Mix",
       "max": 100,
       "default": 100
+    },
+    {
+      "name": "Mode",
+      "max": 10,
+      "default": 0
+    },
+    {
+      "name": "Drive",
+      "max": 100,
+      "default": 0
     }
   ],
   "const_blob": {

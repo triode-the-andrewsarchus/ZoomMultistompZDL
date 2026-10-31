@@ -33,7 +33,7 @@ static PL_INLINE unsigned p_init_core(Dattorro *d,float *data,unsigned capacity)
     t->rightApf2.delay.l=t->calcMaxTime(t->rightApf2Time);
     d->preDelay.l=16002;
     AllpassFilter *ap[]={&d->inApf1,&d->inApf2,&d->inApf3,&d->inApf4};
-    const int times[]={141,107,379,277};
+    static const int times[]={141,107,379,277};
     for(unsigned i=0;i<4;++i){
         ap[i]->delay.l=(int)(8*times[i]*d->dattorroScaleFactor);
         ap[i]->delay.setDelayTime(times[i]*d->dattorroScaleFactor);

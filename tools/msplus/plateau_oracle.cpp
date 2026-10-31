@@ -13,7 +13,11 @@ extern "C" unsigned plateau_render(const float *input,float *output,unsigned fra
     count=0;hold=1;clearPopCancelValue=1;
 #endif
     alignas(Dattorro) unsigned char storage[sizeof(Dattorro)];
+#ifdef PLATEAU_EXPLICIT_INIT
+    std::memset(storage,0xa5,sizeof(storage)); // prove construction initializes every used field
+#else
     std::memset(storage,0,sizeof(storage));
+#endif
     Dattorro *d=new(storage) Dattorro(32000,16,4);
 #ifndef PLATEAU_EXPLICIT_INIT
     d->setSampleRate(32000);
@@ -27,7 +31,10 @@ extern "C" unsigned plateau_render(const float *input,float *output,unsigned fra
     if(p_bind_core(d,arena.data()+1,size)!=size)return 0;
 #endif
 #endif
-    d->clear();d->setTimeScale(p[0]);d->setPreDelay(p[1]);d->setDecay(p[2]);
+#ifndef PLATEAU_EXPLICIT_INIT
+    d->clear();
+#endif
+    d->setTimeScale(p[0]);d->setPreDelay(p[1]);d->setDecay(p[2]);
     d->setTankModSpeed(p[3]);d->setTankModDepth(p[4]);d->setTankModShape(p[5]);
     d->enableInputDiffusion(p[6]>0);d->setTankDiffusion(p[6]*.7);
     d->setInputFilterLowCutoffPitch(p[7]);d->setInputFilterHighCutoffPitch(p[8]);

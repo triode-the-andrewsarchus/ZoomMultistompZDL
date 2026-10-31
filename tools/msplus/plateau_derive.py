@@ -33,6 +33,13 @@ def convert(text):
     text=text.replace('    scaleFactor = timeScale','    float scaleFactor = timeScale')
     text=text.replace('InterpDelay(192010,','InterpDelay(16002,')
     text=text.replace('sampleRate / dattorroSampleRate','sampleRate * (1.0f/29761.0f)')
+    # Immutable tap positions do not need a per-instance array copy.
+    text=text.replace('const int kOutputTaps[7] = {266, 2974, 1913, 1996, 1990, 187, 1066};',
+                      '#ifndef PLATEAU_EXPLICIT_INIT\n    const int kOutputTaps[7] = {266, 2974, 1913, 1996, 1990, 187, 1066};\n#endif')
+    loop='for (size_t i = 0; i < scaledOutputTaps.size(); ++i) {\n        scaledOutputTaps[i] = (int)((float)kOutputTaps[i] * sampleRateScale);\n    }'
+    assignments='\n'.join(f'    scaledOutputTaps[{i}] = (int)({tap}.0f * sampleRateScale);'
+                          for i,tap in enumerate((266,2974,1913,1996,1990,187,1066)))
+    text=text.replace(loop,'#ifndef PLATEAU_EXPLICIT_INIT\n'+loop+'\n#else\n'+assignments+'\n#endif')
     # Return values/pointers are float throughout. Prevent literal promotion
     # from introducing double runtime helpers on the target.
     text=re.sub(r'(?<![\w.])(\d+\.\d*|\.\d+)([eE][+-]?\d+)?(?![\w.])',
@@ -72,7 +79,84 @@ def convert(text):
         if match[0].startswith(('OnePoleLPFilter','OnePoleHPFilter')):
             alternative='\n#else\n_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;\n'
         text=text[:start]+'\n#ifndef PLATEAU_EXPLICIT_INIT\n'+body+alternative+'\n#endif\n'+text[end-1:]
-    return text
+    return share_loops(text)
+
+
+def share_loops(text):
+    """Share symmetric arithmetic without changing per-channel operation order."""
+    bodies={
+        'Dattorro1997Tank::tickApfModulation': '''
+    TriSawLFO *lfos[]={&lfo1,&lfo2,&lfo3,&lfo4};
+    InterpDelay *delays[]={&leftApf1.delay,&leftApf2.delay,&rightApf1.delay,&rightApf2.delay};
+    float times[]={scaledLeftApf1Time,scaledLeftApf2Time,scaledRightApf1Time,scaledRightApf2Time};
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned i=0;i<4;++i)delays[i]->setDelayTime(lfos[i]->process()*lfoExcursion+times[i]);
+''',
+        'Dattorro1997Tank::process': '''
+    tickApfModulation();decay=decayParam;
+    leftSum+=leftIn;rightSum+=rightIn;
+    AllpassFilter *first[]={&leftApf1,&rightApf1},*second[]={&leftApf2,&rightApf2};
+    InterpDelay *delay1[]={&leftDelay1,&rightDelay1},*delay2[]={&leftDelay2,&rightDelay2};
+    OnePoleLPFilter *lowpass[]={&leftHighCutFilter,&rightHighCutFilter};
+    OnePoleHPFilter *highpass[]={&leftLowCutFilter,&rightLowCutFilter},*dc[]={&leftOutDCBlock,&rightOutDCBlock};
+    float sums[]={leftSum,rightSum};
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned ch=0;ch<2;++ch){
+        first[ch]->input=sums[ch];delay1[ch]->input=first[ch]->process();delay1[ch]->process();
+        lowpass[ch]->input=delay1[ch]->output;highpass[ch]->input=lowpass[ch]->process();
+        second[ch]->input=(delay1[ch]->output*(1.0f-fade)+highpass[ch]->process()*fade)*decay;
+        delay2[ch]->input=second[ch]->process();delay2[ch]->process();
+    }
+    rightSum=leftDelay2.output*decay;leftSum=rightDelay2.output*decay;
+    float outputs[2];
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned ch=0;ch<2;++ch){
+        unsigned other=1-ch;
+        dc[ch]->input=first[ch]->output;
+        dc[ch]->input+=delay1[ch]->tap(scaledOutputTaps[0]);
+        dc[ch]->input+=delay1[ch]->tap(scaledOutputTaps[1]);
+        dc[ch]->input-=second[ch]->delay.tap(scaledOutputTaps[2]);
+        dc[ch]->input+=delay2[ch]->tap(scaledOutputTaps[3]);
+        dc[ch]->input-=delay1[other]->tap(scaledOutputTaps[4]);
+        dc[ch]->input-=second[other]->delay.tap(scaledOutputTaps[5]);
+        dc[ch]->input-=delay2[other]->tap(scaledOutputTaps[6]);
+        outputs[ch]=dc[ch]->process()*.5f;
+    }
+    *leftOut=outputs[0];*rightOut=outputs[1];
+    fade+=fadeStep*fadeDir;fade=fade<0?0:(fade>1?1:fade);
+''',
+    }
+    for name,body in bodies.items():
+        signature='PL_INLINE void '+name+'('
+        if signature not in text:continue
+        start=text.index('{',text.index(signature))+1
+        end=text.index('\n}',start)
+        original=text[start:end]
+        text=text[:start]+'\n#ifdef PLATEAU_EXPLICIT_INIT\n'+body+'\n#else\n'+original+'\n#endif\n'+text[end:]
+    # Four serial input allpasses perform identical work on successive values.
+    original='''    inApf1.input = preDelay.output;
+    inApf2.input = inApf1.process();
+    inApf3.input = inApf2.process();
+    inApf4.input = inApf3.process();
+    tankFeed = preDelay.output * (1.f - diffuseInput) + inApf4.process() * diffuseInput;'''
+    replacement='''
+#ifdef PLATEAU_EXPLICIT_INIT
+    AllpassFilter *apfs[]={&inApf1,&inApf2,&inApf3,&inApf4};
+    float value=preDelay.output;
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(1)
+#endif
+    for(unsigned i=0;i<4;++i){apfs[i]->input=value;value=apfs[i]->process();}
+    tankFeed=preDelay.output*(1.0f-diffuseInput)+value*diffuseInput;
+#else
+'''+original+'\n#endif'
+    return text.replace(original,replacement)
 
 
 def main():
