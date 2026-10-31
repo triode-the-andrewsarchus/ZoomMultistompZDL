@@ -1,0 +1,81 @@
+{
+  "name": "ZDLVelvet",
+  "filename": "XXZVELVT",
+  "id": "060013c0",
+  "version": "0.10",
+  "display": "VELVET",
+  "badge": "VN",
+  "description": "Dynamic Velvet Decorrelator, 115dkk MIT core adapted for Plus. Mono-to-stereo default. Experimental: never save.",
+  "dspload": 220,
+  "kernel": "velvet.c",
+  "state_bytes": 8,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": null,
+  "params": [
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100,
+      "explanation": "Dry/wet amount; mono modes stereoize the selected input."
+    },
+    {
+      "name": "Time",
+      "max": 1000,
+      "default": 276,
+      "explanation": "FIR duration in tenths of a millisecond, 1 to 100 ms."
+    },
+    {
+      "name": "Dens",
+      "max": 1000,
+      "default": 272,
+      "explanation": "Density in four impulses/second per step, minimum 100."
+    },
+    {
+      "name": "Mode",
+      "max": 1,
+      "default": 1,
+      "explanation": "Static or evolving independent kernels.",
+      "values": [
+        "STAT",
+        "DYN"
+      ]
+    },
+    {
+      "name": "Evol",
+      "max": 600,
+      "default": 50,
+      "explanation": "Renewal interval in tenths of a second, minimum 0.1 s."
+    },
+    {
+      "name": "XFade",
+      "max": 1000,
+      "default": 250,
+      "explanation": "Transition duration in milliseconds; limited to 90% of interval."
+    },
+    {
+      "name": "Decay",
+      "max": 120,
+      "default": 60,
+      "explanation": "Attenuation at the last FIR tap in dB."
+    },
+    {
+      "name": "Var",
+      "max": 1000,
+      "default": 0,
+      "explanation": "Deterministic variation added to the original default seed."
+    },
+    {
+      "name": "Input",
+      "max": 2,
+      "default": 0,
+      "explanation": "Mono L, mono R, or independent stereo inputs.",
+      "values": [
+        "MON L",
+        "MON R",
+        "ST"
+      ]
+    }
+  ]
+}
