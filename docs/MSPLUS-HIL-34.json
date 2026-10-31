@@ -3,7 +3,7 @@
   "scope": "34 musical ports, selected standalone cases; not a full feature or chain qualification",
   "firmware": "1.10",
   "branch": "feat/ms70cdr-plus",
-  "native_tests": 28,
+  "native_tests": 29,
   "tool_fault_tests": 27,
   "return_gain_db": 0,
   "ports": [
@@ -140,15 +140,15 @@
     {
       "port": "dirtbox",
       "display": "MJ DIRTBOX",
-      "id": "070013a0",
+      "id": "030013a0",
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/dirtbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "1a7822bc580ac92fbe91dcab769d4ef1cb1c0f9c106733768b462d36c9afb67d",
+      "current_build_sha256": "50d57a7ce6b84ee6f67ac86ea30059361d43132fb0f52a0c186f7d33ff30320d",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/matu-packed-campaign-01/dirtbox/hil/analysis.json",
+      "evidence": "build/msplus/categories-hil-20261031-02/dirtbox/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -159,28 +159,20 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 12,
-      "tested_binary_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
+      "tested_binary_sha256": "50d57a7ce6b84ee6f67ac86ea30059361d43132fb0f52a0c186f7d33ff30320d",
       "source_fingerprints": {
-        "src/msplus/dirtbox/manifest.json": "1fd050bc78efbcf59a157d351bf466a61e9e7fabea44942342b62f30019017c2",
+        "src/msplus/dirtbox/manifest.json": "30195b7c4b9c82ad06807042379ef59d86bda7119e3afefbe84f6b58ec73bfa2",
         "src/msplus/dirtbox/dirtbox.c": "c8e6897a6ff012c9886e0056434a5ce8c60238805d5b247ab51b376c8f1b14b3",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
         "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/dirtbox/manifest_pedal.json": "33f33b136f9b626d8cf72a67b0702098f697e833fac476f89646b0c9d5860037",
         "build/msplus/matujuice/src/custom/dirtbox/dirtbox.c": "138c7babebe48ebf547c8c57d9f8d408b8de395e57285e2a88001a8ae27755f5",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "924a544ff86d708d5f14cfa404a98e0cc41432f0600b680a42efd749842cad10",
-        "artwork_binary_sha256": "1a7822bc580ac92fbe91dcab769d4ef1cb1c0f9c106733768b462d36c9afb67d",
-        "dsp_sha256": "b97b73d967d5fa8cc23d72e6235c7a79c10daac6d980d3101c9b9952ddbee1d5",
-        "source_sha256": "b9525e82733c048dac2f56171bd9a2e729dfb2cdb155cf9c0ab3ce3dc4be2cf1",
-        "artwork_format": "native Plus icons, independently authored sizes",
-        "icon_sha256": "9681c07339a36ded388e2449ec22addde52d283f17f3daedd3a6430446c0bd0a",
-        "dsp_byte_identical": true
       }
     },
     {
@@ -306,15 +298,15 @@
     {
       "port": "dustbox",
       "display": "ZDL DUSTBOX",
-      "id": "07001160",
+      "id": "03001160",
       "family": "original",
       "build_report": "src/msplus/dustbox/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "54335377c9a06f7ee655ae6c2bd9f7fab4f4be291033639b6106fb189ed13a5d",
+      "current_build_sha256": "ebfd84d9f78dd64fbc53aadfa676ee0f9487f04ff6097412524ac0795a833105",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/dustbox/hil/analysis.json",
+      "evidence": "build/msplus/categories-hil-20261031-02/dustbox/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -324,9 +316,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 8,
-      "tested_binary_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
+      "tested_binary_sha256": "ebfd84d9f78dd64fbc53aadfa676ee0f9487f04ff6097412524ac0795a833105",
       "source_fingerprints": {
-        "src/msplus/dustbox/manifest.json": "0b4915c18b1853a4ea8670f3346e5e8916d40a261471b479678f2ddd0ce24188",
+        "src/msplus/dustbox/manifest.json": "3f497cf17898da7b047754a595c943d15d36e7f21384ea178fe53f0b13d577ee",
         "src/msplus/dustbox/dustbox.c": "f1655219ce6d0644622c3e5a5752a4742858e01dd02228a9f2ba4755262f71ac",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -336,15 +328,6 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/dustbox/dustbox.c": "9842544e2152699725ded1bc2fe4cac0328f1ea8e0247559ec5129d295914a29"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "4c454175d3be6d24296385f1e870848e60662b2bd6aa1419943ac536ac1b1434",
-        "artwork_binary_sha256": "54335377c9a06f7ee655ae6c2bd9f7fab4f4be291033639b6106fb189ed13a5d",
-        "dsp_sha256": "ef68d79561f35311dc11742528defcd260cb80d32de518f98ae4f93555acde27",
-        "source_sha256": "c4112ecc2e46c795c8164dd124cea96664139ca1baeae928ae176fbc0564e490",
-        "artwork_format": "native Plus icons, independently authored sizes",
-        "icon_sha256": "adb2c2170f16fbd534de99136130f9b8010d0a843ceb037ba52cf65fe8f5927e",
-        "dsp_byte_identical": true
       }
     },
     {
@@ -738,10 +721,10 @@
       "build_report": "src/msplus/mangle/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "04ed494d9b621a6271ae0c187fb365da2091f78577f3ee234e526b706c8b62a4",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: mangle: hardware-tested source has changed: src/msplus/mangle/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-03/mangle/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-02/mangle/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -752,9 +735,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "d052cf8a32579d689eeb249926a247f48850f00900b2087133cd2df0851b0087",
+      "tested_binary_sha256": "04ed494d9b621a6271ae0c187fb365da2091f78577f3ee234e526b706c8b62a4",
       "source_fingerprints": {
-        "src/msplus/mangle/manifest.json": "ffbddc44b6ce8b8fa693f2648785c67d7eca1e393f24a0878155c4fcf1942be8",
+        "src/msplus/mangle/manifest.json": "421a74b685ce2070cafb40587b1fd67e2eacf8053b88259b1f303de912530eda",
         "src/msplus/mangle/mangle.c": "25c45dba9c5ef4cdb8478fcc739b20dc0b6f51ac015b84f3a8a72144850fb362",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -764,8 +747,7 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/mangle/mangle.c": "c8d69c78405e4b598616de18cf051f0ec93224c7e3ae5a5fa42ef96265e37684"
-      },
-      "qualification_error": "mangle: hardware-tested source has changed: src/msplus/mangle/manifest.json"
+      }
     },
     {
       "port": "microloom",
@@ -775,10 +757,10 @@
       "build_report": "src/msplus/microloom/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "1d3b4d716e4020b9dabca0d23f5f1204912048278ee5319c27233541ad607892",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: microloom: hardware-tested source has changed: src/msplus/microloom/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/microloom/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-02/microloom/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -789,9 +771,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "342780e28ca7f3fb6f6ca281f788ab205a0498d88d3a3a47683a21663e5a8a10",
+      "tested_binary_sha256": "1d3b4d716e4020b9dabca0d23f5f1204912048278ee5319c27233541ad607892",
       "source_fingerprints": {
-        "src/msplus/microloom/manifest.json": "63f0fca52d03a79d12330d7b9f394f9968df8f2abba20edc4deff2e7c54220cd",
+        "src/msplus/microloom/manifest.json": "d3113e73ba644e849ad87949af7f4a12f55cad5129a9e581ec128ff5c2dbe32e",
         "src/msplus/microloom/microloom.c": "49604b96b8fad58846a802e0e92b0a8e668a91706c53ff055f432cc4930656fe",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -801,21 +783,20 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/microloom/microloom.c": "87497f0029baf0cbaaa1d604575c82fdf325e4cc02606c869f854a2303e5e3c1"
-      },
-      "qualification_error": "microloom: hardware-tested source has changed: src/msplus/microloom/manifest.json"
+      }
     },
     {
       "port": "oxide",
       "display": "ZDL OXIDE",
-      "id": "07001280",
+      "id": "03001280",
       "family": "original",
       "build_report": "src/msplus/oxide/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "e0c132519282f10a7203b281a5748f1329d8a0115a4f1074fd5eb34e5db20a2b",
+      "current_build_sha256": "c1d930d3cce8d90b44a1d0dda97bab9bfa7473ba923f10c4b6940aec2192e9b3",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/oxide/hil/analysis.json",
+      "evidence": "build/msplus/categories-hil-20261031-02/oxide/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -826,9 +807,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
+      "tested_binary_sha256": "c1d930d3cce8d90b44a1d0dda97bab9bfa7473ba923f10c4b6940aec2192e9b3",
       "source_fingerprints": {
-        "src/msplus/oxide/manifest.json": "363b29a4bb8110c68164691ef612586643e9865e5ed8ecf4990dc5db9ab33dfd",
+        "src/msplus/oxide/manifest.json": "538df8065b6093f302fbd05fc4203927cef0380c02b2747cecbefa0b622c1fab",
         "src/msplus/oxide/oxide.c": "dd873d6564c97350c67d837883885ad00518762ca3ec976f05bed6c7a7c40ac9",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -841,15 +822,6 @@
         "src/airwindows/totape9/totape9.c": "2af8b64be7700d6b5b8993ba4300a8d8f72ac9311fbd0bf54e67666e83e30da0",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "8fcbea5c9d700104066e9e40d31adeec6752c74dc5e97ed00626f617d3fb641a",
-        "artwork_binary_sha256": "e0c132519282f10a7203b281a5748f1329d8a0115a4f1074fd5eb34e5db20a2b",
-        "dsp_sha256": "4c43c8b30eaa79a6627b6bf94681f304d0850e41620dab4a1f7dbe2d23b7c116",
-        "source_sha256": "78f64fdcafd59c4516e90b5d1e548abe49077d7491f9edb27cf02bb9b7f06ab5",
-        "artwork_format": "native Plus icons, independently authored sizes",
-        "icon_sha256": "041544559870631b82d72a300f0ef89e4b996b9be8c0ea711cece7f47fd83fa8",
-        "dsp_byte_identical": true
       }
     },
     {
@@ -905,10 +877,10 @@
       "build_report": "src/msplus/rooms/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "6064c9ba9a4f64ec12756807484077ec5d01dcceef8cd5fd35eb3785ac62bba1",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: rooms: hardware-tested source has changed: src/msplus/rooms/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/rooms/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-02/rooms/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -919,9 +891,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 12,
-      "tested_binary_sha256": "d73afbb08ab1b524a831e6d78b2f92bc089925438855870f5037651f6d5c45e3",
+      "tested_binary_sha256": "6064c9ba9a4f64ec12756807484077ec5d01dcceef8cd5fd35eb3785ac62bba1",
       "source_fingerprints": {
-        "src/msplus/rooms/manifest.json": "1f037c716a4b41a7fcbe849c61d1c445a3885efd27d78eec8226f8314d73e84d",
+        "src/msplus/rooms/manifest.json": "9980647cbf681783f51e934c9b904c59f15a8960018266a736304ce53e06bf3b",
         "src/msplus/rooms/rooms.c": "3dcef9040112fe4abd22ef9ea567db19ef55a7f20cb3e27372946554c03a177d",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -931,21 +903,20 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/rooms/rooms.c": "141d54d94abf8a666793474c3e12be6c37a4d95a160dc276034c36647bb55d59"
-      },
-      "qualification_error": "rooms: hardware-tested source has changed: src/msplus/rooms/manifest.json"
+      }
     },
     {
       "port": "scorch",
       "display": "ZDL SCORCH",
-      "id": "07001130",
+      "id": "03001130",
       "family": "original",
       "build_report": "src/msplus/scorch/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "89e502822022e7ce9ba0fd0b7ee704bae3de3f566c001b79af795202a32ca58f",
+      "current_build_sha256": "8005b0c67197717845c2181302c0c5bb82d4281122a2ee03f2b1b53db36c8cce",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/scorch-linear-range-hil-01/scorch/hil/analysis.json",
+      "evidence": "build/msplus/categories-hil-20261031-02/scorch/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -957,9 +928,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 9,
-      "tested_binary_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
+      "tested_binary_sha256": "8005b0c67197717845c2181302c0c5bb82d4281122a2ee03f2b1b53db36c8cce",
       "source_fingerprints": {
-        "src/msplus/scorch/manifest.json": "ece65afd972027784fe5c7ac84bc80fe5a969ee0184c535f33308d78ebbdde7e",
+        "src/msplus/scorch/manifest.json": "bfc5f36c778902e0503ea4f66740116aebb777df7ade7bbf3c5809b9f64d50ff",
         "src/msplus/scorch/scorch.c": "01916f2591326810547ce7f78b3e401c55f0fa4021b344b5904d2eaf82266f53",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -969,15 +940,6 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/scorch/scorch.c": "9e7d548e678bbaa25f15aa726fed6bc7c10e43129ddd9343e735b3bef958b36a"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "a1e02919b712134dd225a67adaa79ca2d8f37d4e0b131fff3eb1550f08ca556d",
-        "artwork_binary_sha256": "89e502822022e7ce9ba0fd0b7ee704bae3de3f566c001b79af795202a32ca58f",
-        "dsp_sha256": "5567dae3611483d5361590ceadfa61d5919c2207c199559ece76e0afd0c05e69",
-        "source_sha256": "45f04aa06662209807224b5fdaf32fb59ccb522dfdffb7f0ef874adf1460043e",
-        "artwork_format": "native Plus icons, independently authored sizes",
-        "icon_sha256": "a5e54f3385d3a40833fa18f1021ec3d171b2940d3f7fe69316348b0541b2f9db",
-        "dsp_byte_identical": true
       }
     },
     {
@@ -987,11 +949,11 @@
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/scrub/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "ef457a94e6879d52f4db4a42ac4b739709c7712deaa1d6f7728dc98f7823baf9",
-      "ready_for_retention": false,
+      "current_build_sha256": "7184894bbc351a66ed29a3e52317de3ba87fe1a730f4d1b729d943c64fe8e240",
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: scrub: hardware-tested source has changed: src/msplus/scrub/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/scrub/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-03/scrub/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1003,10 +965,10 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 8,
-      "tested_binary_sha256": "fadd7a95d0a8d05ed3213a46b6546c014a10ebd2bae8448eaf87fb8aa177ee85",
+      "tested_binary_sha256": "7184894bbc351a66ed29a3e52317de3ba87fe1a730f4d1b729d943c64fe8e240",
       "source_fingerprints": {
-        "src/msplus/scrub/manifest.json": "50d060791125dd05b312279af361fde06104e56ccb26083e88b53586db3ba972",
-        "src/msplus/scrub/scrub.c": "98cd1db239db6b0ef25473cbdb72758acb502d1c7c0b805f00f0be1bea1a9353",
+        "src/msplus/scrub/manifest.json": "9996ad7fb8834736b50d8bfd2dcf5ae26628b54fd1bc2456ffa4e9e57f3e5ee3",
+        "src/msplus/scrub/scrub.c": "f7119ef316cacd0fb42dbd99d3d2b97e9f85f8f2b1aa1991c8f05cfa94fe9469",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
@@ -1019,8 +981,7 @@
         "build/msplus/matujuice/src/custom/scrub/manifest_pedal.json": "a66b12d6c37f64be7362582a53166819c65403408c3b8e2df5f23e09278caa7f",
         "build/msplus/matujuice/src/custom/scrub/scrub.c": "8a2653cae8201dc13dc5e8af2fa9ab66a9a06a7fa0d3a161fafa8fea7b75c5dc",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "qualification_error": "scrub: hardware-tested source has changed: src/msplus/scrub/manifest.json"
+      }
     },
     {
       "port": "sgnl",
@@ -1077,10 +1038,10 @@
       "build_report": "src/msplus/shatter/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "25ccb6dff49d1a89fffc3f21f4a7d73b94f68ecc797369182bb0145fc708d686",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: shatter: hardware-tested source has changed: src/msplus/shatter/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/shatter/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/shatter/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1091,9 +1052,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "4a842e083b5b85f477d71ac3c9c846a53c1f16c5f864d751001c38b9fbb6937e",
+      "tested_binary_sha256": "25ccb6dff49d1a89fffc3f21f4a7d73b94f68ecc797369182bb0145fc708d686",
       "source_fingerprints": {
-        "src/msplus/shatter/manifest.json": "7dbfb58edebbdac879491dfc092b4b85cb852ea1cd7b7ba2a06c411980947397",
+        "src/msplus/shatter/manifest.json": "8266be11c6b43e8b97244fc988fced601638e3016c900882689deab3364a1867",
         "src/msplus/shatter/shatter.c": "39f9b9838f5d6bca41be1a5b94f98cdfca14980fe39676ec15b9cc802bb1a43b",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1103,8 +1064,7 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/shatter/shatter.c": "ea65fffa8d98670597314d0814a80e62488880ed73208d63cb10acfc1bf32795"
-      },
-      "qualification_error": "shatter: hardware-tested source has changed: src/msplus/shatter/manifest.json"
+      }
     },
     {
       "port": "spiral",
@@ -1114,10 +1074,10 @@
       "build_report": "src/msplus/spiral/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "8dc35a1824f32e92957f9fff320dbef2a062abd4571998c31432a94dcd2f4827",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: spiral: hardware-tested source has changed: src/msplus/spiral/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/spiral/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/spiral/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1128,9 +1088,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "b978492de267482028f720004cdefaaa62752c5336fcbcf62e5cf3cf8fb34471",
+      "tested_binary_sha256": "8dc35a1824f32e92957f9fff320dbef2a062abd4571998c31432a94dcd2f4827",
       "source_fingerprints": {
-        "src/msplus/spiral/manifest.json": "410335c07f604ba02f17f760c5fc25b6973215a4263a3ffa22ab4c3215cb1a6b",
+        "src/msplus/spiral/manifest.json": "160059215c626903737c66f0d5b29e39686469ab62e5173e40132afd92d3c33f",
         "src/msplus/spiral/spiral.c": "a0a185949d6c852fcd0f2c541ad06caf54da7af2dd8a2cac04fa64229cd9866d",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1140,8 +1100,7 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/spiral/spiral.c": "03cc2c42b34e095212d2a4da864e712a9ffa7d0e9e34eefbd63b9f52112264ce"
-      },
-      "qualification_error": "spiral: hardware-tested source has changed: src/msplus/spiral/manifest.json"
+      }
     },
     {
       "port": "spool",
@@ -1151,10 +1110,10 @@
       "build_report": "src/msplus/spool/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "ed6edc191b0831b0a4e224dd6d0c78ad9413c7a5ab0f9bc9ff1faa9a6e2534a9",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: spool: hardware-tested source has changed: src/msplus/spool/manifest.json",
-      "evidence": "build/msplus/native-art-spool-hil-20261030-01/spool/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/spool/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1165,9 +1124,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "82a17b9dd012b29cbfcc7f9a40907a359f5b004dc3f273a21a4678f86983159f",
+      "tested_binary_sha256": "ed6edc191b0831b0a4e224dd6d0c78ad9413c7a5ab0f9bc9ff1faa9a6e2534a9",
       "source_fingerprints": {
-        "src/msplus/spool/manifest.json": "8561fbbebbb543c36e3175c56fc2094038ec1ded8a2005e71c56c3d8a9b348d7",
+        "src/msplus/spool/manifest.json": "a86f1723dd83fc9184a092dbe62e2939f7b6abd712d9ce2b328d6f56839c4152",
         "src/msplus/spool/spool.c": "1450aa0f9ef684927242149d07e149859d243fbe2f0439f744c5786655168470",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1180,8 +1139,7 @@
         "src/airwindows/tapeecho4/tapeecho4.c": "e113ec842938821d56e607ba65ddd6ae53f11117257fbd657a06bb0e0a57d6f8",
         "src/airwindows/common/zoom_params.h": "bff788b99c28cb69870ff22375795056720dbfe389044cbd3c6593d880c86013",
         "src/airwindows/common/tape_controls.h": "1c119d9411f43eec184b33343fa35d1867891c5107bce604cb4ab7f361961984"
-      },
-      "qualification_error": "spool: hardware-tested source has changed: src/msplus/spool/manifest.json"
+      }
     },
     {
       "port": "stasis",
@@ -1191,10 +1149,10 @@
       "build_report": "src/msplus/stasis/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "79816131ef14a0acac8e4d2e7862a116315f3cffb0bfed0cf04069a8940aacba",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: stasis: hardware-tested source has changed: src/msplus/stasis/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/stasis/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/stasis/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1206,9 +1164,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 9,
-      "tested_binary_sha256": "9617076be5c9bdae5b79eae396867e0eb8b08ff29d11b3d4612bdffa8c9e7add",
+      "tested_binary_sha256": "79816131ef14a0acac8e4d2e7862a116315f3cffb0bfed0cf04069a8940aacba",
       "source_fingerprints": {
-        "src/msplus/stasis/manifest.json": "4a0f87e8724fe4c420c00ba8e5792908de93596c44391fd6e7d8948f231706e4",
+        "src/msplus/stasis/manifest.json": "c556bc660106e6232a9d262e7c34c6b8fce41db08bfe7b8654048846a4cc2f19",
         "src/msplus/stasis/stasis.c": "4421e5a3796ded3e2e34111e2d2490d329bbbef2e351bbed86d1470fc5d82f5d",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1218,8 +1176,7 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/stasis/stasis.c": "3a9179159c9a6d70e80738eede3eadff974e6b9e4831448242dfeeb012a4aafb"
-      },
-      "qualification_error": "stasis: hardware-tested source has changed: src/msplus/stasis/manifest.json"
+      }
     },
     {
       "port": "sweep",
@@ -1229,10 +1186,10 @@
       "build_report": "src/msplus/sweep/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "3923417b849ed1b6ce8fbed49a1797083f04e55ef5a7923dd48f6f5c20f011eb",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: sweep: hardware-tested source has changed: src/msplus/sweep/manifest.json",
-      "evidence": "build/msplus/matu-packed-campaign-01/sweep/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/sweep/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1243,9 +1200,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 13,
-      "tested_binary_sha256": "ce51391cb6f6b5ef6f9c7a8aa29311e4778fbd9fd971adddcb894a4062d9b258",
+      "tested_binary_sha256": "3923417b849ed1b6ce8fbed49a1797083f04e55ef5a7923dd48f6f5c20f011eb",
       "source_fingerprints": {
-        "src/msplus/sweep/manifest.json": "334e92b676e2898bbf49593b93b0f8948c63dd843320aa6b24df5a414e8440d5",
+        "src/msplus/sweep/manifest.json": "73be169e4e209a22618bb518655e08c3f965f38fa499cabf7a917adbb358b970",
         "src/msplus/sweep/sweep.c": "8485ea16b85dbbd8cc9c7ea78719856ced70681d506b3f9dfbefefb5a71dd00d",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1257,8 +1214,7 @@
         "build/msplus/matujuice/src/custom/sweep/manifest_pedal.json": "f80c281329c5cb0662526e600850cd901274248bed3d31be225a82af615e918e",
         "build/msplus/matujuice/src/custom/sweep/sweep.c": "3055ac9a55f45e75b872597e39a3bf2ab1cf000d76c180e85aa313094d474bc5",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "qualification_error": "sweep: hardware-tested source has changed: src/msplus/sweep/manifest.json"
+      }
     },
     {
       "port": "synceq",
@@ -1268,10 +1224,10 @@
       "build_report": "src/msplus/synceq/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "65e415d3382f688a60b4cfa31c2396522784d814258affe736921cca90dd723c",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: synceq: hardware-tested source has changed: src/msplus/synceq/manifest.json",
-      "evidence": "build/msplus/matu-packed-campaign-01/synceq/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/synceq/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1281,21 +1237,21 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 9,
-      "tested_binary_sha256": "c35467e5ee4b3a0684299dccec73951169d636eaf83da7fbabe3fe4c890c772a",
+      "tested_binary_sha256": "65e415d3382f688a60b4cfa31c2396522784d814258affe736921cca90dd723c",
       "source_fingerprints": {
-        "src/msplus/synceq/manifest.json": "e24bea1076a35e6c6b9628e1c209312a189cca3695c7b25ae639df72b1926609",
+        "src/msplus/synceq/manifest.json": "e2b27c89d7778b008447ea1da37f3d51c935a57d4f8f94ba3382f0d6b987a4b4",
         "src/msplus/synceq/synceq.c": "3866d6359aa099375a0784fb60600a46cc2611ebc962c810d78f3df1eca39abf",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
         "src/msplus/common/force_inline.h": "e16890741a55688625f98ce854fccdcb1fa6f8d238a5423353cc03cb753c1b26",
         "src/msplus/common/matujuice_controls.h": "a2480035aa5c791d67b08af08d01edfbd98182adccd55d31ba18b01d4248453b",
         "src/msplus/common/matujuice_kernel.h": "8c7a44942548ba0ebd440979ecea34e970b551d3996978ebbec604559cb13cda",
+        "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "build/msplus/matujuice/src/custom/synceq/manifest_pedal.json": "30cc497e2aebff5ab72e282df1653ac640d124d7ef4f62ef263b405996b6eb3a",
         "build/msplus/matujuice/src/custom/synceq/synceq.c": "f2429c1c44e7555cd52d2e3a2b7c8b797052ee3be2b81245f11df802e69505ef",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "qualification_error": "synceq: hardware-tested source has changed: src/msplus/synceq/manifest.json"
+      }
     },
     {
       "port": "taffy",
@@ -1305,10 +1261,10 @@
       "build_report": "src/msplus/taffy/build/REPORT.md",
       "build_validated": true,
       "current_build_sha256": "7cb7eb48003c64da50b893de12bd3b24d636e2b73240eac90c157916ebe26f25",
-      "ready_for_retention": false,
+      "ready_for_retention": true,
       "stock_baseline_healthy": true,
-      "status": "UNQUALIFIED: taffy: hardware-tested source has changed: src/msplus/taffy/manifest.json",
-      "evidence": "build/msplus/remaining-ports-campaign-20261029-04/taffy/hil/analysis.json",
+      "status": "PASS: selected standalone checks and current restoration/provenance gates",
+      "evidence": "build/msplus/categories-hil-20261031-04/taffy/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1319,9 +1275,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 7,
-      "tested_binary_sha256": "c80df4ee249cfa635bda781088344f4fe7006c3410300707971bfed2b2bb92ef",
+      "tested_binary_sha256": "7cb7eb48003c64da50b893de12bd3b24d636e2b73240eac90c157916ebe26f25",
       "source_fingerprints": {
-        "src/msplus/taffy/manifest.json": "b517eee08e0205485687edda63d9e1ad25e41c860417496d977c797d52195334",
+        "src/msplus/taffy/manifest.json": "bfaaeee1cc3095a4792225a054e2e12338dc42c66c89d355aa6554e0351c7719",
         "src/msplus/taffy/taffy.c": "b41ee757ac604083b47c30350182859b41c3303a74165a2dd6575ab940b758f0",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1331,21 +1287,20 @@
         "src/msplus/common/pcm15.h": "ccfbf5719904468f543dd8aac8bb0d250757152cb0d5b5594555bbce7d8ef9ed",
         "src/msplus/common/triangle_probe.h": "e69768c13372ff6dca157eb0a31336a99539d9f2f95ed202b4fe4f93a5205a74",
         "src/custom/taffy/taffy.c": "26279405b8a3c96b9c15cd62d7c952c67c932fde14c3dae9042c4a77117a324f"
-      },
-      "qualification_error": "taffy: hardware-tested source has changed: src/msplus/taffy/manifest.json"
+      }
     },
     {
       "port": "wavefold",
       "display": "MJ WAVEFOLD",
-      "id": "07001300",
+      "id": "03001300",
       "family": "Matujuice v1.5",
       "build_report": "src/msplus/wavefold/build/REPORT.md",
       "build_validated": true,
-      "current_build_sha256": "06f3d3758a35ef04825d8f1626084b0681e2619f1e5a1410060754fea38fe015",
+      "current_build_sha256": "15dac35d063eab4489b7fdc8c9afc08f65d77f4bd1a9b6dca81e7bde27100b95",
       "ready_for_retention": true,
       "stock_baseline_healthy": true,
       "status": "PASS: selected standalone checks and current restoration/provenance gates",
-      "evidence": "build/msplus/wavefold-stages-hil-01/wavefold/hil/analysis.json",
+      "evidence": "build/msplus/categories-hil-20261031-05/wavefold/hil/analysis.json",
       "audio_restoration_marker_present": true,
       "configured_checks": [
         "capture_integrity",
@@ -1358,9 +1313,9 @@
       "configured_passed": true,
       "analysis_errors": [],
       "capture_count": 70,
-      "tested_binary_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
+      "tested_binary_sha256": "15dac35d063eab4489b7fdc8c9afc08f65d77f4bd1a9b6dca81e7bde27100b95",
       "source_fingerprints": {
-        "src/msplus/wavefold/manifest.json": "d63f029050646e55d5c386b1211f370be6d525775f5d76c0e14a6b814626536f",
+        "src/msplus/wavefold/manifest.json": "1efb482791fe16628d63d65025edac97f857d076e22b40cb9bfb7f932f575252",
         "src/msplus/wavefold/wavefold.c": "3319a2b1cf65db537b9ca27e23b841876c32138b16e69526b61b48e1471f01cf",
         "src/msplus/common/arena_state.h": "d08d609043ed8da254875ad82a2dbb658dfd575f3c89da0e6845a8246831d03a",
         "src/msplus/common/compat.h": "3609a7abbd108616ca53ca3dafe687a744d63cf54a8d97d049867f10df5701fb",
@@ -1372,31 +1327,22 @@
         "build/msplus/matujuice/src/custom/wavefold/manifest_pedal.json": "b6655b1c81c4b6fcb6ee3ef5ff71f0b827a0a3e8140cf41bcff28b14fc481855",
         "build/msplus/matujuice/src/custom/wavefold/wavefold.c": "dcf9c383b5e8c95009460937873d1c5c491e5838f4cedf3d1f3245f69c8bc97c",
         "build/msplus/matujuice/src/custom/common/drytag.h": "c76e3dfd2320c32430b85f038efb61d1797764579237bdc4fc8cb3c008faf5d5"
-      },
-      "artwork_only_variant": {
-        "original_sha256": "8c5258a713a86342d55f6776a835ea67cade532f5d8b75ca5e8afefa9988a39a",
-        "artwork_binary_sha256": "06f3d3758a35ef04825d8f1626084b0681e2619f1e5a1410060754fea38fe015",
-        "dsp_sha256": "9bddebbdcbc90d86c4c98240fa45ee7a5b26a65a1f0068e190dbc6fa5327393a",
-        "source_sha256": "67189627cfafeca372ef2e7484bdd42438927beec7a6b5d4a0bfe6f5ea3b0781",
-        "artwork_format": "native Plus icons, independently authored sizes",
-        "icon_sha256": "7c89ee2e9fc253c71274b32f050762a5145a2b97ceeb1462c88b0f07b84bb720",
-        "dsp_byte_identical": true
       }
     }
   ],
   "bench_blocker": null,
-  "safety_audit": null,
-  "saved_patches_after_stock_reload": "build/msplus/native-art-install-20261030-01/audit/VERIFIED.json",
-  "experiments_left_installed": 35,
+  "safety_audit": "build/msplus/categories-final-20261031-01/audit/VERIFIED.json",
+  "saved_patches_after_stock_reload": "build/msplus/categories-final-20261031-01/audit/VERIFIED.json",
+  "experiments_left_installed": 34,
   "limitations": [
     "Matujuice legacy dry-tag FOLLOW/Mozaic tempo relay has no verified Plus mapping",
     "Multi-slot arena ownership and aggregate DSP load unqualified",
-    "Standalone checks cover selected cases; manual visual review of native artwork remains pending"
+    "Selected standalone cases do not cover every control combination; artwork retained from the previous installed set"
   ],
   "counts": {
     "musical_builds": 34,
     "selected_hardware_checks_passed": 34,
-    "current_retention_gate_passed": 23,
+    "current_retention_gate_passed": 34,
     "scorch_reference_mismatch": 0,
     "unqualified_transitions": 0,
     "not_yet_hardware_tested": 0
@@ -1463,31 +1409,19 @@
     "quiet_calibrator_machine_code_preserved_bytes": 640
   },
   "current_blocker": {
-    "ports": [
-      "mangle",
-      "microloom",
-      "rooms",
-      "scrub",
-      "shatter",
-      "spiral",
-      "spool",
-      "stasis",
-      "sweep",
-      "synceq",
-      "taffy"
-    ],
-    "finding": "12 changed IDs pass hardware tests; 11 changes remain. Paused for physical Drive-category observation before further MIDI operations; no transfer or restoration failure remains."
+    "ports": [],
+    "finding": "All musical ports have current standalone hardware qualification"
   },
   "verification_logs": {
     "native": {
-      "path": "build/msplus/categories-session-20261031-01/native-tests.log",
-      "tests": 28,
-      "sha256": "9acf004b385725c14ad93a7bcd5e470f8ea36ccf75c2c531e2fbe756fcb9c103"
+      "path": "build/msplus/categories-session-20261031-01/native-tests-scrub-fixed.log",
+      "tests": 29,
+      "sha256": "63c1deba75fc2c53d4e8dd12587cc34324fe0d3a72af2da7d23dc7a0634915aa"
     },
     "tools": {
-      "path": "build/msplus/categories-session-20261031-01/tools-tests-lower-group-build.log",
+      "path": "build/msplus/categories-session-20261031-01/tools-tests-drive.log",
       "tests": 27,
-      "sha256": "49804079f1c98a74e2958182e48882ede13eaa4fb0810c42e530e6b86c00ea4e"
+      "sha256": "102437406be42ae579a37c415a97f8c567e60696c3d184d533cb8bfd345e1253"
     }
   },
   "native_artwork": {
@@ -1505,19 +1439,39 @@
     "artwork_only_proof": "build/msplus/native-art-install-20261030-01/ARTWORK-ONLY.json",
     "spool_requalified_after_main_metadata_change": true
   },
-  "last_completed_full_set_audit": "build/msplus/native-art-install-20261030-01/audit/VERIFIED.json",
+  "last_completed_full_set_audit": "build/msplus/categories-final-20261031-01/audit/VERIFIED.json",
   "category_migration": {
-    "planned_changes": 23,
-    "changed_ID_hardware_passes": 12,
-    "remaining_changes": 11,
-    "full_set_audit_pending": true,
-    "paused_for_drive_library_observation": true,
+    "planned_changes": 28,
+    "changed_ID_hardware_passes": 28,
+    "remaining_changes": 0,
+    "full_set_audit_pending": false,
+    "paused_for_drive_library_observation": false,
+    "artifact_comparison": "build/msplus/categories-final-20261031-01/ARTIFACT-COMPARISON.json",
     "probe": {
       "id": "030013e0",
       "filename": "XXDRVPRB",
       "gain_checks_passed": true,
-      "UI_confirmation_pending": true,
-      "evidence": "build/msplus/drive-probe-20261031-01/PROBE-COMPLETE.json"
+      "UI_confirmation_pending": false,
+      "UI_confirmed": true,
+      "installed": false,
+      "evidence": "build/msplus/drive-probe-20261031-01/VISUAL-CONFIRMED.json",
+      "absence": "build/msplus/categories-final-20261031-01/PROBE-ABSENT.json"
+    },
+    "intentional_DSP_exception": {
+      "port": "scrub",
+      "version": "0.11",
+      "reason": "Correct Plus integer Pos mapping; fresh native regression and hardware qualification"
+    },
+    "wavefold_repeat": {
+      "first_analysis": "build/msplus/categories-hil-20261031-04/wavefold/hil/analysis.json",
+      "finding": "One seventh harmonic exceeded unchanged 3 dB tolerance by 0.095 dB. Complete repeat passed unchanged limits; original failure retained.",
+      "accepted_analysis": "build/msplus/categories-hil-20261031-05/wavefold/hil/analysis.json"
     }
-  }
+  },
+  "storage": {
+    "custom_pair_bytes": 510685,
+    "available_bytes": 576690,
+    "maximum_bytes": 6204530
+  },
+  "final_audio": "build/msplus/categories-final-20261031-01/final-health/stock-audio-preflight/report.json"
 }

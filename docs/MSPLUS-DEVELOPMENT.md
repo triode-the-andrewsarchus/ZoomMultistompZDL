@@ -383,7 +383,7 @@ memory, never changes descriptor fields, and initializes only its own arena.
 See [memory evidence and limits](MSPLUS-MEMORY-RESEARCH.md). Hydra and Stasis
 clear large buffers in bounded steps.
 
-The 34 ZD2/ZIC pairs total **510,813 bytes** with WaveFold 0.11. They are all
+The 34 ZD2/ZIC pairs total **510,685 bytes** with WaveFold 0.11 and Scrub 0.11. They are all
 installed alongside the factory set, with **576,690 bytes free** after filesystem allocation. Capacity
 to retain all 34 is therefore hardware-verified. Simultaneous processing has
 separate limits: the pedal has
@@ -469,13 +469,15 @@ manifest mapping is:
 |---|---|---|
 | Dynamics | `01` | EuGate |
 | Filter | `02` | Flower, SyncEQ |
+| Drive | `03` | DirtBox, Dustbox, Oxide, Scorch, WaveFold |
 | Modulation | `06` | DualShft, Choral, GenLoss, Klang, Sweep |
-| SFX | `07` | Arrakis, Corrupt, DirtBox, DubSiren, Dustbox, Howl, Oxide, Rewire, Scorch, SGNL, WaveFold |
+| SFX | `07` | Arrakis, Corrupt, DubSiren, Howl, Rewire, SGNL |
 | Delay | `08` | Dissolve, GridDly, Gyre, Hydra, Mangle, Microloom, Scrub, Shatter, Spiral, Spool, Stasis, Taffy |
 | Reverb | `09` | Breather, Galactic, Rooms |
 
-There is no stock Drive category on the MS-70CDR+, so distortion/saturation
-effects stay in SFX. Pitch effects use Modulation; granular/looping effects
+Stock MS-70CDR+ effects do not use Drive, but a separate group-03 probe and the
+user's physical library observation confirmed that the firmware exposes it.
+Distortion/saturation effects therefore use Drive. Pitch effects use Modulation; granular/looping effects
 use Delay, and Breather's pump/reverb uses Reverb. These are library choices,
 not changes to their DSP. Within-category file order remains separate from ID
 numbering; this migration does not renumber effects to sort alphabetically.
@@ -527,6 +529,32 @@ assumed by the old hardcoded channel list. Fault tests reject a wrong carrier
 or the same carrier on both outputs. The original failed analysis and unchanged
 WAVs are retained alongside the reviewed result and `ACCEPTED.json`.
 
+#### Scrub position correction found during migration
+
+The new Scrub audition initially failed its held-audio check. Investigation
+found a pre-existing adapter bug: `mp_raw_controls` supplies Pos as screen
+integers from 0 to 600, but the wrapper called the legacy `sc_ui_pos` converter,
+which expects screen/100 from 0 to 6. Most values were rejected and fell back to
+600. This left Pos effectively stuck at "now" and let a gap of silence at the
+end of recording become the held grain. The original failed captures remain
+in `build/msplus/categories-hil-20261031-02/scrub/`.
+
+Scrub 0.11 uses the existing Plus integer UI helper for Pos, consistent with
+its other controls. The pristine Matujuice core, full 348,000-sample ring,
+15-bit history storage, guards and artwork are unchanged. This one effect is
+an explicit exception to the category-only DSP-byte guarantee: its adapter was
+corrected and rebuilt, not accepted as a metadata-only variant.
+
+A new native test records eight distinct one-second frequency segments, then
+holds and selects six history positions from 50 to 550. The old adapter returned
+the newest ~1600 Hz segment even when ~600 Hz was requested. The corrected
+adapter selects all six expected distinct segments and preserves arena canaries.
+The failing and passing logs are retained; the full native suite now has 29
+passing tests. The fresh Scrub hardware audition passed HOLD at Pos 500, scan
+at Pos 400, dry gain, stability, exact binary/source provenance and stock-audio
+restoration with all 100 saved patches unchanged. Its evidence is
+`build/msplus/categories-hil-20261031-03/scrub/`.
+
 #### Unused Drive-group probe
 
 The stock MS-70CDR+ has no Drive entries, but that does not establish whether
@@ -539,22 +567,60 @@ the compiler's numeric-floor override was not enabled. Its gain, bypass,
 zero-output and restoration checks pass, with all saved patches unchanged.
 Evidence is `build/msplus/drive-probe-20261031-01/`.
 
-The unused category's actual library presentation needs visual confirmation
-on the pedal. A valid file, accepted install and working DSP alone do not
-establish that the firmware exposes a Drive column. Until that observation,
-`categories.py` continues to restrict normal migrations to verified categories.
+The user confirmed a Drive category containing the **DRIVE?** tile on the
+physical pedal. That observation, together with the valid file, guarded
+installation and gain tests, qualifies group `03` for `categories.py`.
+The plain probe tile was intentional; the five musical effects retain their
+existing native artwork. The probe was removed after stock scratch restoration
+before resuming the musical migrations. `VISUAL-CONFIRMED.json` records the
+observation separately from the earlier audio completion evidence.
 
-October 31 checkpoint: 12 of the planned 23 changed IDs passed their existing
-hardware cases. Eleven changes remain, with their previous SFX files still
-installed; all 34 musical effects and the separate Drive probe are retained.
-The next hardware step awaits the user's physical library observation, to
-avoid MIDI automation during browsing. The stock patch/audio restoration and
-100 saved-patch checks passed after the probe. A final complete-set audit is
-still required when migration finishes; the current qualification report marks
-the pending ports explicitly. The architecture delta's added `reviewed_cases`
+Earlier October 31 checkpoint: 12 of the initially planned 23 changed IDs had
+passed their existing hardware cases. Eleven changes remained, with their
+previous SFX files still installed; all 34 musical effects and the separate Drive
+probe were retained. Testing paused for the user's physical library observation
+to avoid MIDI automation during browsing. The stock patch/audio restoration and
+100 saved-patch checks passed after the probe. The complete-set audit was still
+pending at that checkpoint. After Drive was confirmed, five more
+effects were assigned to Drive, making 28 changed IDs in total; the remaining
+six effects stay in SFX. The architecture delta's added `reviewed_cases`
 branches enforce the probe's exact ID and gain-control schema; these are
 intentional safeguards. Other complexity maxima remain unchanged and overall
 duplication decreased.
+
+#### Completed category migration (October 31)
+
+All 28 changed IDs passed their selected standalone hardware cases. All 34
+musical effects remain installed in the categories above, with the temporary
+Drive probe removed. The final independent audit read back all 68 binaries/icons,
+required the original factory catalogue plus exactly these 34 entries, checked
+all 100 saved patches unchanged and verified diagnostic files absent. Both
+stock stereo audio paths passed again after all file sessions closed. Autosave
+is OFF and the temporary scratch patch contains only a stock effect.
+
+All 34 embedded and companion icons are byte-identical to the pre-migration
+backup. The other 33 DSP/control payloads are unchanged; Scrub 0.11 is the
+explicit position-control correction described above. WaveFold's first new
+comparison had one weak seventh harmonic at +3.095 dB against the unchanged
+3 dB limit. A complete independent repeat of all 66 cases passed the same
+limits; both recordings and analyses remain available. This is selected-case
+qualification, not proof of every control sequence or multi-effect combination.
+
+`build/msplus/categories-final-20261031-01/COMPLETE.json` binds the current
+34/34 report, exact installed hashes, artifact comparison, full audit, probe
+absence, backup and final audio evidence. There are **576,690 bytes free**;
+the current custom pairs total **510,685 bytes**. Native and tool/fault suites
+pass **29/27 tests**. The final PipeWire forced-quantum setting is restored to
+`0` (automatic), as observed after the campaign.
+
+Architecture review against `pre-plus-categories` keeps maximum/average
+complexity at 136/4.85, clone groups at 449 and dependency cycles at six;
+duplication decreases 10.67%→10.62%. The reported regression is the probe's
+three strict identity/schema conditions (CCN 16→19). Scrub's existing adapter
+boilerplate and the new independent regression fixture also touch detected
+clones; the adapter correction itself reuses the existing integer UI helper.
+These checks and fixed ABI declarations remain rather than changing tested
+DSP or weakening validation to improve a metric.
 
 ```sh
 $PY "$SH/tools-pedal/safe_connect.py" build/msplus/session-YYYYMMDD
