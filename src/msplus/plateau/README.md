@@ -1,125 +1,107 @@
-# Plateau / Campestria — MS-70CDR+ port in development
+# Plateau / Campestria plate reverb — MS-70CDR+
 
 Upstream: digitalartifactmusic/PlateauNEVersio,
 `4218b072e7420dd788cd3c98c36b3eba445f8886`, based on Dale Johnson's
-Valley Plateau / Dattorro reverb. GPL-3.0-or-later; retain the accompanying
-licenses and third-party notices. This directory is not yet an installable
-or hardware-qualified effect.
+Valley Plateau / Dattorro reverb. GPL-3.0-or-later; retain the supplied licenses
+and third-party notices. Hardware qualification is pending.
 
-Implementation requirements:
+The port retains the original 32 kHz plate topology, maximum size 4, modulation
+depth 16, diffusion, input/tank filters, input gain, freeze and clear. Predelay
+is capped at the approved 500 ms. The output section uses the normal lookahead
+limiter and a Level control. Per the requested scope, the upstream distortion
+modes and additional Bogaudio dynamics processor are omitted.
 
-- Retain the 32 kHz reverb topology, modulation range, maximum size 4,
-  diffusion, freeze, filters, gain stages and eleven output modes.
-- Replace rectangular/global SDRAM allocation with bounded per-instance arena
-  buffers; cap predelay at 500 ms as authorized. Initialize cooperatively.
-- Supply anti-aliasing conversion to/from the 44.1 kHz host; float32 DSP.
-- Retain all DSP safety and transfer checks; never save an experimental patch.
-- Fit ten coefficient controls: Mix, Size, Decay, Pre, Speed, Depth, Hold,
-  Mode, Edit and Value. Hold selects run/freeze/clear; Mode selects the original
-  eleven output modes. Edit/Value retain the source's multifunction Tone
-  control for input/tank filters, diffusion, input gain, output drive,
-  modulation shape and depth lock. Changing Edit selects a target; only a
-  subsequent Value movement changes it, preserving other settings. As with
-  the source's switches/knob, the scalar Value display is not a readout of
-  every stored advanced setting. Chain reinitialization restores defaults.
-- Validate the core against the pinned upstream DSP, output stages separately,
-  then actual hardware response/tails, changing delay times, zero-input
-  stability, clear/freeze and stock-effect restoration.
+## Controls
 
-The advanced-control mapping is needed because the complete upstream firmware
-has more independent settings than the Plus toolchain's ten safe knob slots.
-It preserves the source's switch-selected editing approach rather than silently
-omitting output modes or independent filter settings.
+| Control | Behavior |
+|---|---|
+| Mix | Dry/wet blend, 0–1000. |
+| Size | Original quadratic size curve, 0.01–4. |
+| Decay | Original nonlinear feedback curve. |
+| Pre | Predelay in milliseconds, 0–500. |
+| Speed | Original modulation speed curve. |
+| Depth | Original 0–16 modulation depth; edits shape while depth is locked. |
+| Hold | RUN, FRZ, CLEAR; clear triggers once when selected. |
+| Level | Output trim, 0–2×; 500 is unity, before the limiter. |
+| Edit | Select INHI, INLO, TNKHI, TNKLO, DIFF, INAMP, LIMIT, SHAPE or LOCK. |
+| Value | Edit the selected advanced setting, 0–1000. |
 
-The 64-tap, 32-phase input/output SRC is implemented in `resample.h`,
-with readonly generated coefficient tables. Four native tests pass: exact
-32,000 internal frames per 44,100 host frames, unity DC, under 0.03 dB
-round-trip gain error through 12 kHz, exact channel isolation, and more than
-65 dB rejection for the tested 16–21 kHz input tones. This is component-level
-validation; full integration and hardware qualification remain
-to be completed. `tools/msplus/resample_coeffs.py` reproduces the tables.
+Changing Edit selects a target; only a subsequent Value movement changes it.
+Other advanced settings are retained. Value displays the shared editing knob,
+not a readout of all stored settings. Reinitializing the effect restores defaults.
+LOCK captures the current depth; while locked, Depth adjusts modulation shape.
+LIMIT lowers the limiter threshold; its default maximum is a DSP peak of 0.25,
+below the rig's independently measured linear output range through 0.275.
 
-The offline TI integration probe passes the unchanged Stomphacks validator.
-Target tables use its existing `const_blob` manifest support (symbol
-`plateau_src_blob`, 4,224 words, init `resample_coeffs.bin`) so the parameter
-table remains first in `.const`. The native header has identical generated
-coefficients; binary equality is tested. No SRC probe was installed.
+The original smoothing recurrence advances at 32 kHz. Setters apply at the end
+of each host block, avoiding repeated coefficient calculations in the audio
+loop. Small endpoint snaps prevent float smoothing from stalling below full
+freeze or above zero. Clear fades the reverb feed/output, clears histories in
+bounded slices and fades back in while retaining settings.
 
-The mechanically derived float32 reverb core is now checked against the pinned
-upstream double implementation. Six profiles cover impulse tails, minimum and
-maximum size, 500 ms predelay, modulation depth/shape and independent filters.
-A third test variant verifies that explicit bounded initialization matches the
-ordinary adapted constructors. Run `python -m unittest discover -s tools/msplus
--p test_plateau.py -v` in the project venv. The oracle's sole upstream-source
-change enlarges its undersized predelay storage row; DSP equations are retained.
+## Build and memory
 
-The core/SRC-only checkpoint passed the unchanged Stomphacks validator at
-16,704 bytes of text, including leaf/runtime-helper, relocation, parameter-table
-and code-size checks. The current fixture also includes the complete output
-processing and remains offline; see the current size limitation below. Explicit initialization retains the
-original float operation order and zero-initializes scalar members correctly;
-the native tests also run six extreme profiles under AddressSanitizer and
-UndefinedBehaviorSanitizer. Full controls, cooperative output-stage initialization and hardware
-qualification remain outstanding. No Plateau integration probe has been installed.
+`tools/msplus/build.py plateau` uses the pinned Stomphacks compiler, packager,
+container checks and native Plus artwork. The root manifest is the musical
+candidate; `offline-core-probe` is a separate development identity, never for
+installation. No firmware, factory effects or saved patches are modified.
 
-To reproduce the offline build (after `plateau_derive.py`), run:
+The current candidate passes the unchanged target validator: **17,152 bytes of
+text**, under the **18,432-byte** ten-control cap; only accepted relocations,
+no runtime helper calls and no writable static storage. The TI compiler's layout
+measurement reports **602,240 arena bytes required**, including the encoded
+control header, versus the verified standalone **705,600-byte** grant. Multi-slot
+arena sharing and CPU headroom remain unqualified.
 
-```sh
-ZOOM_TI_CGT="$PWD/build/msplus/ti/ti-cgt-c6000_8.3.15" \
-  build/msplus/venv/bin/python build/msplus/stomphacks/tools/zd2_make_effect.py \
-  src/msplus/plateau/offline-core-probe/manifest.json
-```
+Histories initialize cooperatively (at most 1,024 core and 1,024 limiter words
+per callback). Integer/control state is encoded between callbacks; raw header
+words are erased. Non-audio limiter histories and pre-limiter audio are stored
+at very small scales so firmware reusing the arena does not interpret control
+sums or amplified samples as loud audio. An unstable core output is quarantined
+and cleared; native tests require its fault counter to remain zero.
 
-`offline-core-probe` is deliberately outside the installable port inventory.
-Its private development identity is not Plateau's final identity. Its artifact
-is a compile/integration fixture, not a complete or hardware-qualified effect;
-do not install it. The build report is under that fixture's ignored `build/`.
+The 64-tap, 32-phase rational SRC converts 44.1 ↔ 32 kHz. Its readonly tables
+use Stomphacks' existing `const_blob` support, retaining the parameter table's
+required position. `resample_coeffs.py` reproduces them. `plateau_derive.py`
+mechanically derives the float core; it shares symmetric arithmetic and pole
+coefficient storage while retaining each channel's operation order.
 
+## Verification and safe use
 
-Architecture review against `pre-velvet-plateau` reports generated compatibility
-header duplication. These headers are mechanical C++ inline-syntax adaptations
-of the shared C implementation, generated from that implementation rather than
-independently maintained copies. The TI C++ frontend rejects its C-only inline
-pragmas. Keeping the adaptation local also preserves the exact shared source
-fingerprints of all 35 already qualified effects. The broader report includes
-historical HIL JSON snapshots and the already qualified Velvet implementation;
-this core adds no dependency cycles or maximum-complexity increase.
+Six core profiles compare against the pinned upstream double DSP: impulse tails,
+minimum/maximum size, 500 ms predelay, extreme modulation and independent filters.
+The explicit target initializer is tested from poisoned storage without an
+extra signal-state clear. AddressSanitizer and UndefinedBehaviorSanitizer cover
+extreme core and limiter profiles. Four control tests cover endpoints, retained
+advanced settings, depth lock, freeze and clear edges. Whole-adapter tests cover
+latency/gain/isolation, stereo tails, live controls, clear, invalid coefficients,
+insufficient arena grants, canaries and encoded-header cleanup.
 
-Output-stage implementation in `output.h` retains all eleven gain modes and
-its 10 ms lookahead / 600 ms release limiter. Forty-three mode/drive profiles
-match the pinned original processing within 0.0003 absolute / 0.2% relative
-sample error. The full-drive fold case is tested separately: upstream uses
-`fmod(x,0)` there, while this port returns a finite zero fold signal. The original
-LMTR wrapper's right/left output-reference ordering is preserved. Detector
-accumulation uses compensated float summation; the amplifier preserves the
-original 8192-step quantization by evaluating its quantized table entries.
+Run `python -m unittest discover -s tools/msplus -p 'test_plateau*.py' -v` in the
+project venv. Separate SRC tests verify exact rate accounting, unity DC,
+under 0.03 dB round-trip gain error through 12 kHz, channel isolation and more
+than 65 dB rejection at tested 16–21 kHz tones. These are software/component
+checks; actual hardware measurements and stock-audio restoration are still
+required before retention.
 
-The soft limiter uses the same 320-sample minimum window with bounded fixed
-storage, the original three box lengths (130/108/84), and prefix-sum/reset
-ordering. A fixed minimum tree replaces Signalsmith's dynamically allocated
-peak-hold storage. Non-audio histories and pre-limiter delay samples are stored
-at very low scales and restored on read, so reused delay memory does not contain
-unscaled control sums or amplified pre-limiter signals. Only the small control
-header is encoded; large histories remain outside it.
+The HIL campaign uses reviewed cases in `plateau_reference.py`: dry path,
+calibrated limiting, native plate transfer responses, predelay, level, damping,
+maximum modulation, freeze and noise-floor clearing. It uses the existing
+safe installer, dry runs, exact readback, temporary-patch guard and independent
+stock-audio restoration gate. Autosave must remain OFF. Never save this effect
+into a patch.
 
-Run the output comparisons with `python -m unittest discover -s tools/msplus
--p test_plateau_output.py -v`. The test oracle extracts the original processing
-and removes its LED updates; it also explicitly resets the original detector
-buffer to reproduce firmware static initialization between test renders.
+Generated C++ compatibility headers adapt TI's inline syntax locally, preserving
+shared C headers and all 35 previously qualified effects' source fingerprints.
+Historical build logs and the earlier complete upstream distortion implementation
+remain in git history; their size limits do not describe this plate-only build.
 
-Current integration: **17,920 bytes of text versus a 17,536-byte three-control
-probe limit** (384 bytes over). The final ten-control cap is 18,432 bytes, but its
-remaining controls are not yet implemented. The build is still rejected by the
-unchanged validator. Sharing the original stereo/modulation arithmetic and
-output stage flags reduced the first full integration from 24,160 bytes without
-removing modes. Do not install this fixture: startup is not yet cooperatively
-bounded and it lacks the final control/safety integration and hardware checks.
-
-Architecture review: the output mode flag table consolidates the original
-repeated branches and shared DSP stages. The remaining mode dispatcher has
-CCN 20 for eleven distinct pipelines. A separate always-inline coloration
-helper reduced source-level CCN but increased TI text from 17,920 to 18,368
-bytes; it was reverted because the bounded target budget takes precedence over
-that metric. The new license duplication is the required retained MIT notice.
-Generated C++ compatibility copies and historical HIL snapshots remain the
-previously documented duplication; no new dependency cycle was introduced.
+Architecture comparison against `pre-velvet-plateau` reports duplication growth
+(10.59% to 11.69%). This includes the retained historical HIL journal, mandatory
+license copies, generated TI C++ compatibility copies and the explicit offline
+fixture manifest. The fixture includes the production kernel rather than copying
+it. The adapter callback's CCN 18 reflects its fail-closed coefficient, arena and
+state checks plus bounded stereo/SRC processing; those checks remain required.
+Control editing, smoothing and filter coefficient updates are separate cohesive
+operations. Existing installer, capture, native kernel and analysis mechanisms
+are reused; no alternate hardware transport or effect packager was added.

@@ -79,7 +79,29 @@ def convert(text):
         if match[0].startswith(('OnePoleLPFilter','OnePoleHPFilter')):
             alternative='\n#else\n_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;\n'
         text=text[:start]+'\n#ifndef PLATEAU_EXPLICIT_INIT\n'+body+alternative+'\n#endif\n'+text[end-1:]
-    return share_loops(text)
+    return share_poles(share_loops(text))
+
+
+def share_poles(text):
+    """Share coefficient storage so a bounded loop can configure all six poles."""
+    for name in ('OnePoleLPFilter','OnePoleHPFilter'):
+        signature='class '+name+' {'
+        if signature not in text:continue
+        start=text.index(signature);end=text.index('\n};',start)+3
+        body=text[start:end]
+        if name=='OnePoleLPFilter':
+            body=re.sub(r'\b_a\b','_a0',body);body=re.sub(r'\b_b\b','_b1',body)
+        body=re.sub(r'^\s*float (?:_sampleRate|_1_sampleRate_pi|_cutoffFreq|_maxCutoffFreq|_a0|_a1|_b1) PL_DEFAULT\([^\n]*\);\n','\n',body,flags=re.M)
+        body=body.replace('public:','public:\n    PlateauPoleCoefficients pole;',1)
+        for field in ('_sampleRate','_1_sampleRate_pi','_cutoffFreq','_maxCutoffFreq','_a0','_a1','_b1'):
+            body=re.sub(r'\b'+field+r'\b','pole.'+field,body)
+        text=text[:start]+body+text[end:]
+    text=text.replace('    inputLpf.setCutoffFreq(inputHighCut);\n    inputHpf.setCutoffFreq(inputLowCut);',
+                      '#ifndef PLATEAU_EXPLICIT_INIT\n    inputLpf.setCutoffFreq(inputHighCut);\n    inputHpf.setCutoffFreq(inputLowCut);\n#endif')
+    for field,pole in [('inputHighCut','inputLpf'),('inputLowCut','inputHpf')]:
+        line=f'    {field} = 440.0f * p_exp2(pitch - 5.0f);'
+        text=text.replace(line,line+f'\n#ifdef PLATEAU_EXPLICIT_INIT\n    {pole}.setCutoffFreq({field});\n#endif')
+    return text
 
 
 def share_loops(text):
@@ -185,6 +207,15 @@ def main():
 #else
 #define PL_DEFAULT(value) = value
 #endif
+/* The two original pole classes share only coefficients, not signal state. */
+struct PlateauPoleCoefficients {
+    PL_INLINE PlateauPoleCoefficients(){}
+    float _sampleRate PL_DEFAULT(32000.0f);
+    float _1_sampleRate_pi PL_DEFAULT((1.0f/32000.0f)*-_2M_PI);
+    float _cutoffFreq PL_DEFAULT(0.0f);
+    float _maxCutoffFreq PL_DEFAULT(15999.0f);
+    float _a0 PL_DEFAULT(0.0f),_a1 PL_DEFAULT(0.0f),_b1 PL_DEFAULT(0.0f);
+};
 '''
     output.write_text(preamble+'\n'.join(convert((dependency/name).read_text()) for name in SOURCES)+'\n#endif\n')
     # Use the compiler's always_inline attribute in C++ mode. Generate local

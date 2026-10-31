@@ -19,8 +19,9 @@ class Kernel:
         header = (folder / 'build/sh_params.h').read_text()
         symbol = re.search(r'#define SH_AUDIO_FN (\w+)', header)[1]
         variant = '-raw' if raw_state else ''
-        so = ROOT / 'build/msplus' / f'{name}{variant}-host.so'
-        subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
+        so = ROOT / 'build/msplus' / f'{name.replace("/","-")}{variant}-host.so'
+        cpp='--cpp_default' in self.manifest.get('kernel_cflags', []) or Path(self.manifest['kernel']).suffix=='.cpp'
+        subprocess.run(['c++' if cpp else 'cc', *(['-std=c++14'] if cpp else []), '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
                         *(['-DMP_RAW_STATE_REFERENCE'] if raw_state else []),
                         '-I' + str(folder / 'build'), '-I' + str(ROOT / 'build/msplus/headers' / name), str(folder / self.manifest['kernel']),
                         '-o', str(so)], check=True)

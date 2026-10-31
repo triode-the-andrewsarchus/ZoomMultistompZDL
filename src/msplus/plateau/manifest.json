@@ -1,0 +1,94 @@
+{
+  "name": "ZDLPlate",
+  "filename": "XXZPLATE",
+  "id": "090013c1",
+  "version": "0.10",
+  "display": "PLATE",
+  "badge": "PL",
+  "description": "Plateau/Campestria plate reverb, 32 kHz core, 500 ms predelay, full reverb controls and lookahead limiter. No distortion modes. Experimental: never save.",
+  "dspload": 220,
+  "kernel": "plateau.cpp",
+  "state_bytes": 12,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": 2,
+  "params": [
+    {
+      "name": "Mix",
+      "max": 1000,
+      "default": 500
+    },
+    {
+      "name": "Size",
+      "max": 1000,
+      "default": 500
+    },
+    {
+      "name": "Decay",
+      "max": 1000,
+      "default": 563
+    },
+    {
+      "name": "Pre",
+      "max": 500,
+      "default": 0
+    },
+    {
+      "name": "Speed",
+      "max": 1000,
+      "default": 5
+    },
+    {
+      "name": "Depth",
+      "max": 1000,
+      "default": 31
+    },
+    {
+      "name": "Hold",
+      "max": 2,
+      "default": 0,
+      "values": [
+        "RUN",
+        "FRZ",
+        "CLEAR"
+      ]
+    },
+    {
+      "name": "Level",
+      "max": 1000,
+      "default": 500
+    },
+    {
+      "name": "Edit",
+      "max": 8,
+      "default": 0,
+      "values": [
+        "INHI",
+        "INLO",
+        "TNKHI",
+        "TNKLO",
+        "DIFF",
+        "INAMP",
+        "LIMIT",
+        "SHAPE",
+        "LOCK"
+      ]
+    },
+    {
+      "name": "Value",
+      "max": 1000,
+      "default": 0
+    }
+  ],
+  "const_blob": {
+    "symbol": "plateau_src_blob",
+    "words": 4224,
+    "init": "resample_coeffs.bin"
+  },
+  "kernel_cflags": [
+    "--cpp_default",
+    "--c++14"
+  ],
+  "opt_level": 1
+}

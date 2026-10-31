@@ -1528,8 +1528,11 @@
       "previous_failed_pilot": "build/msplus/velvet-pilot-20261031-01/velvet/hil/analysis.json"
     },
     "plateau": {
-      "status": "SRC component native and TI leaf validation passed; reverb/output DSP and hardware work pending",
-      "SRC_evidence": "build/msplus/plateau-src-offline/build/REPORT.md"
+      "status": "Plate reverb, full reverb controls, Level and lookahead limiter implemented; native and unchanged TI validation passed; hardware qualification pending",
+      "SRC_evidence": "build/msplus/plateau-src-offline/build/REPORT.md",
+      "build_evidence": "src/msplus/plateau/build/REPORT.md",
+      "native_evidence": "build/msplus/plateau-final-native-02.log",
+      "arena_evidence": "build/msplus/plateau-layout.json"
     }
   }
 }

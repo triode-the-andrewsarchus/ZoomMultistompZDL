@@ -27,9 +27,11 @@ from pedal_common import assert_autosave_off, editor_off
 
 # Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
 from velvet_reference import CASES as VELVET_CASES
+from plateau_reference import CASES as PLATEAU_CASES
 
 CASES = {
     'XXZVELVT': VELVET_CASES,
+    'XXZPLATE': PLATEAU_CASES,
     'XXZLINE': [(f'peak{level:02}', [(2, level)], 'silence')
                 for level in (1, 2, 5, 10, 25, 50, 75, 100)]
                + [('reset', [(2, 0)], 'silence')],
@@ -367,7 +369,7 @@ def main():
                 print('restore-' + label + ' recording failed: ' + str(error), flush=True)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
         sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'),
-                   *args.effect.glob('*.h'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
+                   *args.effect.glob('*.cpp'), *args.effect.glob('*.h'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
         if manifest.get('const_blob', {}).get('init'):
             sources.append((args.effect / manifest['const_blob']['init']).resolve())
         original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')

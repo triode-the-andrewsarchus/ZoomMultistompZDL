@@ -15,6 +15,15 @@
 #else
 #define PL_DEFAULT(value) = value
 #endif
+/* The two original pole classes share only coefficients, not signal state. */
+struct PlateauPoleCoefficients {
+    PL_INLINE PlateauPoleCoefficients(){}
+    float _sampleRate PL_DEFAULT(32000.0f);
+    float _1_sampleRate_pi PL_DEFAULT((1.0f/32000.0f)*-_2M_PI);
+    float _cutoffFreq PL_DEFAULT(0.0f);
+    float _maxCutoffFreq PL_DEFAULT(15999.0f);
+    float _a0 PL_DEFAULT(0.0f),_a1 PL_DEFAULT(0.0f),_b1 PL_DEFAULT(0.0f);
+};
 
 
 class AllpassFilter {
@@ -77,6 +86,7 @@ private:
 
 class OnePoleLPFilter {
 public:
+    PlateauPoleCoefficients pole;
 
     PL_INLINE OnePoleLPFilter(float cutoffFreq = 22049.0f, float initSampleRate = 32000.0f) {
 #ifndef PLATEAU_EXPLICIT_INIT
@@ -85,13 +95,13 @@ public:
         setCutoffFreq(cutoffFreq);
     
 #else
-_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;
+pole._sampleRate=32000;pole._1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;pole._maxCutoffFreq=15999;
 
 #endif
 }
 
     PL_INLINE float process() {
-        _z =  _a * input + _z * _b;
+        _z =  pole._a0 * input + _z * pole._b1;
         output = _z;
         return output;
     }
@@ -103,36 +113,37 @@ _sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutof
     }
 
     PL_INLINE void setSampleRate(float sampleRate) {
-        _sampleRate = sampleRate;
-        _1_sampleRate_pi = (p_recip(sampleRate)) * -_2M_PI;
-        _maxCutoffFreq = sampleRate / 2.0f - 1.0f;
-        setCutoffFreq(_cutoffFreq);
+        pole._sampleRate = sampleRate;
+        pole._1_sampleRate_pi = (p_recip(sampleRate)) * -_2M_PI;
+        pole._maxCutoffFreq = sampleRate / 2.0f - 1.0f;
+        setCutoffFreq(pole._cutoffFreq);
     }
 
     PL_INLINE void setCutoffFreq(float cutoffFreq) {
-        if (cutoffFreq == _cutoffFreq) {
+        if (cutoffFreq == pole._cutoffFreq) {
             return;
         }
 
-        _cutoffFreq = cutoffFreq;
-        _b = p_expf(_cutoffFreq * _1_sampleRate_pi);
-        _a = 1.0f - _b;
+        pole._cutoffFreq = cutoffFreq;
+        pole._b1 = p_expf(pole._cutoffFreq * pole._1_sampleRate_pi);
+        pole._a0 = 1.0f - pole._b1;
     }
 
     float input PL_DEFAULT(0.0f);
     float output PL_DEFAULT(0.0f);
 private:
-    float _sampleRate PL_DEFAULT(32000.0f);
-    float _1_sampleRate_pi PL_DEFAULT((p_recip(_sampleRate)) * -_2M_PI);
-    float _cutoffFreq PL_DEFAULT(0.0f);
-    float _maxCutoffFreq PL_DEFAULT(_sampleRate / 2.0f);
-    float _a PL_DEFAULT(0.0f);
-    float _b PL_DEFAULT(0.0f);
+
+
+
+
+
+
     float _z PL_DEFAULT(0.0f);
 };
 
 class OnePoleHPFilter {
 public:
+    PlateauPoleCoefficients pole;
     
     PL_INLINE OnePoleHPFilter(float initCutoffFreq = 10.0f, float initSampleRate = 32000.0f) {
 #ifndef PLATEAU_EXPLICIT_INIT
@@ -142,14 +153,14 @@ public:
         clear();
     
 #else
-_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;
+pole._sampleRate=32000;pole._1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;pole._maxCutoffFreq=15999;
 
 #endif
 }
 
     PL_INLINE float process() {
         _x0 = input;
-        _y0 = _a0 * _x0 + _a1 * _x1 + _b1 * _y1;
+        _y0 = pole._a0 * _x0 + pole._a1 * _x1 + pole._b1 * _y1;
         _y1 = _y0;
         _x1 = _x0;
         output = _y0;
@@ -166,38 +177,38 @@ _sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutof
     }
 
     PL_INLINE void setCutoffFreq(float cutoffFreq) {
-        if (cutoffFreq == _cutoffFreq) {
+        if (cutoffFreq == pole._cutoffFreq) {
             return;
         }
 
-        _cutoffFreq = cutoffFreq;
-        _b1 = p_expf(_cutoffFreq * _1_sampleRate_pi);
-        _a0 = (1.0f + _b1) / 2.0f;
-        _a1 = -_a0;
+        pole._cutoffFreq = cutoffFreq;
+        pole._b1 = p_expf(pole._cutoffFreq * pole._1_sampleRate_pi);
+        pole._a0 = (1.0f + pole._b1) / 2.0f;
+        pole._a1 = -pole._a0;
     }
 
     PL_INLINE void setSampleRate(float sampleRate) {
-        _sampleRate = sampleRate;
-        _1_sampleRate_pi = (p_recip(sampleRate)) * -_2M_PI;
-        _maxCutoffFreq = sampleRate / 2.0f - 1.0f;
-        setCutoffFreq(_cutoffFreq);
+        pole._sampleRate = sampleRate;
+        pole._1_sampleRate_pi = (p_recip(sampleRate)) * -_2M_PI;
+        pole._maxCutoffFreq = sampleRate / 2.0f - 1.0f;
+        setCutoffFreq(pole._cutoffFreq);
         clear();
     }
 
     float input PL_DEFAULT(0.0f);
     float output PL_DEFAULT(0.0f);
 private:
-    float _sampleRate PL_DEFAULT(32000.0f);
-    float _1_sampleRate_pi PL_DEFAULT((p_recip(_sampleRate)) * -_2M_PI);
-    float _cutoffFreq PL_DEFAULT(0.0f);
-    float _maxCutoffFreq PL_DEFAULT(_sampleRate / 2.0f - 1.0f);
+
+
+
+
     float _y0 PL_DEFAULT(0.0f);
     float _y1 PL_DEFAULT(0.0f);
     float _x0 PL_DEFAULT(0.0f);
     float _x1 PL_DEFAULT(0.0f);
-    float _a0 PL_DEFAULT(0.0f);
-    float _a1 PL_DEFAULT(0.0f);
-    float _b1 PL_DEFAULT(0.0f);
+
+
+
 };
 
 
@@ -864,8 +875,10 @@ PL_INLINE Dattorro::Dattorro(const float initMaxSampleRate,
 PL_INLINE void Dattorro::process(float leftInput, float rightInput) {
     leftInputDCBlock.input = leftInput;
     rightInputDCBlock.input = rightInput;
+#ifndef PLATEAU_EXPLICIT_INIT
     inputLpf.setCutoffFreq(inputHighCut);
     inputHpf.setCutoffFreq(inputLowCut);
+#endif
     inputLpf.input = leftInputDCBlock.process() + rightInputDCBlock.process();
     inputHpf.input = inputLpf.process();
     inputHpf.process();
@@ -938,10 +951,16 @@ PL_INLINE void Dattorro::freeze(bool freezeFlag) {
 
 PL_INLINE void Dattorro::setInputFilterLowCutoffPitch(float pitch) {
     inputLowCut = 440.0f * p_exp2(pitch - 5.0f);
+#ifdef PLATEAU_EXPLICIT_INIT
+    inputHpf.setCutoffFreq(inputLowCut);
+#endif
 }
 
 PL_INLINE void Dattorro::setInputFilterHighCutoffPitch(float pitch) {
     inputHighCut = 440.0f * p_exp2(pitch - 5.0f);
+#ifdef PLATEAU_EXPLICIT_INIT
+    inputLpf.setCutoffFreq(inputHighCut);
+#endif
 }
 
 PL_INLINE void Dattorro::enableInputDiffusion(bool enable) {

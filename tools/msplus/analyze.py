@@ -13,8 +13,9 @@ from reference import validate_linearity, compare_scorch
 from wavefold_reference import validate_hardware as validate_wavefold, compare_native, mono_input
 
 from velvet_reference import validate_velvet
+from plateau_reference import validate_plateau, compare_limiter
 
-NATIVE_CHECKS = {'scorch': compare_scorch, 'wavefold': compare_native}
+NATIVE_CHECKS = {'plateau': compare_limiter, 'scorch': compare_scorch, 'wavefold': compare_native}
 
 
 def align(reference, actual, rate):
@@ -233,6 +234,7 @@ def validate_activity(directory):
 # Effect-specific evidence stays next to its test function, rather than adding
 # another branch to the orchestration for each new port.
 EFFECT_CHECKS = {
+    'plateau': ('plateau_reference', 'plate_reverb_native_response_and_clear', validate_plateau),
     'velvet': ('velvet_reference', 'mono_stereo_upstream_FIR_and_renewal', validate_velvet),
     'linearity': ('output_linearity', 'known_amplitude_output_linearity', validate_linearity),
     'corrupt': ('tracking', 'master_sub_harmony_frequencies', validate_tracking),

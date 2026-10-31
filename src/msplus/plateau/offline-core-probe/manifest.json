@@ -5,10 +5,10 @@
   "version": "0.11",
   "display": "SRC DEV",
   "badge": "DEV",
-  "description": "Offline full core/SRC/output-stage integration; startup/control mapping incomplete; NEVER INSTALL.",
+  "description": "Offline plate reverb, full reverb controls, freeze/clear and lookahead limiter; NO distortion modes. Awaiting target validation and HIL. NEVER INSTALL.",
   "dspload": 220,
   "kernel": "core.cpp",
-  "state_bytes": 8,
+  "state_bytes": 12,
   "scaffold": "cleanroom",
   "kernel_section": "text",
   "allow_stack": true,
@@ -16,17 +16,68 @@
   "params": [
     {
       "name": "Mix",
-      "max": 100,
-      "default": 100
+      "max": 1000,
+      "default": 500
     },
     {
-      "name": "Mode",
-      "max": 10,
+      "name": "Size",
+      "max": 1000,
+      "default": 500
+    },
+    {
+      "name": "Decay",
+      "max": 1000,
+      "default": 563
+    },
+    {
+      "name": "Pre",
+      "max": 500,
       "default": 0
     },
     {
-      "name": "Drive",
-      "max": 100,
+      "name": "Speed",
+      "max": 1000,
+      "default": 5
+    },
+    {
+      "name": "Depth",
+      "max": 1000,
+      "default": 31
+    },
+    {
+      "name": "Hold",
+      "max": 2,
+      "default": 0,
+      "values": [
+        "RUN",
+        "FRZ",
+        "CLEAR"
+      ]
+    },
+    {
+      "name": "Level",
+      "max": 1000,
+      "default": 500
+    },
+    {
+      "name": "Edit",
+      "max": 8,
+      "default": 0,
+      "values": [
+        "INHI",
+        "INLO",
+        "TNKHI",
+        "TNKLO",
+        "DIFF",
+        "INAMP",
+        "LIMIT",
+        "SHAPE",
+        "LOCK"
+      ]
+    },
+    {
+      "name": "Value",
+      "max": 1000,
       "default": 0
     }
   ],

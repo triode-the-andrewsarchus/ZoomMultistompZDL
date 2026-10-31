@@ -22,21 +22,6 @@ static PL_INLINE float p_exp2(float x) {
         f*(.009618129108f+f*(.001333355815f+f*(.000154035304f+f*.000015252734f)))))));
 }
 static PL_INLINE float p_expf(float x){return p_exp2(x*1.442695040889f);}
-static PL_INLINE float p_sqrt(float x){
-#ifdef __TI_COMPILER_VERSION__
-    float y=_rsqrsp(x);y*=1.5f-.5f*x*y*y;y*=1.5f-.5f*x*y*y;return x*y;
-#else
-    return __builtin_sqrtf(x);
-#endif
-}
-/* Positive finite domain only; the caller applies the original dB floor. */
-static PL_INLINE float p_log2(float x){
-    union {uint32_t u;float f;} v;v.f=x;
-    int exponent=(int)(v.u>>23)-127;v.u=(v.u&0x7fffffu)|0x3f800000u;
-    float y=(v.f-1)*p_recip(v.f+1),z=y*y;
-    return (float)exponent+2.885390081778f*y*(1+z*(1.0f/3+z*(1.0f/5+
-        z*(1.0f/7+z*(1.0f/9+z*(1.0f/11))))));
-}
 class InterpDelay {
 public:
 #ifdef PLATEAU_EXPLICIT_INIT
