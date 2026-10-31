@@ -17,7 +17,8 @@ from pedal_diy import is_diy_id
 from stock_catalog import STOCK_IDS
 from zd2_from_scratch import GROUP_NAMES, crc32_zd2, verify_envelope, verify_zic
 
-PLUS_GROUPS = {1, 2, 6, 7, 8, 9}
+# Group 03 was verified by the DriveProbe hardware/audio and library test.
+PLUS_GROUPS = {1, 2, 3, 6, 7, 8, 9}
 
 
 def reclassify(original, new_id):

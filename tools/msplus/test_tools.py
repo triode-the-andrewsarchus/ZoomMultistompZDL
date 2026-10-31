@@ -18,7 +18,7 @@ class CategoryTests(unittest.TestCase):
         import build
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
-            for group in (1, 2, 6, 7, 8, 9):
+            for group in (1, 2, 3, 6, 7, 8, 9):
                 manifest = dict(id=f'{(group << 24) | 0x1110:08x}', kernel='flower.c')
                 source = folder / 'manifest.json'
                 source.write_text(json.dumps(manifest))
@@ -80,7 +80,7 @@ class CategoryTests(unittest.TestCase):
         icon, zic = icon_pair(ROOT / 'src/msplus/artwork/wavefold.png')
         original = build_zd2(blob=b'known tested DSP bytes', name='XXTEST',
                              groupname='SFX', group=7, eid=0x07001300, icon=icon)
-        for group in (1, 2, 6, 7, 8, 9):
+        for group in (1, 2, 3, 6, 7, 8, 9):
             with self.subTest(group=group):
                 new_id = (group << 24) | 0x1300
                 changed = reclassify(original, new_id)
@@ -104,7 +104,7 @@ class CategoryTests(unittest.TestCase):
         _, other_zic = icon_pair(ROOT / 'src/msplus/artwork/flower.png')
         with self.assertRaisesRegex(ValueError, 'companion icon'):
             check_variant(original, changed, zic, other_zic, 0x08001300)
-        for invalid_id in (0x03001300, 0x08001310, 0x08011300, 0x08000010):
+        for invalid_id in (0x04001300, 0x08001310, 0x08011300, 0x08000010):
             with self.subTest(invalid_id=invalid_id), self.assertRaises(ValueError):
                 reclassify(original, invalid_id)
 
