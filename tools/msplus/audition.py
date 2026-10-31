@@ -103,6 +103,11 @@ MATU_CASES = {
 
 
 def reviewed_cases(manifest):
+    if manifest['filename'] == 'XXDRVPRB':
+        if manifest['id'] != '030013e0' or manifest['params'] != json.loads(
+                (ROOT / 'src/msplus/gain/manifest.json').read_text())['params']:
+            raise ValueError('Drive category probe must retain the reviewed gain controls and ID')
+        return CASES['XXZGAIN']
     if manifest['filename'] in CASES:
         return CASES[manifest['filename']]
     name = manifest['kernel'].removesuffix('.c')

@@ -453,10 +453,108 @@ Declared DSP loads are conservative placeholders; they are not timing profiles.
 Only one process may use MIDI. Autosave must be OFF with a pedal ACK. Never save
 an experimental effect in a patch, overwrite/delete factory effects, flash
 firmware, or issue unknown SysEx. Recovery from storage corruption is unproven.
-Private playground IDs `07001100` through `07001280` cover the original ports
-and diagnostics; `07001300` through `070013b0` cover Matujuice. Filenames start
+Private playground low-ID values `0x1100` through `0x1280` cover the original
+ports and diagnostics; `0x1300` through `0x13b0` cover Matujuice. The top ID byte
+now follows the MS-70CDR+ library category, rather than placing every musical
+effect in SFX. Diagnostics retain their original SFX IDs. Filenames start
 with `XXZ`/`XXM`. Upstream collision checks remain mandatory; these are not public
 ID allocations.
+
+### Library categories
+
+The Plus library takes its category from the full ID's top byte. The target
+manifest mapping is:
+
+| Category | Group byte | Effects |
+|---|---|---|
+| Dynamics | `01` | EuGate |
+| Filter | `02` | Flower, SyncEQ |
+| Modulation | `06` | DualShft, Choral, GenLoss, Klang, Sweep |
+| SFX | `07` | Arrakis, Corrupt, DirtBox, DubSiren, Dustbox, Howl, Oxide, Rewire, Scorch, SGNL, WaveFold |
+| Delay | `08` | Dissolve, GridDly, Gyre, Hydra, Mangle, Microloom, Scrub, Shatter, Spiral, Spool, Stasis, Taffy |
+| Reverb | `09` | Breather, Galactic, Rooms |
+
+There is no stock Drive category on the MS-70CDR+, so distortion/saturation
+effects stay in SFX. Pitch effects use Modulation; granular/looping effects
+use Delay, and Breather's pump/reverb uses Reverb. These are library choices,
+not changes to their DSP. Within-category file order remains separate from ID
+numbering; this migration does not renumber effects to sort alphabetically.
+
+`tools/msplus/categories.py` repackages existing tested artifacts offline after
+the manifest's group byte is changed. It validates both envelopes and exact
+container round trips, restricts groups to this pedal's supported categories,
+preserves the lower 24 ID bits, and rejects stock/non-DIY IDs. Its independent
+comparison accepts only group, full ID, group-name/padding and CRC changes.
+All DSP, parameters, INFO, embedded artwork and companion ZIC bytes must match.
+The normal builder also derives the category from the manifest for future builds.
+
+The pinned high-level Stomphacks compiler wrapper still has an older full-number
+minimum (`07000f07`), even though its ID convention and installer permit
+playground IDs in other groups. Our build wrapper leaves that check enabled:
+for a lower group, it compiles a temporary SFX manifest beside the real source,
+then applies the same strict category-only transformation. The real manifest
+is never overwritten; relative paths stay unchanged, and a failed compile
+cannot proceed to category packaging. No `allow_any_id` flag is used. An actual
+TI/upstream Flower rebuild verified the Filter ID and native artwork; the exact
+already hardware-tested artifact was restored afterward.
+
+For example, Spool changes `07001270` to `08001270`. Its new full ID is a new
+patch reference: saved patches using the old ID would need migration. Our
+guarded workflow requires stock-only saved patches, so no patch conversion or
+patch save is performed. These remain private playground IDs. Stomphacks'
+[per-author convention](https://github.com/thammer/stomphacks/blob/main/docs/id-scheme.md)
+explicitly permits an author's lower-ID range across categories; publishing
+installable binaries still requires a registered range and filename prefix.
+
+Hardware replacement must uninstall using the **old backed-up artifact**, then
+install the newly validated artifact with its matching ZIC through the upstream
+installer. Do not uninstall by the new ID or edit the catalogue directly. Run
+the existing audition/analysis on each affected port, recording new BUILT/SOURCES
+evidence; preserve the previous evidence. Finish with a full-set catalogue/file,
+saved-bank and actual stereo audio audit. Missing provenance or a failed
+transfer/test stops the campaign without retries or guessed recovery commands.
+
+Mono ports with a dry case now share the measured-input check previously used
+by WaveFold. It recomputes routing from the actual send/return WAVs and rejects
+ambiguous, forged or silent routes; dry gain and tone analysis use that measured
+lane. SyncEQ has no dry case, so this check does not assert a dry routing result
+for it. No DSP acceptance limit was relaxed.
+
+Klang's ring test likewise requires both distinct 400.4/402.8024 Hz carriers
+and their sidebands, with the original 1 Hz tolerance, but accepts either
+physical stereo orientation. Reconnecting the rig reversed the orientation
+assumed by the old hardcoded channel list. Fault tests reject a wrong carrier
+or the same carrier on both outputs. The original failed analysis and unchanged
+WAVs are retained alongside the reviewed result and `ACCEPTED.json`.
+
+#### Unused Drive-group probe
+
+The stock MS-70CDR+ has no Drive entries, but that does not establish whether
+its library can display group `03`. A separate temporary probe tests that
+question: `DriveProbe`, ID `030013e0`, filename `XXDRVPRB`, icon **DRIVE?**.
+It preserves the existing tested gain DATA and parameter sections exactly;
+only its experimental identity/category and artwork differ. The upstream
+packager/icon helpers, envelope/ZIC checks and guarded installer are used;
+the compiler's numeric-floor override was not enabled. Its gain, bypass,
+zero-output and restoration checks pass, with all saved patches unchanged.
+Evidence is `build/msplus/drive-probe-20261031-01/`.
+
+The unused category's actual library presentation needs visual confirmation
+on the pedal. A valid file, accepted install and working DSP alone do not
+establish that the firmware exposes a Drive column. Until that observation,
+`categories.py` continues to restrict normal migrations to verified categories.
+
+October 31 checkpoint: 12 of the planned 23 changed IDs passed their existing
+hardware cases. Eleven changes remain, with their previous SFX files still
+installed; all 34 musical effects and the separate Drive probe are retained.
+The next hardware step awaits the user's physical library observation, to
+avoid MIDI automation during browsing. The stock patch/audio restoration and
+100 saved-patch checks passed after the probe. A final complete-set audit is
+still required when migration finishes; the current qualification report marks
+the pending ports explicitly. The architecture delta's added `reviewed_cases`
+branches enforce the probe's exact ID and gain-control schema; these are
+intentional safeguards. Other complexity maxima remain unchanged and overall
+duplication decreased.
 
 ```sh
 $PY "$SH/tools-pedal/safe_connect.py" build/msplus/session-YYYYMMDD

@@ -125,9 +125,16 @@ def tone_peaks(audio, rate, channel, centers):
 
 def validate_ring(directory):
     audio, rate = sf.read(directory / 'wet/return.wav', always_2d=True)
-    rows, errors = [], []
-    for ch, carrier in enumerate([400.4 * 1.006, 400.4]):
-        rows.extend(tone_peaks(audio, rate, ch, [997 - carrier, 997 + carrier]))
+    # The physical return order changed when the rig was reconnected. Require
+    # BOTH distinct carriers, but allow either stereo orientation. Frequency
+    # tolerance stays 1 Hz; duplicating one carrier on both outputs still fails.
+    candidates = []
+    for carriers in ((400.4, 400.4 * 1.006), (400.4 * 1.006, 400.4)):
+        rows = [dict(row, carrier_hz=carrier) for ch, carrier in enumerate(carriers)
+                for row in tone_peaks(audio, rate, ch, [997 - carrier, 997 + carrier])]
+        candidates.append(rows)
+    rows = min(candidates, key=lambda pair: max(abs(r['measured_hz'] - r['expected_hz']) for r in pair))
+    errors = []
     for row in rows:
         if abs(row['measured_hz'] - row['expected_hz']) > 1:
             errors.append(f'Klang sideband mismatch: {row}')

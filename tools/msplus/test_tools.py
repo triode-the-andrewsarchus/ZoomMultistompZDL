@@ -12,11 +12,71 @@ from audio import analyze, require_loopback
 
 
 class CategoryTests(unittest.TestCase):
+    def test_lower_groups_build_via_guarded_sfx_without_changing_source_manifest(self):
+        import json
+        from unittest.mock import patch
+        import build
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            for group in (1, 2, 6, 7, 8, 9):
+                manifest = dict(id=f'{(group << 24) | 0x1110:08x}', kernel='flower.c')
+                source = folder / 'manifest.json'
+                source.write_text(json.dumps(manifest))
+                used = []
+                def compile_check(command, **kwargs):
+                    path = Path(command[-1])
+                    actual = json.loads(path.read_text())
+                    expected = dict(manifest, id='07001110') if group < 7 else manifest
+                    self.assertEqual(actual, expected)
+                    self.assertEqual(json.loads(source.read_text()), manifest)
+                    self.assertNotIn('allow_any_id', actual)
+                    self.assertEqual(path.parent, folder)
+                    used.append(path)
+                with patch.object(build.subprocess, 'run', side_effect=compile_check), \
+                        patch('categories.apply') as recategorize:
+                    build.build_container(folder, manifest, {})
+                    self.assertEqual(recategorize.call_count, int(group < 7))
+                self.assertEqual(used[0].exists(), group >= 7)
+            with patch.object(build.subprocess, 'run', side_effect=RuntimeError('compile failed')), \
+                    patch('categories.apply') as recategorize:
+                with self.assertRaisesRegex(RuntimeError, 'compile failed'):
+                    build.build_container(folder, dict(manifest, id='02001110'), {})
+                recategorize.assert_not_called()
+            self.assertEqual(list(folder.glob('*.json')), [source])
+
+    def test_ring_signature_accepts_reversed_returns_but_not_lost_stereo_detune(self):
+        import soundfile as sf
+        from analyze import validate_ring
+        rate = 8000
+        t = np.arange(6 * rate) / rate
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / 'wet').mkdir()
+            for carriers, passed in (((400.4, 402.8024), True),
+                                     ((402.8024, 400.4), True),
+                                     ((400.4, 400.4), False),
+                                     ((450, 402.8024), False)):
+                audio = np.column_stack([.005 * np.sin(2*np.pi*997*t) * np.sin(2*np.pi*f*t)
+                                         for f in carriers])
+                sf.write(folder / 'wet/return.wav', audio, rate, subtype='FLOAT')
+                rows, errors = validate_ring(folder)
+                self.assertEqual(len(rows), 4)
+                self.assertEqual(not errors, passed, carriers)
+
     def test_categories_preserve_all_dsp_and_icon_bytes_and_reject_drift(self):
+        import copy
+        import json
         import zoomzt2
         from artwork import ROOT, icon_pair
+        from audition import reviewed_cases
         from categories import reclassify, check_variant
         from zd2_from_scratch import build_zd2, crc32_zd2
+        gain = json.loads((ROOT / 'src/msplus/gain/manifest.json').read_text())
+        probe = dict(copy.deepcopy(gain), filename='XXDRVPRB', id='030013e0')
+        self.assertEqual(reviewed_cases(probe), reviewed_cases(gain))
+        probe['id'] = '030013e1'
+        with self.assertRaisesRegex(ValueError, 'reviewed gain'):
+            reviewed_cases(probe)
         icon, zic = icon_pair(ROOT / 'src/msplus/artwork/wavefold.png')
         original = build_zd2(blob=b'known tested DSP bytes', name='XXTEST',
                              groupname='SFX', group=7, eid=0x07001300, icon=icon)
