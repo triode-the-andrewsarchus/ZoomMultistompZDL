@@ -45,6 +45,13 @@ def convert(text):
             line=line[:len(line)-len(line.lstrip())]+'PL_INLINE '+stripped
         lines.append(line)
     text=re.sub(r'\n\s*\n\s*\n','\n\n','\n'.join(lines))
+    # The bounded target initializer sets its configuration once. Use zero
+    # scalar defaults there instead of a discarded default configuration,
+    # preserving ordinary host construction as the independent comparison path.
+    declarations, separator, definitions=text.partition('PL_INLINE Dattorro1997Tank::Dattorro1997Tank')
+    declarations=re.sub(r'^(\s*(?:float|bool) \w+) = ([^;]+);',
+                        r'\1 PL_DEFAULT(\2);',declarations,flags=re.M)
+    text=declarations+separator+definitions
     # Heavy constructors remain available to the independent host oracle.
     # The DSP uses explicit bounded initialization, avoiding repeated filter
     # construction/assignment and its duplicated exponential approximations.
@@ -59,7 +66,11 @@ def convert(text):
         body=text[start:end-1]
         alternative=''
         if match[0].startswith('TriSawLFO'):
-            alternative='\n#else\n_step=0;_rising=true;_sampleRate=32000;_1_sampleRate=1.0f/32000;\n'
+            alternative='\n#else\n_output=phase=_step=0;_rising=true;_sampleRate=32000;_1_sampleRate=1.0f/32000;\n'
+        if match[0].startswith('AllpassFilter'):
+            alternative='\n#else\ninput=output=gain=_inSum=_outSum=0;\n'
+        if match[0].startswith(('OnePoleLPFilter','OnePoleHPFilter')):
+            alternative='\n#else\n_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;\n'
         text=text[:start]+'\n#ifndef PLATEAU_EXPLICIT_INIT\n'+body+alternative+'\n#endif\n'+text[end-1:]
     return text
 
@@ -85,6 +96,11 @@ def main():
 #include <cstdint>
 #include "core_support.h"
 #define _2M_PI 6.283185307179586f
+#ifdef PLATEAU_EXPLICIT_INIT
+#define PL_DEFAULT(value) = {}
+#else
+#define PL_DEFAULT(value) = value
+#endif
 '''
     output.write_text(preamble+'\n'.join(convert((dependency/name).read_text()) for name in SOURCES)+'\n#endif\n')
     # Use the compiler's always_inline attribute in C++ mode. Generate local

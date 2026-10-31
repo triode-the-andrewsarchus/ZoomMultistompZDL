@@ -10,6 +10,11 @@
 #include <cstdint>
 #include "core_support.h"
 #define _2M_PI 6.283185307179586f
+#ifdef PLATEAU_EXPLICIT_INIT
+#define PL_DEFAULT(value) = {}
+#else
+#define PL_DEFAULT(value) = value
+#endif
 
 
 class AllpassFilter {
@@ -20,6 +25,9 @@ public:
         
         gain = 0.f;
     
+#else
+input=output=gain=_inSum=_outSum=0;
+
 #endif
 }
 
@@ -30,6 +38,9 @@ public:
         delay = InterpDelay(maxDelay, initDelay);
         this->gain = gain;
     
+#else
+input=output=gain=_inSum=_outSum=0;
+
 #endif
 }
 
@@ -73,6 +84,9 @@ public:
         setSampleRate(initSampleRate);
         setCutoffFreq(cutoffFreq);
     
+#else
+_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;
+
 #endif
 }
 
@@ -105,16 +119,16 @@ public:
         _a = 1.0f - _b;
     }
 
-    float input = 0.0f;
-    float output = 0.0f;
+    float input PL_DEFAULT(0.0f);
+    float output PL_DEFAULT(0.0f);
 private:
-    float _sampleRate = 32000.0f;
-    float _1_sampleRate_pi = (p_recip(_sampleRate)) * -_2M_PI;
-    float _cutoffFreq = 0.0f;
-    float _maxCutoffFreq = _sampleRate / 2.0f;
-    float _a = 0.0f;
-    float _b = 0.0f;
-    float _z = 0.0f;
+    float _sampleRate PL_DEFAULT(32000.0f);
+    float _1_sampleRate_pi PL_DEFAULT((p_recip(_sampleRate)) * -_2M_PI);
+    float _cutoffFreq PL_DEFAULT(0.0f);
+    float _maxCutoffFreq PL_DEFAULT(_sampleRate / 2.0f);
+    float _a PL_DEFAULT(0.0f);
+    float _b PL_DEFAULT(0.0f);
+    float _z PL_DEFAULT(0.0f);
 };
 
 class OnePoleHPFilter {
@@ -127,6 +141,9 @@ public:
         setCutoffFreq(initCutoffFreq);
         clear();
     
+#else
+_sampleRate=32000;_1_sampleRate_pi=(1.0f/32000.0f)*-6.283185307179586f;_maxCutoffFreq=15999;
+
 #endif
 }
 
@@ -167,20 +184,20 @@ public:
         clear();
     }
 
-    float input = 0.0f;
-    float output = 0.0f;
+    float input PL_DEFAULT(0.0f);
+    float output PL_DEFAULT(0.0f);
 private:
-    float _sampleRate = 32000.0f;
-    float _1_sampleRate_pi = (p_recip(_sampleRate)) * -_2M_PI;
-    float _cutoffFreq = 0.0f;
-    float _maxCutoffFreq = _sampleRate / 2.0f - 1.0f;
-    float _y0 = 0.0f;
-    float _y1 = 0.0f;
-    float _x0 = 0.0f;
-    float _x1 = 0.0f;
-    float _a0 = 0.0f;
-    float _a1 = 0.0f;
-    float _b1 = 0.0f;
+    float _sampleRate PL_DEFAULT(32000.0f);
+    float _1_sampleRate_pi PL_DEFAULT((p_recip(_sampleRate)) * -_2M_PI);
+    float _cutoffFreq PL_DEFAULT(0.0f);
+    float _maxCutoffFreq PL_DEFAULT(_sampleRate / 2.0f - 1.0f);
+    float _y0 PL_DEFAULT(0.0f);
+    float _y1 PL_DEFAULT(0.0f);
+    float _x0 PL_DEFAULT(0.0f);
+    float _x1 PL_DEFAULT(0.0f);
+    float _a0 PL_DEFAULT(0.0f);
+    float _a1 PL_DEFAULT(0.0f);
+    float _b1 PL_DEFAULT(0.0f);
 };
 
 
@@ -199,7 +216,7 @@ public:
         setRevPoint(0.5f);
     
 #else
-_step=0;_rising=true;_sampleRate=32000;_1_sampleRate=1.0f/32000;
+_output=phase=_step=0;_rising=true;_sampleRate=32000;_1_sampleRate=1.0f/32000;
 
 #endif
 }
@@ -264,7 +281,7 @@ private:
     float _output;
     float _sampleRate;
     float _1_sampleRate;
-    float _frequency = 0.0f;
+    float _frequency PL_DEFAULT(0.0f);
     float _revPoint;
     float _riseRate;
     float _fallRate;
@@ -363,46 +380,46 @@ public:
 
     static constexpr float minTimeScale = 0.0001f;
 
-    float timePadding = 0.0f;
+    float timePadding PL_DEFAULT(0.0f);
 
-    float scaledLeftApf1Time = leftApf1Time;
-    float scaledLeftDelay1Time = leftDelay1Time;
-    float scaledLeftApf2Time = leftApf2Time;
-    float scaledLeftDelay2Time = leftDelay2Time;
+    float scaledLeftApf1Time PL_DEFAULT(leftApf1Time);
+    float scaledLeftDelay1Time PL_DEFAULT(leftDelay1Time);
+    float scaledLeftApf2Time PL_DEFAULT(leftApf2Time);
+    float scaledLeftDelay2Time PL_DEFAULT(leftDelay2Time);
 
-    float scaledRightApf1Time = rightApf1Time;
-    float scaledRightDelay1Time = rightDelay1Time;
-    float scaledRightApf2Time = rightApf2Time;
-    float scaledRightDelay2Time = rightDelay2Time;
+    float scaledRightApf1Time PL_DEFAULT(rightApf1Time);
+    float scaledRightDelay1Time PL_DEFAULT(rightDelay1Time);
+    float scaledRightApf2Time PL_DEFAULT(rightApf2Time);
+    float scaledRightDelay2Time PL_DEFAULT(rightDelay2Time);
 
     std::array<int, 7> scaledOutputTaps;
 
-    float maxSampleRate = 32000.0f;
-    float sampleRate = maxSampleRate;
-    float sampleRateScale = sampleRate * (1.0f/29761.0f);
+    float maxSampleRate PL_DEFAULT(32000.0f);
+    float sampleRate PL_DEFAULT(maxSampleRate);
+    float sampleRateScale PL_DEFAULT(sampleRate * (1.0f/29761.0f));
 
-    float maxTimeScale = 1.0f;
-    float timeScale = 1.0f;
+    float maxTimeScale PL_DEFAULT(1.0f);
+    float timeScale PL_DEFAULT(1.0f);
 
-    float modDepth = 0.0f;
-    float decayParam = 0.0f;
-    float decay = 0.0f;
+    float modDepth PL_DEFAULT(0.0f);
+    float decayParam PL_DEFAULT(0.0f);
+    float decay PL_DEFAULT(0.0f);
 
-    float lfoExcursion = 0.0f;
+    float lfoExcursion PL_DEFAULT(0.0f);
 
-    bool frozen = false;
-    float fade = 1.0f;
-    float fadeTime = 0.002f;
-    float fadeStep = p_recip(fadeTime * sampleRate);
-    float fadeDir = 1.0f;
+    bool frozen PL_DEFAULT(false);
+    float fade PL_DEFAULT(1.0f);
+    float fadeTime PL_DEFAULT(0.002f);
+    float fadeStep PL_DEFAULT(p_recip(fadeTime * sampleRate));
+    float fadeDir PL_DEFAULT(1.0f);
 
     TriSawLFO lfo1;
     TriSawLFO lfo2;
     TriSawLFO lfo3;
     TriSawLFO lfo4;
 
-    float leftSum = 0.0f;
-    float rightSum = 0.0f;
+    float leftSum PL_DEFAULT(0.0f);
+    float rightSum PL_DEFAULT(0.0f);
 
     AllpassFilter leftApf1;
     InterpDelay leftDelay1;
@@ -459,30 +476,30 @@ public:
     PL_INLINE float getLeftOutput() const;
     PL_INLINE float getRightOutput() const;
 
-    float preDelayTime = 0.0f;
+    float preDelayTime PL_DEFAULT(0.0f);
     static constexpr int kInApf1Time = 141;
     static constexpr int kInApf2Time = 107;
     static constexpr int kInApf3Time = 379;
     static constexpr int kInApf4Time = 277;
 
     static constexpr float dattorroSampleRate = 29761.0f;
-    float sampleRate = 32000.0f;
-    float dattorroScaleFactor = sampleRate * (1.0f/29761.0f);
-    float leftSum = 0.0f;
-    float rightSum = 0.0f;
+    float sampleRate PL_DEFAULT(32000.0f);
+    float dattorroScaleFactor PL_DEFAULT(sampleRate * (1.0f/29761.0f));
+    float leftSum PL_DEFAULT(0.0f);
+    float rightSum PL_DEFAULT(0.0f);
 
-    float rightOut = 0.0f;
-    float leftOut = 0.0f;
-    float inputLowCut = 0.0f;
-    float inputHighCut = 10000.0f;
-    float reverbHighCut = 10000.0f;
-    float reverbLowCut = 0.0f;
-    float modDepth = 1.0f;
-    float inputDiffusion1 = 0.75f;
-    float inputDiffusion2 = 0.625f;
-    float decay = 0.9999f;
-    float modSpeed = 1.0f;
-    float diffuseInput = 0.0f;
+    float rightOut PL_DEFAULT(0.0f);
+    float leftOut PL_DEFAULT(0.0f);
+    float inputLowCut PL_DEFAULT(0.0f);
+    float inputHighCut PL_DEFAULT(10000.0f);
+    float reverbHighCut PL_DEFAULT(10000.0f);
+    float reverbLowCut PL_DEFAULT(0.0f);
+    float modDepth PL_DEFAULT(1.0f);
+    float inputDiffusion1 PL_DEFAULT(0.75f);
+    float inputDiffusion2 PL_DEFAULT(0.625f);
+    float decay PL_DEFAULT(0.9999f);
+    float modSpeed PL_DEFAULT(1.0f);
+    float diffuseInput PL_DEFAULT(0.0f);
 
     OnePoleHPFilter leftInputDCBlock;
     OnePoleHPFilter rightInputDCBlock;
@@ -498,7 +515,7 @@ public:
 
     Dattorro1997Tank tank;
 
-    float tankFeed = 0.0f;
+    float tankFeed PL_DEFAULT(0.0f);
 
     PL_INLINE float dattorroScale(float delayTime);
 };

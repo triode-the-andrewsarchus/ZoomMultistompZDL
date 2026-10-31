@@ -18,6 +18,9 @@ static PL_INLINE unsigned p_bind_core(Dattorro *d,float *data,unsigned capacity)
 #ifdef PLATEAU_EXPLICIT_INIT
 static PL_INLINE unsigned p_init_core(Dattorro *d,float *data,unsigned capacity){
     Dattorro1997Tank *t=&d->tank;
+    d->sampleRate=32000;d->dattorroScaleFactor=32000.0f*(1.0f/29761.0f);
+    t->maxSampleRate=t->sampleRate=32000;t->sampleRateScale=d->dattorroScaleFactor;
+    t->fade=t->fadeDir=1;
     t->timePadding=16;t->maxTimeScale=4;t->fadeStep=1.0f/32000.0f;
     t->rescaleTapTimes();
     t->leftDelay1.l=t->calcMaxTime(t->leftDelay1Time);

@@ -57,6 +57,14 @@ class PlateauCoreTests(unittest.TestCase):
             rows.append(out)
         return rows
 
+    def test_bounded_core_under_address_and_undefined_sanitizers(self):
+        output=ROOT/'build/msplus/plateau-core-sanitized'
+        subprocess.run(['c++','-O1','-g','-std=c++14','-fsanitize=address,undefined',
+                        '-fno-omit-frame-pointer','-DPL_DERIVED','-DPLATEAU_EXPLICIT_INIT',
+                        '-DPL_SANITIZE_MAIN','-I'+str(ROOT/'src/msplus/plateau'),
+                        str(ROOT/'tools/msplus/plateau_oracle.cpp'),'-o',str(output)],check=True)
+        subprocess.run([str(output)],check=True)
+
     def test_impulse_core_matches_original_without_modulation(self):
         source=np.zeros((192000,2),np.float32);source[0,0]=.01
         for size,pre,decay in [(1.0075,0,.877465),(.01,.05,.5),(4,.5,.95)]:

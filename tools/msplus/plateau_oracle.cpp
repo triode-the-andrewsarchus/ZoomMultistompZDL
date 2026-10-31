@@ -41,3 +41,16 @@ extern "C" unsigned plateau_render(const float *input,float *output,unsigned fra
     return count;
 #endif
 }
+#ifdef PL_SANITIZE_MAIN
+#include <cmath>
+int main(){
+    const unsigned frames=192000;
+    std::vector<float> input(frames*2),output(frames*2);
+    for(unsigned i=0;i<frames*2;++i)input[i]=.001f*std::sin(.137f*i);
+    for(float size:{.01f,1.0075f,4.0f})for(float shape:{.001f,.999f}){
+        const float parameters[]={size,.5f,.95f,100.5f,16,shape,1,2,8,1,9};
+        if(!plateau_render(input.data(),output.data(),frames,parameters))return 1;
+        for(auto sample:output)if(!std::isfinite(sample))return 2;
+    }
+}
+#endif

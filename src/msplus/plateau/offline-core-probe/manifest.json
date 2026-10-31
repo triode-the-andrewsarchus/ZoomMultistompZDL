@@ -1,0 +1,33 @@
+{
+  "name": "SrcDev",
+  "filename": "XXSRCDEV",
+  "id": "090013f0",
+  "version": "0.11",
+  "display": "SRC DEV",
+  "badge": "DEV",
+  "description": "Offline only full core plus SRC integration; never installed.",
+  "dspload": 220,
+  "kernel": "core.cpp",
+  "state_bytes": 8,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": 1,
+  "params": [
+    {
+      "name": "Mix",
+      "max": 100,
+      "default": 100
+    }
+  ],
+  "const_blob": {
+    "symbol": "plateau_src_blob",
+    "words": 4224,
+    "init": "../resample_coeffs.bin"
+  },
+  "kernel_cflags": [
+    "--cpp_default",
+    "--c++14"
+  ],
+  "opt_level": 1
+}

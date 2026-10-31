@@ -53,10 +53,27 @@ ordinary adapted constructors. Run `python -m unittest discover -s tools/msplus
 -p test_plateau.py -v` in the project venv. The oracle's sole upstream-source
 change enlarges its undersized predelay storage row; DSP equations are retained.
 
-The combined core/SRC target integration remains offline: runtime-helper
-references have been resolved, but the build still exceeds the unchanged
-Stomphacks text-size gate. Full output stages, controls and hardware qualification
-remain outstanding. No Plateau integration probe has been installed.
+The combined core/SRC target integration remains offline. It now passes the
+unchanged Stomphacks validator, including leaf/runtime-helper, relocation,
+parameter-table and code-size checks. Explicit initialization retains the
+original float operation order and zero-initializes scalar members correctly;
+the native tests also run six extreme profiles under AddressSanitizer and
+UndefinedBehaviorSanitizer. Full output stages, controls and hardware
+qualification remain outstanding. No Plateau integration probe has been installed.
+
+To reproduce the offline build (after `plateau_derive.py`), run:
+
+```sh
+ZOOM_TI_CGT="$PWD/build/msplus/ti/ti-cgt-c6000_8.3.15" \
+  build/msplus/venv/bin/python build/msplus/stomphacks/tools/zd2_make_effect.py \
+  src/msplus/plateau/offline-core-probe/manifest.json
+```
+
+`offline-core-probe` is deliberately outside the installable port inventory.
+Its private development identity is not Plateau's final identity. Its artifact
+is a compile/integration fixture, not a complete or hardware-qualified effect;
+do not install it. The build report is under that fixture's ignored `build/`.
+
 
 Architecture review against `pre-velvet-plateau` reports generated compatibility
 header duplication. These headers are mechanical C++ inline-syntax adaptations

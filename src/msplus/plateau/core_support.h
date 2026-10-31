@@ -24,11 +24,19 @@ static PL_INLINE float p_exp2(float x) {
 static PL_INLINE float p_expf(float x){return p_exp2(x*1.442695040889f);}
 class InterpDelay {
 public:
+#ifdef PLATEAU_EXPLICIT_INIT
+    float input,output;
+    float *data;
+    int l,w,t;
+    float f;
+    PL_INLINE InterpDelay(unsigned maxLength=512,float delay=0):input(0),output(0),data(nullptr),l(0),w(0),t(0),f(0){}
+#else
     float input=0,output=0;
     float *data=nullptr;
     int l=512,w=0,t=0;
     float f=0;
     PL_INLINE InterpDelay(unsigned maxLength=512,float delay=0):l((int)maxLength){setDelayTime(delay);}
+#endif
     PL_INLINE void process(){
         data[w]=input;
         int r=w-t;if(r<0)r+=l;
