@@ -10,20 +10,20 @@ from reference import harmonic_rms
 from wavefold_reference import capture_coefficients
 
 CASES=[
-    ('dry',[(2,0),(3,500),(4,563),(5,0),(6,5),(7,0),(8,0),(9,500),(10,6),(11,0)],'sweep'),
-    ('limited',[(9,1000),(11,995)],'tone'),
-    ('reset-default',[(8,2),(9,500),(11,0),(2,1000)],'silence'),
+    ('dry',[(2,0),(3,500),(4,563),(5,0),(6,5),(7,0),(8,0),(9,100),(10,6),(11,0)],'sweep'),
+    ('limited',[(9,200),(11,995)],'tone'),
+    ('reset-default',[(8,2),(9,100),(11,0),(2,1000)],'silence'),
     ('wet',[(8,0)],'sweep'),
     ('reset-pre',[(8,2)],'silence'),
     ('predelay',[(8,0),(5,500)],'sweep'),
     ('reset-level',[(8,2)],'silence'),
-    ('quiet-level',[(8,0),(5,0),(9,250)],'sweep'),
+    ('quiet-level',[(8,0),(5,0),(9,50)],'sweep'),
     ('reset-filter',[(8,2)],'silence'),
-    ('filtered',[(8,0),(9,500),(10,2),(11,700)],'sweep'),
-    ('motion',[(11,0),(3,1000),(4,900),(5,500),(6,1000),(7,1000)],'probe'),
+    ('filtered',[(8,0),(9,100),(10,2),(11,700)],'sweep'),
+    ('motion',[(11,0),(3,1000),(4,900),(5,500),(6,1000),(7,255)],'probe'),
     ('freeze',[(8,1)],'tone'),
     ('clear',[(8,2)],'silence'),
-    ('dry-final',[(8,0),(2,0),(3,500),(4,563),(5,0),(6,5),(7,0),(9,500)],'sweep'),
+    ('dry-final',[(8,0),(2,0),(3,500),(4,563),(5,0),(6,5),(7,0),(9,100)],'sweep'),
 ]
 STATIC_CASES={'wet','predelay','quiet-level','filtered'}
 

@@ -20,9 +20,9 @@ modes and additional Bogaudio dynamics processor are omitted.
 | Decay | Original nonlinear feedback curve. |
 | Pre | Predelay in milliseconds, 0–500. |
 | Speed | Original modulation speed curve. |
-| Depth | Original 0–16 modulation depth; edits shape while depth is locked. |
+| Depth | 0–255 display; original 0–16 modulation depth; edits shape while depth is locked. |
 | Hold | RUN, FRZ, CLEAR; clear triggers once when selected. |
-| Level | Output trim, 0–2×; 500 is unity, before the limiter. |
+| Level | Output trim, 0–2×; 100 is unity, before the limiter. |
 | Edit | Select INHI, INLO, TNKHI, TNKLO, DIFF, INAMP, LIMIT, SHAPE or LOCK. |
 | Value | Edit the selected advanced setting, 0–1000. |
 
@@ -105,3 +105,16 @@ state checks plus bounded stereo/SRC processing; those checks remain required.
 Control editing, smoothing and filter coefficient updates are separate cohesive
 operations. Existing installer, capture, native kernel and analysis mechanisms
 are reused; no alternate hardware transport or effect packager was added.
+
+The first hardware pilot stopped before its first effect capture: the Level
+knob was specified as 0–1000 in EDTB's 8-bit eighth parameter slot; readback was
+244 for 500. Depth uses another 8-bit slot. Their display scales are now 0–200
+(Level, unity 100) and 0–255 (Depth); normalized DSP ranges are unchanged.
+Build and audition guards reject values exceeding the patch format's width.
+During checked cleanup, direct replacement returned the missing-effect ID;
+loading the already-verified stock patch using the documented Plus bank/program
+messages restored the exact stock settings and healthy stereo audio. All 100
+saved patches remained unchanged and the first binary was safely uninstalled.
+Evidence: `build/msplus/plateau-pilot-20261031-01`,
+`build/msplus/plateau-stock-reload-20261031-01`. This pilot does not qualify the
+DSP; a complete repeat with corrected ranges is required.

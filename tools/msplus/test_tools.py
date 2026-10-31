@@ -12,6 +12,18 @@ from audio import analyze, require_loopback
 
 
 class CategoryTests(unittest.TestCase):
+    def test_build_rejects_unrepresentable_patch_parameters_before_compilation(self):
+        from unittest.mock import patch
+        import build
+        for index in range(1, 11):
+            maximum = 255 if 6 <= index <= 8 else 4095
+            params = [dict(name='knob', max=100, default=0) for _ in range(index)]
+            params[-1]['max'] = maximum + 1
+            with patch.object(build.subprocess, 'run') as compile:
+                with self.assertRaisesRegex(ValueError, 'EDTB range'):
+                    build.build_container(Path('.'), dict(id='090013c1', params=params), {})
+                compile.assert_not_called()
+
     def test_lower_groups_build_via_guarded_sfx_without_changing_source_manifest(self):
         import json
         from unittest.mock import patch
@@ -433,6 +445,16 @@ class AudioTests(unittest.TestCase):
 
 
 class AuditionSafetyTests(unittest.TestCase):
+    def test_patch_bit_width_overflow_is_rejected_before_any_edit(self):
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session._edit_checked = Mock()
+        for parameter in range(2, 12):
+            maximum = 255 if 7 <= parameter <= 9 else 4095
+            with self.assertRaisesRegex(ValueError, 'bit width'):
+                session.edit(parameter, maximum + 1)
+        session._edit_checked.assert_not_called()
+
     def test_restoration_bypasses_before_replacing_the_experiment(self):
         from unittest.mock import patch
         from audition import TempPatch

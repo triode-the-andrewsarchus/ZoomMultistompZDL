@@ -41,8 +41,8 @@
     },
     {
       "name": "Depth",
-      "max": 1000,
-      "default": 31
+      "max": 255,
+      "default": 8
     },
     {
       "name": "Hold",
@@ -56,8 +56,8 @@
     },
     {
       "name": "Level",
-      "max": 1000,
-      "default": 500
+      "max": 200,
+      "default": 100
     },
     {
       "name": "Edit",

@@ -13,6 +13,12 @@ from upstream import ROOT, STOMPHACKS
 
 def build_container(folder, manifest, env):
     """Keep upstream's legacy numeric floor enabled for lower category groups."""
+    # EDTB stores knobs 6–8 in eight bits; the remaining knobs use twelve.
+    # A wider UI range can appear to work but truncates current-patch readback.
+    for index, param in enumerate(manifest.get('params', []), 1):
+        maximum = 255 if 6 <= index <= 8 else 4095
+        if not 0 <= param['default'] <= param['max'] <= maximum:
+            raise ValueError(f"Knob {index} ({param['name']}) exceeds its EDTB range 0–{maximum}")
     command = [sys.executable, str(STOMPHACKS / 'tools/zd2_make_effect.py')]
     if int(manifest['id'], 16) >> 24 < 7:
         from categories import PLUS_GROUPS, apply

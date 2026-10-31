@@ -242,6 +242,8 @@ class TempPatch:
         if not ((slot == 0 and 0 <= parameter <= 11 and 0 <= value < (1 << 29))
                 or (slot == 0x64 and parameter == 0 and 0 <= value <= 100)):
             raise ValueError('Invalid temporary parameter edit')
+        if slot == 0 and parameter >= 2 and value > (255 if 7 <= parameter <= 9 else 4095):
+            raise ValueError('Temporary parameter exceeds its EDTB bit width')
         self.modified = True
         try:
             self._edit_checked(parameter, value, slot)
