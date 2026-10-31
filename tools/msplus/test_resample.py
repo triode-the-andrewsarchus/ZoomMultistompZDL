@@ -55,6 +55,9 @@ class ResampleTests(unittest.TestCase):
                 self.assertLess(rejection,-65)
 
     def test_generated_tables_match_declared_filter_response(self):
+        blob=np.fromfile(ROOT/'src/msplus/plateau/resample_coeffs.bin',dtype='<f4')
+        np.testing.assert_array_equal(blob,np.concatenate([coefficients(44100).ravel(),
+                                                          coefficients(32000).ravel()]))
         for rate in (32000,44100):
             for row in coefficients(rate):
                 frequency,response=freqz(row,worN=8192,fs=rate)

@@ -366,7 +366,10 @@ def main():
                 trace_errors.append(dict(stage=label, error=str(error)))
                 print('restore-' + label + ' recording failed: ' + str(error), flush=True)
         (args.output / 'ORIGINAL.ZPTC').write_bytes(session.original)
-        sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
+        sources = [args.effect / 'manifest.json', *args.effect.glob('*.c'),
+                   *args.effect.glob('*.h'), *sorted((ROOT / 'src/msplus/common').glob('*.h'))]
+        if manifest.get('const_blob', {}).get('init'):
+            sources.append((args.effect / manifest['const_blob']['init']).resolve())
         original_source = ROOT / 'src/custom' / args.effect.name / (args.effect.name + '.c')
         if original_source.exists():
             sources.append(original_source)

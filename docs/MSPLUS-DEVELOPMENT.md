@@ -799,3 +799,45 @@ implementation. New tooling reuses upstream packaging, validation and transfers 
 than implementing another protocol. The remaining metric increases reflect the
 explicit safety branches, ABI coexistence and added validation, not an altered
 musical algorithm or deletion of necessary guards.
+
+## New ports: Velvet complete, Plateau in progress (October 31)
+
+[Current evidence](MSPLUS-HIL.json) now covers 35 built, hardware-qualified
+musical effects; the older `MSPLUS-HIL-34.json` remains the original migration
+checkpoint. Velvet 0.11 (`060013c0`, `XXZVELVT`) is retained alongside those
+34, with mono-to-stereo as its default routing. All 70 files were independently
+read back, factory catalogue entries and all 100 saved patches were unchanged,
+all diagnostics were absent, and final actual stock stereo audio passed after
+file sessions closed. Autosave OFF was confirmed. There are 548,060 bytes free.
+The exact retention proof is `build/msplus/retained-35-20261031-01/COMPLETE.json`.
+
+The first Velvet pilot passed its default FIR reference but failed long/dense
+filters and stereo separation; that failed binary was safely removed. The
+accepted 0.11 uses a tap-outer block FIR and mirrored histories, retaining
+100 ms / 4000 impulses/s and bounded asynchronous kernel generation. All nine
+hardware cases pass. Across 48 band/channel comparisons the maximum upstream
+response error is 0.360 dB (limit 1 dB). Fast dense mono-to-stereo renewal has
+correlation 0.011 and no detected 20 ms dropout; independent stereo leakage is
+below -40 dB. Native tests compare static/dynamic DSP directly to the pinned,
+unmodified MIT upstream core. Five new native tests plus 29 existing DSP tests
+pass, as do all 27 tool/fault tests. See [Velvet controls and adaptation](../src/msplus/velvet/README.md).
+
+Plateau is not installed or complete. Its GPL notices, native artwork and
+64-tap rational SRC component are checked in. Four SRC tests prove exact rate
+accounting, DC/audio-band gain, isolation and tested high-frequency rejection.
+An offline-only TI build passes the unchanged leaf/section/relocation/envelope
+checks. Stomphacks' existing `const_blob` mechanism places its 16,896-byte table
+after the parameter table, preserving the ABI rather than relaxing the check
+that correctly rejected ordinary compiler constant placement. The transfer
+runner now fingerprints local headers and constant initialization files, and
+the retention gate requires them. The reverb/output DSP, control mapping and
+hardware qualification remain active work; the authorized predelay cap is 500 ms.
+
+Architecture review of Velvet keeps maximum complexity at 136 and reduces
+duplication from 10.59% to 10.44%; it flags one additional clone group and the
+new entry/validator complexity. The entry's initialization, preparation,
+three-bank transition and routing branches implement the required bounded
+real-time behavior and safety gates; they were not removed to improve metrics.
+The oracle is shared by native tests and HIL analysis, and packaging, transfers,
+constant placement, arena/header protection and restoration reuse the existing
+tooling. No factory handling or validation override was introduced.

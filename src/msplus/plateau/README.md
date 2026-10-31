@@ -38,3 +38,9 @@ round-trip gain error through 12 kHz, exact channel isolation, and more than
 65 dB rejection for the tested 16–21 kHz input tones. This is component-level
 validation; the reverb core, output stages and hardware qualification remain
 to be completed. `tools/msplus/resample_coeffs.py` reproduces the tables.
+
+The offline TI integration probe passes the unchanged Stomphacks validator.
+Target tables use its existing `const_blob` manifest support (symbol
+`plateau_src_blob`, 4,224 words, init `resample_coeffs.bin`) so the parameter
+table remains first in `.const`. The native header has identical generated
+coefficients; binary equality is tested. No SRC probe was installed.

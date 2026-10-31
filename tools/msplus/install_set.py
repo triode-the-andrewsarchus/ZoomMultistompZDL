@@ -40,6 +40,9 @@ def check_sources(folder, manifest, evidence):
     sources = json.loads((evidence.parent / 'SOURCES.json').read_text())
     required = {str((folder / part).relative_to(ROOT))
                 for part in ('manifest.json', manifest['kernel'])}
+    required.update(str(path.relative_to(ROOT)) for path in folder.glob('*.h'))
+    if manifest.get('const_blob', {}).get('init'):
+        required.add(str((folder / manifest['const_blob']['init']).resolve().relative_to(ROOT)))
     if not required <= set(sources):
         raise RuntimeError(f'{folder.name}: missing source provenance')
     for source, expected in sources.items():
