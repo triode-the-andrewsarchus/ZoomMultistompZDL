@@ -11,6 +11,44 @@ from backup import CheckedInput
 from audio import analyze, require_loopback
 
 
+class CategoryTests(unittest.TestCase):
+    def test_categories_preserve_all_dsp_and_icon_bytes_and_reject_drift(self):
+        import zoomzt2
+        from artwork import ROOT, icon_pair
+        from categories import reclassify, check_variant
+        from zd2_from_scratch import build_zd2, crc32_zd2
+        icon, zic = icon_pair(ROOT / 'src/msplus/artwork/wavefold.png')
+        original = build_zd2(blob=b'known tested DSP bytes', name='XXTEST',
+                             groupname='SFX', group=7, eid=0x07001300, icon=icon)
+        for group in (1, 2, 6, 7, 8, 9):
+            with self.subTest(group=group):
+                new_id = (group << 24) | 0x1300
+                changed = reclassify(original, new_id)
+                proof = check_variant(original, changed, zic, zic, new_id)
+                self.assertTrue(proof['dsp_parameters_artwork_unchanged'])
+                parsed = zoomzt2.ZD2.parse(changed)
+                self.assertEqual((parsed.group, parsed.id), (group, new_id))
+                self.assertEqual(bytes(parsed.DATA.data), b'known tested DSP bytes')
+                self.assertEqual(bytes(parsed.ICON.data), icon)
+                differences = {i for i, (a, b) in enumerate(zip(original, changed)) if a != b}
+                self.assertEqual(len(original), len(changed))
+                self.assertTrue(differences <= set(range(8, 12)) | set(range(95, 100)) | set(range(111, 122)))
+        changed = reclassify(original, 0x08001300)
+        for offset in (12, 85, 100, changed.index(b'DATA') + 8,
+                       changed.index(b'ICON') + 8, changed.index(b'INFO') + 8):
+            damaged = bytearray(changed)
+            damaged[offset] ^= 1
+            damaged[8:12] = crc32_zd2(damaged).to_bytes(4, 'little')
+            with self.subTest(offset=offset), self.assertRaises(ValueError):
+                check_variant(original, bytes(damaged), zic, zic, 0x08001300)
+        _, other_zic = icon_pair(ROOT / 'src/msplus/artwork/flower.png')
+        with self.assertRaisesRegex(ValueError, 'companion icon'):
+            check_variant(original, changed, zic, other_zic, 0x08001300)
+        for invalid_id in (0x03001300, 0x08001310, 0x08011300, 0x08000010):
+            with self.subTest(invalid_id=invalid_id), self.assertRaises(ValueError):
+                reclassify(original, invalid_id)
+
+
 class WaveFoldToolsTests(unittest.TestCase):
     def test_mono_input_is_measured_and_ambiguous_or_forged_routes_are_rejected(self):
         import json
@@ -30,6 +68,11 @@ class WaveFoldToolsTests(unittest.TestCase):
                 report=analyze(stimulus,measured,8000);report['xruns']=[]
                 (dry/'report.json').write_text(json.dumps(report))
                 self.assertEqual(mono_input(folder),lane)
+                from analyze import validate_dry
+                baseline = np.pad(sent[:-12], ((12, 0), (0, 0))) * .1
+                for effect in ('wavefold', 'breather', 'dualshft'):
+                    self.assertEqual(validate_dry(folder, baseline, effect, lane), [])
+                    self.assertTrue(validate_dry(folder, baseline, effect, 1-lane))
                 report['paths']=[dict(row,send=1-lane) for row in report['paths']]
                 (dry/'report.json').write_text(json.dumps(report))
                 with self.assertRaises(ValueError):mono_input(folder)

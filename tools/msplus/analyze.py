@@ -267,7 +267,8 @@ def main():
     ap.add_argument('--effect', choices=['gain', 'linearity', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
-    lane = mono_input(args.directory) if args.effect == 'wavefold' else 0
+    lane = (mono_input(args.directory)
+            if args.effect in MATU_PORTS and (args.directory / 'dry').is_dir() else 0)
     results = load_captures(args.directory, reference, rate, args.effect in MATU_PORTS, lane)
     errors = validate_gain(args.directory, reference, results) if args.gain_check else []
     checks = ['capture_integrity']
