@@ -12,6 +12,8 @@ from native import MATU_PORTS
 from reference import validate_linearity, compare_scorch
 from wavefold_reference import validate_hardware as validate_wavefold, compare_native, mono_input
 
+from velvet_reference import validate_velvet
+
 NATIVE_CHECKS = {'scorch': compare_scorch, 'wavefold': compare_native}
 
 
@@ -231,6 +233,7 @@ def validate_activity(directory):
 # Effect-specific evidence stays next to its test function, rather than adding
 # another branch to the orchestration for each new port.
 EFFECT_CHECKS = {
+    'velvet': ('velvet_reference', 'mono_stereo_upstream_FIR_and_renewal', validate_velvet),
     'linearity': ('output_linearity', 'known_amplitude_output_linearity', validate_linearity),
     'corrupt': ('tracking', 'master_sub_harmony_frequencies', validate_tracking),
     'klang': ('sidebands', 'ring_sideband_frequencies', validate_ring),
@@ -271,7 +274,7 @@ def main():
     ap.add_argument('--gain-check', action='store_true')
     ap.add_argument('--calibration', type=Path)
     ap.add_argument('--output-probe', type=Path, help='Completed bounded output-linearity HIL directory')
-    ap.add_argument('--effect', choices=['gain', 'linearity', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
+    ap.add_argument('--effect', choices=['velvet', 'plateau', 'gain', 'linearity', 'flower', 'klang', 'scorch', 'corrupt', 'howl', 'dustbox', 'genloss', 'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle', 'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'] + list(MATU_PORTS))
     args = ap.parse_args()
     reference, rate = sf.read(args.directory / 'baseline/return.wav', always_2d=True)
     lane = (mono_input(args.directory)

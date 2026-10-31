@@ -11,6 +11,8 @@ from upstream import ROOT
 
 # Body colour, title lines and a distinct motif inspired by each old design.
 DESIGNS = {
+ 'velvet': (1, ['VELVET'], 'blocks', 'weave'),
+ 'plateau': (0, ['PLATEAU'], 'room', 'room'),
  'arrakis': (0, ['ARRAKIS'], 'wave', 'dunes'),
  'breather': (1, ['BREATHER'], 'wave', 'breath'),
  'corrupt': (0, ['CORRUPT'], 'blocks', 'glitch'),
@@ -206,7 +208,7 @@ def main():
             records[path.name]=hashlib.sha256(path.read_bytes()).hexdigest()
     (output/'designs.json').write_text(json.dumps(dict(designs=DESIGNS,font=font.name,
         font_sha256=hashlib.sha256(font.read_bytes()).hexdigest(),png_sha256=records),indent=2)+'\n')
-    print('Authored 68 original icons at their native Plus dimensions.')
+    print(f'Authored {len(records)} original icons at their native Plus dimensions.')
 
 
 if __name__=='__main__':main()

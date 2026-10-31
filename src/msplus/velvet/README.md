@@ -26,6 +26,21 @@ passes the selected dry input while preparing all three banks; it does not
 block the audio callback. Changing filter/timing/seed controls rebuilds the
 kernels, while Mix, Mode and Input do not clear histories.
 
-Current status: native upstream-reference/safety tests pass; TI leaf build
-passes. Hardware qualification is pending. Declared load 220 is conservative
+The first hardware pilot matched the default FIRs but failed dense FIR and
+stereo-separation checks. Its source/artifact/captures remain archived; stock
+audio and saved-bank restoration passed and that binary was removed. Version
+0.11 uses mirrored histories and a tap-outer block FIR to reduce memory traffic,
+retaining the full parameter range. Native upstream-reference/safety tests and
+TI leaf validation pass. The fresh 0.11 hardware pilot passes all nine cases: maximum
+band-response error is 0.360 dB against a 1 dB limit; fast dense mono-to-stereo
+renewal has interchannel correlation 0.011; stereo leakage is below -40 dB.
+No capture xruns, clipping, silence, renewal dropouts or zero-input growth were
+detected. Stock audio and all 100 saved patches were restored before removal.
+Evidence: `build/msplus/velvet-pilot-20261031-02/velvet/hil/`. Declared load 220 is conservative
 composition gating, not measured CPU utilization. Never save an experiment.
+
+The mirrored block-FIR layout requires 90,592 arena bytes on this build.
+The kernel is 13,356 bytes before generated handlers; the unmodified upstream
+validator accepts the leaf/stack, relocation, envelope and section checks.
+Hardware qualification covers the reviewed standalone cases, not arbitrary
+chains or every control sequence. Retained installation is tracked separately.

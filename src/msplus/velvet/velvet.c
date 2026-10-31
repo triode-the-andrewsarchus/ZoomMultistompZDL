@@ -20,7 +20,7 @@
 #pragma FUNC_ALWAYS_INLINE(vn_convolve)
 #pragma FUNC_ALWAYS_INLINE(vn_init)
 #endif
-#define VN_RING 4412
+#define VN_RING 4432
 #define VN_TAPS 402
 #define VN_MAGIC 0x564e3031u
 typedef struct { uint32_t delay; float gain; } VnTap;
@@ -30,7 +30,7 @@ typedef struct {
     uint32_t length, count, jobBank, jobChannel, jobIndex, normalizing, previous;
     uint64_t random;
     float controls[6], energy, scale, mix;
-    float ring[2][VN_RING];
+    float ring[2][VN_RING*2];
     VnTap taps[3][2][VN_TAPS];
 } VnState;
 #define VN_HEADER offsetof(VnState, ring)
@@ -119,17 +119,28 @@ static inline int vn_generate(VnState *s, unsigned generation, int initial) {
     }
     return 0;
 }
-static inline float vn_convolve(VnState *s, unsigned bank, unsigned channel) {
-    VnTap *taps=s->taps[bank][channel];
-    float result=0; unsigned i;
+/* Tap-outer block FIR: reuse a tap for 16 adjacent history samples. Mirrored
+ * histories remove per-sample wrap branches and preserve contiguous reads.
+ * Capacity exceeds maximum delay by at least a full block, so prewriting the
+ * block cannot overwrite any history required by its earliest frame. */
+static inline void vn_convolve(VnState *s, unsigned bank, unsigned channel,
+                               unsigned write, float * restrict output) {
+    const VnTap * restrict taps=s->taps[bank][channel];
+    const float * restrict ring=s->ring[channel];
+    unsigned i,j;
+    for(j=0;j<SH_FRAMES;++j) output[j]=0;
 #ifdef __TI_COMPILER_VERSION__
+#pragma MUST_ITERATE(2,400,1)
 #pragma UNROLL(1)
 #endif
-    for (i=0; i<s->count; ++i) {
-        unsigned read=s->write>=taps[i].delay ? s->write-taps[i].delay : s->write+VN_RING-taps[i].delay;
-        result+=taps[i].gain*s->ring[channel][read];
+    for(i=0;i<s->count;++i) {
+        unsigned read=write>=taps[i].delay ? write-taps[i].delay : write+VN_RING-taps[i].delay;
+        float gain=taps[i].gain;
+#ifdef __TI_COMPILER_VERSION__
+#pragma UNROLL(16)
+#endif
+        for(j=0;j<SH_FRAMES;++j) output[j]+=gain*ring[read+j];
     }
-    return result;
 }
 static inline void vn_init(VnState *s, const float *p) {
     volatile uint32_t *words=(volatile uint32_t *)s; unsigned i;
@@ -175,6 +186,26 @@ void SH_AUDIO_FN(void **instance, void **ctx) {
         }
     } else if(!s->ready && vn_generate(s,s->generation,0)) {s->ready=1;s->generation+=2;}
     unsigned input=(unsigned)(int)(p[8]*2.0f+.5f);
+    float primary[2][SH_FRAMES], secondary[2][SH_FRAMES];
+    unsigned firstActive=s->active, write=s->write;
+    int needPending=running && (s->crossfading || (p[3]>.5f && s->until<=SH_FRAMES));
+    if(running) {
+        unsigned at=write;
+        for(i=0;i<SH_FRAMES;++i) {
+            float a=mp_input(bus[i]),b=mp_input(bus[i+SH_CH_B_OFFSET]);
+            float left=input==0 ? b : a, right=input==1 ? a : b;
+            s->ring[0][at]=s->ring[0][at+VN_RING]=left;
+            s->ring[1][at]=s->ring[1][at+VN_RING]=right;
+            if(++at==VN_RING) at=0;
+        }
+        vn_convolve(s,s->active,0,write,primary[0]);
+        vn_convolve(s,s->active,1,write,primary[1]);
+        if(needPending) {
+            vn_convolve(s,s->pending,0,write,secondary[0]);
+            vn_convolve(s,s->pending,1,write,secondary[1]);
+        }
+        s->write=at;
+    }
     for(i=0;i<SH_FRAMES;++i) {
         float a=mp_input(bus[i]), b=mp_input(bus[i+SH_CH_B_OFFSET]);
         /* On this verified rig bus B is physical L, bus A physical R. */
@@ -182,16 +213,14 @@ void SH_AUDIO_FN(void **instance, void **ctx) {
         s->mix+=.003f*(p[0]-s->mix);
         float wet[2];wet[0]=dry[0];wet[1]=dry[1];
         if(running) {
-            s->ring[0][s->write]=dry[0];s->ring[1][s->write]=dry[1];
             float phase=(float)s->position*vn_recip((float)(s->transition-1));
             float oldWeight=s->crossfading ? vn_sin(1.0f-phase) : 1.0f;
             float newWeight=s->crossfading ? vn_sin(phase) : 0.0f;
             unsigned ch;
             for(ch=0;ch<2;++ch) {
-                wet[ch]=vn_convolve(s,s->active,ch);
-                if(s->crossfading) wet[ch]=oldWeight*wet[ch]+newWeight*vn_convolve(s,s->pending,ch);
+                wet[ch]=s->active==firstActive ? primary[ch][i] : secondary[ch][i];
+                if(s->crossfading) wet[ch]=oldWeight*wet[ch]+newWeight*secondary[ch][i];
             }
-            if(++s->write==VN_RING)s->write=0;
             if(p[3]>.5f) {
                 if(s->crossfading) {
                     if(++s->position>=s->transition) {

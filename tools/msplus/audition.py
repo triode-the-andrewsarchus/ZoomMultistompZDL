@@ -26,7 +26,10 @@ from pedal_common import assert_autosave_off, editor_off
 
 
 # Reviewed temporary parameter edits: bypass=0, identity=1, knobs start at 2.
+from velvet_reference import CASES as VELVET_CASES
+
 CASES = {
+    'XXZVELVT': VELVET_CASES,
     'XXZLINE': [(f'peak{level:02}', [(2, level)], 'silence')
                 for level in (1, 2, 5, 10, 25, 50, 75, 100)]
                + [('reset', [(2, 0)], 'silence')],

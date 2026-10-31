@@ -2,7 +2,7 @@
   "name": "ZDLVelvet",
   "filename": "XXZVELVT",
   "id": "060013c0",
-  "version": "0.10",
+  "version": "0.11",
   "display": "VELVET",
   "badge": "VN",
   "description": "Dynamic Velvet Decorrelator, 115dkk MIT core adapted for Plus. Mono-to-stereo default. Experimental: never save.",

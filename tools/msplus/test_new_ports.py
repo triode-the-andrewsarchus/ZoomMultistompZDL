@@ -1,28 +1,17 @@
 """Independent pinned upstream oracles and native safety checks for new ports."""
 import ctypes
-import json
 import subprocess
 import unittest
 
 import numpy as np
 from native import Kernel, ROOT
+from velvet_reference import VelvetReference
 
 
 class VelvetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        dependency=ROOT/'build/msplus/velvet'
-        pin=json.loads((ROOT/'tools/msplus/upstream.lock.json').read_text())['velvet']
-        actual=subprocess.check_output(['git','-C',str(dependency),'rev-parse','HEAD'],text=True).strip()
-        if actual!=pin:
-            raise RuntimeError('Velvet reference is not the pinned upstream source')
-        subprocess.run(['git','-C',str(dependency),'diff','--exit-code','HEAD','--','src','include'],check=True)
-        output=ROOT/'build/msplus/velvet-oracle.so'
-        subprocess.run(['c++','-shared','-fPIC','-O2','-std=c++17','-I'+str(dependency/'include'),
-                        str(ROOT/'tools/msplus/velvet_oracle.cpp'),str(dependency/'src/processor.cpp'),
-                        '-o',str(output)],check=True)
-        cls.oracle=ctypes.CDLL(str(output)).velvet_reference
-        cls.oracle.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_uint,ctypes.c_void_p,ctypes.c_uint,ctypes.c_int]
+        cls.oracle=VelvetReference()
         # Compile-time layout observation only; the reference DSP is independent.
         wrapper=ROOT/'build/msplus/velvet-layout.c'
         wrapper.write_text('#include "'+str(ROOT/'src/msplus/velvet/velvet.c')+'"\n'
@@ -51,10 +40,7 @@ class VelvetTests(unittest.TestCase):
         p=kernel.coeff[5:14].astype(float)
         controls=np.array([p[0],max(1,p[1]*100),max(100,p[2]*4000),max(.1,p[4]*60),
                            max(1,p[5]*1000),p[6]*120],dtype=np.float64)
-        out=np.zeros_like(samples,dtype=np.float32)
-        self.oracle(samples.ctypes.data,out.ctypes.data,len(samples),controls.ctypes.data,
-                    int(p[7]*1000+.5),int(p[3]>.5))
-        return out
+        return self.oracle.render(samples,controls,int(p[7]*1000+.5),p[3]>.5)
 
     def render(self,kernel,samples):
         return np.concatenate([kernel.block(b) for b in samples.reshape(-1,16,2)])
@@ -106,6 +92,22 @@ class VelvetTests(unittest.TestCase):
         for bad in (float('nan'),float('inf'),-.01,1.01):
             k.coeff[7]=bad
             np.testing.assert_array_equal(k.block(np.ones((16,2))*.01),0)
+        self.canaries(k)
+
+    def test_live_mode_mix_and_input_changes_remain_bounded(self):
+        k=self.prepared({1:1000,2:1000,4:1,5:90,6:0})
+        source=np.random.default_rng(91).normal(0,.005,(22064,2)).astype(np.float32)
+        output=[]
+        for index,block in enumerate(source.reshape(-1,16,2)):
+            if index%31==0:
+                k.coeff[8]=(index//31)%2
+                k.coeff[13]=((index//31)%3)/2
+                k.coeff[5]=((index//31)%5)/4
+            output.append(k.block(block))
+        actual=np.concatenate(output)
+        self.assertTrue(np.isfinite(actual).all())
+        self.assertLess(np.max(abs(actual)),.1)
+        self.assertGreater(np.sqrt(np.mean(actual**2)),.001)
         self.canaries(k)
 
 
