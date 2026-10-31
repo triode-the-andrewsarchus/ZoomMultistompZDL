@@ -34,7 +34,8 @@ static inline int mp_half(ScState *s, const float *params, float *fxBuf)
 
 
 
-    u[0] = sc_ui_pos(params[SCRUB_POS_SLOT], (float)SCRUB_POS_UI_DEFAULT);
+    /* Plus glue supplies screen integers, not the legacy screen/100 value. */
+    u[0] = mp_mj_ui(params[SCRUB_POS_SLOT], (float)SCRUB_POS_UI_DEFAULT, 600.0f);
     u[1] = mp_mj_ui(params[SCRUB_GRAIN_SLOT],  (float)SCRUB_GRAIN_UI_DEFAULT,  112.0f);
     u[2] = mp_mj_ui(params[SCRUB_REC_SLOT],    (float)SCRUB_REC_UI_DEFAULT,    2.0f);
     u[3] = mp_mj_ui(params[SCRUB_GLIDE_SLOT], (float)SCRUB_GLIDE_UI_DEFAULT, 100.0f);

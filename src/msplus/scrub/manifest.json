@@ -2,7 +2,7 @@
   "name": "MJScrub",
   "filename": "XXMSCRUB",
   "id": "08001360",
-  "version": "0.10",
+  "version": "0.11",
   "display": "MJ SCRUB",
   "badge": "MJ",
   "description": "Experimental MS Plus adaptation of Matujuice v1.5. Mono left input. Never save. Full-length history uses 15-bit PCM for finite shared-memory reuse.",

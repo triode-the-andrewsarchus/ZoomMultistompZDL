@@ -200,6 +200,35 @@ class DSPTests(unittest.TestCase):
             self.assertLess(np.max(abs(pcm[1:-1].view(np.float32))), 1.1e-19)
             np.testing.assert_array_equal(pcm[[0, -1]], [0xcafef00d]*2)
 
+    def test_scrub_position_selects_distinct_held_history_across_its_range(self):
+        kernel = Kernel('scrub', arena_bytes=705600)
+        knobs = {p['name']: (i, p['max']) for i, p in enumerate(kernel.manifest['params'], 5)}
+        for name, value in {'Mix': 100, 'Glide': 0, 'Rec': 0, 'Dir': 0, 'Spray': 0}.items():
+            index, maximum = knobs[name]
+            kernel.coeff[index] = value / maximum
+        zero = np.zeros((16, 2))
+        for _ in range(4096):
+            kernel.block(zero)
+        rate = 44100
+        t = np.arange(8 * rate) / rate
+        frequency = 200 * (1 + np.floor(t))
+        source = np.column_stack([np.zeros(len(t)), .1 * np.sin(2*np.pi*frequency*t)])
+        for block in source.reshape(-1, 16, 2):
+            kernel.block(block)
+        kernel.coeff[knobs['Rec'][0]] = 1 / knobs['Rec'][1]
+        measured = []
+        for position, expected in zip((50, 150, 250, 350, 450, 550), range(600, 1800, 200)):
+            kernel.coeff[knobs['Pos'][0]] = position / knobs['Pos'][1]
+            held = np.concatenate([kernel.block(zero) for _ in range(1024)])[-8192:, 0]
+            self.assertGreater(np.sqrt(np.mean(held**2)), .005)
+            freq = np.fft.rfftfreq(len(held), 1/rate)
+            peak = freq[np.argmax(abs(np.fft.rfft(held * np.hanning(len(held)))))]
+            measured.append(peak)
+            self.assertLess(abs(peak-expected), 20, (position, peak, expected))
+        self.assertGreater(min(np.diff(measured)), 150)
+        np.testing.assert_array_equal(kernel.arena[:2], [0xcafef00d]*2)
+        np.testing.assert_array_equal(kernel.arena[-2:], [0xcafef00d]*2)
+
     def test_pcm_history_ports_keep_full_buffers_and_bound_clean_wet_reference_error(self):
         t = np.arange(65536)/44100
         source = np.column_stack([np.zeros(len(t)), .1*np.sin(2*np.pi*997*t)])
