@@ -1,0 +1,10 @@
+{
+  "commit": "4218b072e7420dd788cd3c98c36b3eba445f8886",
+  "sha256": {
+    "dsp/delays/AllpassFilter.hpp": "41006c28e744ee2f29a571e90ca7629891ddf000dcd0da1ee5e6eaeb028fd64f",
+    "dsp/filters/OnePoleFilters.hpp": "f1b0b8f51e2e3bea3743c6b870f139efeba0cedcf344f9c4b68ce34778a46f21",
+    "dsp/modulation/LFO.hpp": "76d6c7c1b2c1e1e213aa99e755126b1a8f87605df00bb24a7dbd21e181fbd18c",
+    "Dattorro.hpp": "c1e135e3f9cc5869e3f7e7e2c6f87a7f6fa85b61c424aa9ff21508e3d637e830",
+    "Dattorro.cpp": "eafe913f007ef53f075809fb4821553ed472c0b4c6f991d59bf0d2fe961927fa"
+  }
+}

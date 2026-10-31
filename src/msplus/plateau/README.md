@@ -44,3 +44,25 @@ Target tables use its existing `const_blob` manifest support (symbol
 `plateau_src_blob`, 4,224 words, init `resample_coeffs.bin`) so the parameter
 table remains first in `.const`. The native header has identical generated
 coefficients; binary equality is tested. No SRC probe was installed.
+
+The mechanically derived float32 reverb core is now checked against the pinned
+upstream double implementation. Six profiles cover impulse tails, minimum and
+maximum size, 500 ms predelay, modulation depth/shape and independent filters.
+A third test variant verifies that explicit bounded initialization matches the
+ordinary adapted constructors. Run `python -m unittest discover -s tools/msplus
+-p test_plateau.py -v` in the project venv. The oracle's sole upstream-source
+change enlarges its undersized predelay storage row; DSP equations are retained.
+
+The combined core/SRC target integration remains offline: runtime-helper
+references have been resolved, but the build still exceeds the unchanged
+Stomphacks text-size gate. Full output stages, controls and hardware qualification
+remain outstanding. No Plateau integration probe has been installed.
+
+Architecture review against `pre-velvet-plateau` reports generated compatibility
+header duplication. These headers are mechanical C++ inline-syntax adaptations
+of the shared C implementation, generated from that implementation rather than
+independently maintained copies. The TI C++ frontend rejects its C-only inline
+pragmas. Keeping the adaptation local also preserves the exact shared source
+fingerprints of all 35 already qualified effects. The broader report includes
+historical HIL JSON snapshots and the already qualified Velvet implementation;
+this core adds no dependency cycles or maximum-complexity increase.
