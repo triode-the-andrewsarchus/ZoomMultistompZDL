@@ -6,9 +6,13 @@ extern "C" {
 #include "cpp_compat.h"
 }
 #include "core_bind.h"
+#define PLATEAU_SRC_EXTERNAL_HISTORY
 #include "cpp_resample.h"
 #include "output.h"
 #include "controls.h"
+#ifndef PLATEAU_OUTPUT_CEILING
+#define PLATEAU_OUTPUT_CEILING .25f
+#endif
 struct State {
     PL_INLINE State(){}
     uint32_t magic,clear,outclear,resetPhase;
@@ -18,6 +22,7 @@ struct State {
     PlateauOutput output;
     PlateauControls controls;
     float history[144261];
+    PlateauSRCMemory srcmemory;
     PlateauOutputMemory outputmemory;
 };
 #define HEADER offsetof(State,history)
@@ -25,6 +30,7 @@ struct State {
 static_assert(PACKED+2*HEADER<=705600u,"Plateau arena exceeds verified standalone grant");
 static PL_INLINE int construct(State *s){
     new(s)State;s->clear=s->outclear=0;s->resetPhase=2;s->clearGain=0;
+    s->src.input=s->srcmemory.input;s->src.output=s->srcmemory.output;
     for(unsigned channel=0;channel<2;++channel)for(unsigned j=0;j<128;++j){
         ((volatile float*)s->src.input[channel])[j]=0;((volatile float*)s->src.output[channel])[j]=0;
     }
@@ -84,7 +90,8 @@ extern "C" void SH_AUDIO_FN(void **instance,void **ctx){
             if(ps_push(&s->src,a,b)){ps_down(&s->src,&l,&r);internal_frame(s,&l,&r,&small[2]);ps_store(&s->src,l,r);}
             ps_up(&s->src,&l,&r);
         }
-        bus[i]=mp_output(a,l,fade);bus[i+SH_CH_B_OFFSET]=mp_output(b,r,fade);
+        bus[i]=po_clip(mp_output(a,l,fade),PLATEAU_OUTPUT_CEILING);
+        bus[i+SH_CH_B_OFFSET]=po_clip(mp_output(b,r,fade),PLATEAU_OUTPUT_CEILING);
     }
 packed_exit:
     mp_pack_header(base,base+PACKED,HEADER);small[1]=1;

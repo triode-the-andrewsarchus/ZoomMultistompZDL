@@ -445,6 +445,47 @@ class AudioTests(unittest.TestCase):
 
 
 class AuditionSafetyTests(unittest.TestCase):
+    def test_saved_slot_restoration_requires_exact_original_before_audition(self):
+        import io
+        from unittest.mock import patch
+        from audition import TempPatch
+        with tempfile.TemporaryDirectory() as tmp:
+            backup = Path(tmp)
+            (backup / 'PATCH_081.ZPTC').write_bytes(b'different stock patch')
+            pedal = Mock()
+            pedal.connect.return_value = True
+            transport = Mock()
+            transport.recv.return_value = bytes.fromhex('7e000602526e002600') + b'1.10'
+            with patch('audition.mido.get_input_names', return_value=['ZOOM MS Plus Series']), \
+                    patch('audition.zoomzt2.zoomzt2', return_value=pedal), \
+                    patch('audition.MidoTransport', return_value=transport), \
+                    patch('audition.assert_autosave_off'), patch('audition.stock_patch'), \
+                    patch.object(TempPatch, 'current', return_value=b'original stock patch'), \
+                    patch('audition.defined_patch', side_effect=lambda data: data):
+                with self.assertRaisesRegex(ValueError, 'exactly match'):
+                    TempPatch(io.StringIO(), backup, 81)
+            pedal.outport.send.assert_not_called()
+
+    def test_saved_slot_reload_reconnects_and_requires_exact_stock_result(self):
+        import io
+        from unittest.mock import patch
+        from audition import TempPatch
+        session = TempPatch.__new__(TempPatch)
+        session.log = io.StringIO(); session.backup = Path('/backup')
+        session.original = b'original stock'; session.restore_slot = 81
+        session.pedal = Mock()
+        old = session.pedal
+        replacement = Mock(original=session.original)
+        with patch('audition.TempPatch', return_value=replacement), \
+                patch('audition.defined_patch', side_effect=lambda data: data), \
+                patch('audition.editor_off'), patch('audition.time.sleep'):
+            session.restore_saved()
+        self.assertEqual([call.args[0].type for call in old.outport.send.call_args_list],
+                         ['control_change', 'control_change', 'program_change'])
+        self.assertEqual(old.outport.send.call_args_list[-1].args[0].program, 80)
+        old.disconnect.assert_called_once()
+        self.assertIs(session.pedal, replacement.pedal)
+
     def test_patch_bit_width_overflow_is_rejected_before_any_edit(self):
         from audition import TempPatch
         session = TempPatch.__new__(TempPatch)

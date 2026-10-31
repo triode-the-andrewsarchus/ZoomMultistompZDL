@@ -1528,11 +1528,19 @@
       "previous_failed_pilot": "build/msplus/velvet-pilot-20261031-01/velvet/hil/analysis.json"
     },
     "plateau": {
-      "status": "Plate reverb, full reverb controls, Level and lookahead limiter implemented; native and unchanged TI validation passed; hardware qualification pending",
+      "status": "Failed first two full pilots; isolated SRC passes; SRC/limiter audio behaves correctly but direct replacement restoration fails. Optimized header and guarded saved-stock restoration implemented; full repeat pending.",
       "SRC_evidence": "build/msplus/plateau-src-offline/build/REPORT.md",
       "build_evidence": "src/msplus/plateau/build/REPORT.md",
-      "native_evidence": "build/msplus/plateau-final-native-02.log",
-      "arena_evidence": "build/msplus/plateau-layout.json"
+      "native_evidence": "build/msplus/plateau-final-native-06.log",
+      "arena_evidence": "build/msplus/plateau-layout.json",
+      "failed_pilots": [
+        "build/msplus/plateau-pilot-20261031-01",
+        "build/msplus/plateau-pilot-20261031-02"
+      ],
+      "SRC_hardware_evidence": "build/msplus/plateau-src-probe-20261031-01/hil/analysis.json",
+      "output_component_partial": "build/msplus/plateau-output-probe-20261031-01",
+      "diagnostic_output_ceiling": 0.02,
+      "retained": false
     }
   }
 }

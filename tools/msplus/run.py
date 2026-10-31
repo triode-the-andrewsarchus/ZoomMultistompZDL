@@ -31,7 +31,7 @@ def upstream_operation(output, operation, artifact, dry=False):
                            'No further pedal commands will be sent. Keep powered if transfer safety is unverified.')
 
 
-def run_effect(name, backup, output, calibration=None, output_probe=None):
+def run_effect(name, backup, output, calibration=None, output_probe=None, restore_slot=None):
     effect = ROOT / 'src/msplus' / name
     manifest = json.loads((effect / 'manifest.json').read_text())
     artifact = effect / 'build' / (manifest['filename'] + '.ZD2')
@@ -43,9 +43,12 @@ def run_effect(name, backup, output, calibration=None, output_probe=None):
     upstream_operation(output, 'install', artifact)
     print(f'{name}: installed, starting checked audition', flush=True)
     hil = output / 'hil'
+    audition = [sys.executable, str(ROOT / 'tools/msplus/audition.py'),
+                str(effect), str(backup), str(hil)]
+    if restore_slot is not None:
+        audition.extend(['--restore-saved-slot', str(restore_slot)])
     with (output / 'audition.log').open('w') as log:
-        result = subprocess.run([sys.executable, str(ROOT / 'tools/msplus/audition.py'),
-                                 str(effect), str(backup), str(hil)], stdout=log, stderr=subprocess.STDOUT)
+        result = subprocess.run(audition, stdout=log, stderr=subprocess.STDOUT)
     if not (hil / 'RESTORED').exists():
         raise RuntimeError(f'{name}: no verified restoration marker. STOP; inspect {output / "audition.log"}. '
                            'Effect remains installed. Do not power-cycle or issue further commands blindly.')
@@ -70,13 +73,13 @@ def run_effect(name, backup, output, calibration=None, output_probe=None):
     print(f'{name}: configured checks PASS; stock restored, saved patches unchanged, effect removed', flush=True)
 
 
-def preflight(backup, output):
+def preflight(backup, output, restore_slot=None):
     # Fail before installation if audio routing or the scratch patch is wrong.
     physical_ports([f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
                    [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)])
     with open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, (output / 'preflight.log').open('w') as log:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        session = TempPatch(log, backup)
+        session = TempPatch(log, backup, restore_slot) if restore_slot is not None else TempPatch(log, backup)
         try:
             session.verify_saved()
         finally:
@@ -94,6 +97,8 @@ def main():
     ap.add_argument('--output', required=True, type=Path)
     ap.add_argument('--calibration', type=Path, help='Enable calibrated Scorch harmonic comparison')
     ap.add_argument('--output-probe', type=Path, help='Measured output-stage linearity HIL directory')
+    ap.add_argument('--restore-saved-slot', type=int,
+                    help='Plus-only: reload the byte-identical original saved stock patch after each test')
     ap.add_argument('effects', nargs='+')
     args = ap.parse_args()
     available = {p.parent.name for p in (ROOT / 'src/msplus').glob('*/manifest.json')}
@@ -107,9 +112,10 @@ def main():
         args.output_probe = args.output_probe.resolve()
     verify_backup(args.backup)
     args.output.mkdir(parents=True, exist_ok=False)
-    preflight(args.backup.resolve(), args.output)
+    preflight(args.backup.resolve(), args.output, args.restore_saved_slot)
     for name in args.effects:
-        run_effect(name, args.backup.resolve(), args.output / name, args.calibration, args.output_probe)
+        run_effect(name, args.backup.resolve(), args.output / name, args.calibration, args.output_probe,
+                   args.restore_saved_slot)
     (args.output / 'COMPLETE').write_text('All requested configured checks passed and experimental effects were removed.\n')
 
 

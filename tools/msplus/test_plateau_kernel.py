@@ -6,6 +6,16 @@ from native import Kernel
 
 
 class PlateauKernelTests(unittest.TestCase):
+    def test_final_ceiling_applies_to_large_dry_signals(self):
+        kernel=self.make();kernel.coeff[5]=0
+        self.run_audio(kernel,np.zeros((32000,2)))
+        configured=[f.split('=',2)[-1] for f in kernel.manifest.get('kernel_cflags', [])
+                    if f.startswith('--define=PLATEAU_OUTPUT_CEILING=')]
+        ceiling=float(configured[0].rstrip('f')) if configured else .25
+        out=self.run_audio(kernel,np.full((16000,2),.1,np.float32))
+        self.assertLessEqual(np.max(abs(out)),ceiling+1e-7)
+        self.assertAlmostEqual(float(np.mean(out[-4000:])),min(.1,ceiling),places=5)
+
     def make(self):
         kernel=Kernel('plateau',arena_bytes=705600)
         self.run_audio(kernel,np.zeros((6400,2),np.float32))

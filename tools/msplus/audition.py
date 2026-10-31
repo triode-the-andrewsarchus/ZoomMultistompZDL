@@ -62,6 +62,9 @@ CASES = {
 }
 
 
+CASES['XXPSRC01'] = CASES['XXZGAIN']
+CASES['XXPOUT01'] = CASES['XXZGAIN']
+
 BUFFERED_PORTS = {'microloom', 'shatter', 'arrakis', 'taffy', 'dissolve', 'mangle',
                   'rooms', 'hydra', 'spiral', 'stasis', 'rewire', 'gyre', 'galactic', 'spool', 'oxide'}
 
@@ -172,7 +175,7 @@ def defined_patch(data):
 
 
 class TempPatch:
-    def __init__(self, log, backup):
+    def __init__(self, log, backup, restore_slot=None):
         ports = [p for p in mido.get_input_names() if p.startswith('ZOOM MS Plus Series')]
         if len(ports) != 1:
             raise RuntimeError('Expected exactly one MS Plus MIDI input')
@@ -193,6 +196,14 @@ class TempPatch:
         assert_autosave_off(self.pedal)
         self.original = self.current()
         stock_patch(self.original)
+        self.restore_slot = restore_slot
+        if restore_slot is not None:
+            if not 1 <= restore_slot <= 100:
+                raise ValueError('Saved restoration slot must be 1–100')
+            target = (backup / f'PATCH_{restore_slot:03d}.ZPTC').read_bytes()
+            stock_patch(target)
+            if defined_patch(target) != defined_patch(self.original):
+                raise ValueError('Saved restoration slot must exactly match the original stock patch')
         if ZPTC.parse(self.original).fx_count != 1:
             raise ValueError('Audition requires a one-slot scratch patch; no automatic patch clearing')
         self.restore_parameter_count = self.original_parameter_count()
@@ -286,6 +297,40 @@ class TempPatch:
         time.sleep(0.25)
         if observe:
             observe('bypass')
+        if getattr(self, 'restore_slot', None) is not None:
+            self.restore_saved()
+            if observe:
+                observe('stock-saved-slot')
+        else:
+            self.restore_parameters(effect, observe)
+        final = stock_patch(self.current())
+        if final.ids != original.ids or final.EDTB != original.EDTB or final.PPRM != original.PPRM:
+            raise RuntimeError('Restored patch differs from original effect settings')
+        if observe:
+            observe('stock-settings')
+        editor_off(self.pedal)
+        if observe:
+            observe('editor-off')
+
+    def restore_saved(self):
+        # Documented MS PLUS bank/program reload: no patch is written. The
+        # constructor verified firmware 1.10 and byte-identical stock contents.
+        editor_off(self.pedal)
+        time.sleep(.2)
+        for msg in (mido.Message('control_change', control=0, value=0),
+                    mido.Message('control_change', control=32, value=0),
+                    mido.Message('program_change', program=self.restore_slot - 1)):
+            self.log.write('CHANNEL ' + str(msg) + '\n'); self.log.flush()
+            self.pedal.outport.send(msg)
+        time.sleep(1)
+        self.pedal.disconnect()
+        replacement = TempPatch(self.log, self.backup)
+        self.pedal = replacement.pedal
+        if defined_patch(replacement.original) != defined_patch(self.original):
+            raise RuntimeError('Reloaded saved slot differs from original stock patch')
+
+    def restore_parameters(self, effect, observe):
+        original = stock_patch(self.original)
         self.edit(1, effect.id)
         if observe:
             observe('stock-id')
@@ -296,14 +341,6 @@ class TempPatch:
         self.edit(0, int(effect.enabled))
         if ZPTC.parse(self.current()).PPRM.reversed.bitwise.patchVolume != original.PPRM.reversed.bitwise.patchVolume:
             self.edit(0, original.PPRM.reversed.bitwise.patchVolume, slot=0x64)
-        final = stock_patch(self.current())
-        if final.ids != original.ids or final.EDTB != original.EDTB or final.PPRM != original.PPRM:
-            raise RuntimeError('Restored patch differs from original effect settings')
-        if observe:
-            observe('stock-settings')
-        editor_off(self.pedal)
-        if observe:
-            observe('editor-off')
 
     def verify_saved(self):
         self.drain()
@@ -348,6 +385,8 @@ def main():
     ap.add_argument('output', type=Path)
     ap.add_argument('--trace-restoration', action='store_true',
                     help='Record between restoration steps; no additional MIDI operations')
+    ap.add_argument('--restore-saved-slot', type=int,
+                    help='Plus-only: reload this saved slot, which must exactly match the original stock patch')
     args = ap.parse_args()
     verify_backup(args.backup)
     manifest = json.loads((args.effect / 'manifest.json').read_text())
@@ -358,7 +397,7 @@ def main():
             [f'AF16Rig Audio Pro:playback_AUX{i}' for i in (6, 7)],
             [f'AF16Rig Audio Pro:capture_AUX{i}' for i in (2, 3)]) as rig, open('/tmp/ZoomMultistompZDL-midi.lock', 'w') as lock, open(args.output / 'wire.log', 'w') as log:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        session = TempPatch(log, args.backup)
+        session = TempPatch(log, args.backup, args.restore_saved_slot)
         trace_errors = []
         def observe_restoration(label):
             # A diagnostic recording failure must never interrupt stock-patch

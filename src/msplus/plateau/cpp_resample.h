@@ -13,9 +13,14 @@
 
 
 #endif
+typedef struct {float input[2][128], output[2][128];} PlateauSRCMemory;
 typedef struct {
     uint32_t phase, inwrite, outwrite;
+#ifdef PLATEAU_SRC_EXTERNAL_HISTORY
+    float (*input)[128], (*output)[128];
+#else
     float input[2][128], output[2][128];
+#endif
 } PlateauSRC;
 static __attribute__((always_inline)) inline int ps_push(PlateauSRC *s,float left,float right) {
     s->inwrite=(s->inwrite+1u)&63u;

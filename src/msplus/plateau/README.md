@@ -46,10 +46,10 @@ container checks and native Plus artwork. The root manifest is the musical
 candidate; `offline-core-probe` is a separate development identity, never for
 installation. No firmware, factory effects or saved patches are modified.
 
-The current candidate passes the unchanged target validator: **17,152 bytes of
+The current candidate passes the unchanged target validator: **16,896 bytes of
 text**, under the **18,432-byte** ten-control cap; only accepted relocations,
 no runtime helper calls and no writable static storage. The TI compiler's layout
-measurement reports **602,240 arena bytes required**, including the encoded
+measurement reports **598,168 arena bytes required**, including the encoded
 control header, versus the verified standalone **705,600-byte** grant. Multi-slot
 arena sharing and CPU headroom remain unqualified.
 
@@ -118,3 +118,43 @@ saved patches remained unchanged and the first binary was safely uninstalled.
 Evidence: `build/msplus/plateau-pilot-20261031-01`,
 `build/msplus/plateau-stock-reload-20261031-01`. This pilot does not qualify the
 DSP; a complete repeat with corrected ranges is required.
+
+
+### Follow-up component isolation
+
+The second full pilot (`plateau-pilot-20261031-02`) stopped on a Depth readback
+mismatch. A diagnostic capture at the dry setting was much louder than expected;
+this is a failed pilot, not a qualified effect. Stock patch 81 was reloaded using
+the documented Plus bank/program messages, all 100 saved patches were unchanged,
+stereo stock audio passed, and the candidate was uninstalled with readback.
+
+The isolated C++ SRC probe passed its complete gain/silence campaign and stock
+restoration (`plateau-src-probe-20261031-01`). At 1 kHz, cross-return RMS was
+-45.53/-43.22 dB; the sweep's approximately -0.35 dB broadband gain includes the
+intentional high-frequency low-pass response. The isolated SRC/limiter probe
+produced the expected unity/half/quarter/zero/bypass output with 562 samples of
+extra latency at 48 kHz, but direct stock-ID replacement returned the missing
+ID. It is not qualified: its regular restoration marker is absent. Explicit
+saved-stock reload, saved-bank verification and stereo audio passed before
+removal (`plateau-output-stock-reload-20261031-01`). Neither probe is retained.
+
+The harness now offers explicit `--restore-saved-slot 81` for this bench. Before
+installation/audition it requires that slot's backed-up, stock-only contents to
+match the original temporary patch exactly, as well as firmware 1.10 and autosave
+OFF. Restoration bypasses, leaves edit mode, sends documented Plus bank/program
+selection, reconnects and checks the exact original stock patch. The existing
+100-patch and independent stereo-audio gates remain required. This uses no save
+or patch-upload messages and is never enabled implicitly for another pedal.
+
+The latest full candidate moves the SRC audio rings out of the encoded control
+header: 1,724 bytes instead of 3,764 (54% less per-block encoding), with no DSP
+curve/rate changes. Native tests pass (17), as do 31 tool/fault tests. Runtime
+CPU overload remains a hypothesis, not a diagnosis. The current `XXZPLT02`
+manifest deliberately enables a **0.02 DSP peak diagnostic ceiling**; remove it
+and repeat hardware qualification before normal-output retention. The normal
+kernel ceiling is 0.25. Native compilation honors the same manifest defines.
+
+The component probes share one kernel and existing gain cases; the limiter probe
+includes it with a compile-time option. The extra diagnostic callback's CCN 17
+comes from bounded initialization, state packing, SRC scheduling and the final
+independent ceiling. No alternate MIDI/file transport or packager is introduced.

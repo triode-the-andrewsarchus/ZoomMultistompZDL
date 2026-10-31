@@ -1,0 +1,33 @@
+{
+  "name": "PlateSRC",
+  "filename": "XXPSRC01",
+  "id": "090013f1",
+  "version": "0.10",
+  "display": "SRC DEV",
+  "badge": "DEV",
+  "description": "Temporary guarded SRC diagnostic, not a musical port. Never save.",
+  "dspload": 220,
+  "kernel": "src.cpp",
+  "state_bytes": 8,
+  "scaffold": "cleanroom",
+  "kernel_section": "text",
+  "allow_stack": true,
+  "opt_for_space": 2,
+  "params": [
+    {
+      "name": "Level",
+      "max": 100,
+      "default": 100
+    }
+  ],
+  "const_blob": {
+    "symbol": "plateau_src_blob",
+    "words": 4224,
+    "init": "../resample_coeffs.bin"
+  },
+  "kernel_cflags": [
+    "--cpp_default",
+    "--c++14"
+  ],
+  "opt_level": 1
+}

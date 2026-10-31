@@ -21,7 +21,10 @@ class Kernel:
         variant = '-raw' if raw_state else ''
         so = ROOT / 'build/msplus' / f'{name.replace("/","-")}{variant}-host.so'
         cpp='--cpp_default' in self.manifest.get('kernel_cflags', []) or Path(self.manifest['kernel']).suffix=='.cpp'
+        defines = ['-D' + flag.removeprefix('--define=') for flag in self.manifest.get('kernel_cflags', [])
+                   if flag.startswith('--define=')]
         subprocess.run(['c++' if cpp else 'cc', *(['-std=c++14'] if cpp else []), '-shared', '-fPIC', '-O2', '-Wno-unknown-pragmas',
+                        *defines,
                         *(['-DMP_RAW_STATE_REFERENCE'] if raw_state else []),
                         '-I' + str(folder / 'build'), '-I' + str(ROOT / 'build/msplus/headers' / name), str(folder / self.manifest['kernel']),
                         '-o', str(so)], check=True)

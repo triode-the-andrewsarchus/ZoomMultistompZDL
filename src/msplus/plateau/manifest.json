@@ -1,8 +1,8 @@
 {
   "name": "ZDLPlate",
-  "filename": "XXZPLATE",
+  "filename": "XXZPLT02",
   "id": "090013c1",
-  "version": "0.10",
+  "version": "0.11",
   "display": "PLATE",
   "badge": "PL",
   "description": "Plateau/Campestria plate reverb, 32 kHz core, 500 ms predelay, full reverb controls and lookahead limiter. No distortion modes. Experimental: never save.",
@@ -88,7 +88,8 @@
   },
   "kernel_cflags": [
     "--cpp_default",
-    "--c++14"
+    "--c++14",
+    "--define=PLATEAU_OUTPUT_CEILING=0.02f"
   ],
   "opt_level": 1
 }
